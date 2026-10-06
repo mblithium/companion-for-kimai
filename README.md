@@ -104,6 +104,13 @@ npm run check     # syntax, page integration, and contrast checks
 npm run build     # checks + tests + production archives in dist/
 ```
 
+## CI
+
+O GitHub Actions executa o build das variantes Chrome e Firefox em push para
+`main`, pull requests e tags `v*`. As duas zips ficam disponíveis como artifact
+por 30 dias; o resumo da execução inclui a seção da versão correspondente em
+`CHANGELOG.md`. Tags devem corresponder à versão em `package.json`.
+
 ## Problemas conhecidos
 
 - Se o Kimai recusar o início (ex.: projeto com período bloqueado, atividade

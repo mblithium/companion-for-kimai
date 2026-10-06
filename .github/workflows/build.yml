@@ -1,0 +1,42 @@
+name: Build browser extensions
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Chrome and Firefox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate and build both packages
+        run: npm run build
+
+      - name: Add version changes to workflow summary
+        run: node scripts/release-notes.js >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Chrome and Firefox packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-for-kimai-${{ github.ref_name }}
+          path: dist/companion-for-kimai-*.zip
+          if-no-files-found: error
+          retention-days: 30

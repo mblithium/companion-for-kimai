@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "node tests/harness.js",
-    "check": "node -e \"const fs=require('fs'),cp=require('child_process');const m=JSON.parse(fs.readFileSync('manifest.json','utf8'));const files=[...m.content_scripts[0].js,'src/background/worker.js','src/popup/popup.js','src/options/options.js','src/common/permissions.js','src/common/format.js','src/common/theme.js','scripts/build-zip.js','scripts/select-manifest.js','scripts/check-sensitive.js','tests/harness.js','tests/check-pages.js','tests/check-contrast.js'];files.forEach(f=>cp.execFileSync('node',['--check',f],{stdio:'inherit'}));console.log('check ok:',files.length,'arquivos JS');\" && node tests/check-pages.js && node tests/check-contrast.js && node scripts/check-sensitive.js",
+    "check": "node -e \"const fs=require('fs'),cp=require('child_process');const m=JSON.parse(fs.readFileSync('manifest.json','utf8'));const files=[...m.content_scripts[0].js,'src/background/worker.js','src/popup/popup.js','src/options/options.js','src/common/permissions.js','src/common/format.js','src/common/theme.js','scripts/build-zip.js','scripts/select-manifest.js','scripts/check-sensitive.js','scripts/release-notes.js','tests/harness.js','tests/check-pages.js','tests/check-contrast.js'];files.forEach(f=>cp.execFileSync('node',['--check',f],{stdio:'inherit'}));console.log('check ok:',files.length,'arquivos JS');\" && node tests/check-pages.js && node tests/check-contrast.js && node scripts/check-sensitive.js",
     "check:sensitive": "node scripts/check-sensitive.js",
     "manifest:chrome": "node scripts/select-manifest.js chrome",
     "manifest:firefox": "node scripts/select-manifest.js firefox",
