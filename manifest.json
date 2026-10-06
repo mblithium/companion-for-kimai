@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Companion for Kimai",
-  "version": "0.22.4",
+  "version": "0.22.5",
   "description": "A browser extension that enhances your Kimai time-tracking workflow.",
   "author": "mblithium",
   "homepage_url": "https://github.com/mblithium/companion-for-kimai",

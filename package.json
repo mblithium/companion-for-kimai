@@ -1,6 +1,6 @@
 {
   "name": "companion-for-kimai",
-  "version": "0.22.4",
+  "version": "0.22.5",
   "private": true,
   "description": "A browser extension that enhances your Kimai time-tracking workflow.",
   "author": "Matheus Bastos (https://github.com/mblithium)",

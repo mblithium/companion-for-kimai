@@ -2,6 +2,12 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.5] — 2026-10-06
+### Changed
+- GitHub Actions agora cria GitHub Releases para tags de versão, com os
+  pacotes Chrome/Firefox anexados e notas extraídas deste changelog.
+- `npm run check` inclui a verificação de informações sensíveis no repositório.
+
 ## [0.22.4] — 2026-10-06
 ### Changed
 - Substituídos os scripts Python de seleção de manifest e empacotamento por
