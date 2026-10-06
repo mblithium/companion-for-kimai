@@ -36,7 +36,35 @@ jobs:
       - name: Upload Chrome and Firefox packages
         uses: actions/upload-artifact@v4
         with:
-          name: companion-for-kimai-${{ github.ref_name }}
+          name: packages-${{ github.run_id }}-${{ github.run_attempt }}
           path: dist/companion-for-kimai-*.zip
           if-no-files-found: error
           retention-days: 30
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+
+      - name: Download Chrome and Firefox packages
+        uses: actions/download-artifact@v4
+        with:
+          name: packages-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist
+
+      - name: Render version changes
+        run: node scripts/release-notes.js > release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Companion for Kimai ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: dist/companion-for-kimai-*.zip
+          fail_on_unmatched_files: true

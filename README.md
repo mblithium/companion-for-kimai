@@ -109,7 +109,8 @@ npm run build     # checks + tests + production archives in dist/
 O GitHub Actions executa o build das variantes Chrome e Firefox em push para
 `main`, pull requests e tags `v*`. As duas zips ficam disponíveis como artifact
 por 30 dias; o resumo da execução inclui a seção da versão correspondente em
-`CHANGELOG.md`. Tags devem corresponder à versão em `package.json`.
+`CHANGELOG.md`. Ao enviar uma tag `v*` igual à versão de `package.json`, cria
+também um GitHub Release com os dois ZIPs anexados e as notas do changelog.
 
 ## Problemas conhecidos
 
