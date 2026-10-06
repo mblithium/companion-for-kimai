@@ -18,7 +18,7 @@ Ask about a version bump and a commit separately, using clear questions. When a 
 ## Safe repository workflow
 
 - Start with `git status --short --branch`, `git remote -v`, and inspect the relevant diff. Preserve user changes and avoid staging unrelated files.
-- Before a commit, run the applicable checks, review the staged diff, and ask the mandatory commit question if it has not already been answered for this exact change set.
+- Before a commit, run `npm run check:sensitive` and the applicable project checks, review the staged diff, and ask the mandatory commit question if it has not already been answered for this exact change set.
 - Use focused staging and a concise commit message. Never amend, reset, rebase destructively, or force-push without first explaining the impact and receiving explicit approval.
 - Before publishing, verify the current branch, remote URL, upstream, and commit range. If the remote has commits not present locally, stop and resolve the divergence without overwriting remote history.
 - A configured remote only connects the local repository; it is not permission to fetch private data, commit, or publish. Fetch only when relevant, and never push without the push approval gate above.
@@ -26,6 +26,6 @@ Ask about a version bump and a commit separately, using clear questions. When a 
 ## Release checklist
 
 - Ask whether to bump the plugin version. If approved, use the project's release convention and keep all four manifest/package versions synchronized.
-- Update the current changelog entry and run `npm run check`, `npm test`, and `npm run build`.
+- Update the current changelog entry and run `npm run check:sensitive`, `npm run check`, `npm test`, and `npm run build`.
 - Ask separately whether to create a commit. Do not create one without an explicit yes.
 - Ask separately before pushing. Publish only the specifically approved branch/tag to `origin` and report the resulting commit or tag.
