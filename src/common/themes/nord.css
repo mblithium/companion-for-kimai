@@ -1,0 +1,22 @@
+/* Nord module. */
+:root[data-ke-theme="nord"] {
+  --ke-green: #a3be8c;
+  --ke-green-dark: #8aa872;
+  --ke-red: #bf616a;
+  --ke-on-green: #2e3440;
+  --ke-green-text: #a3be8c;
+  --ke-red-btn: #a6535c;
+  --ke-on-red: #ffffff;
+  --ke-red-text: #e0a8ae;
+  --ke-link: #88c0d0;
+  --ke-warn: #ebcb8b;
+  --ke-bg: #2e3440;
+  --ke-surface: #3b4252;
+  --ke-text: #eceff4;
+  --ke-border: #4c566a;
+  --ke-input-bg: #3b4252;
+  --ke-hover: rgba(136, 192, 208, 0.16);
+  --ke-shadow: rgba(0, 0, 0, 0.5);
+  --ke-group-bg: #434c5e;
+  --ke-primary-rgb: 163, 190, 140;
+}

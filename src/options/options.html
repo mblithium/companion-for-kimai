@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Companion for Kimai — Configurações</title>
+<link rel="stylesheet" href="options.css">
+<link rel="stylesheet" href="../common/theme.css">
+<link rel="stylesheet" href="../common/themes/light.css">
+<link rel="stylesheet" href="../common/themes/dark.css">
+<link rel="stylesheet" href="../common/themes/system.css">
+<link rel="stylesheet" href="../common/themes/dracula.css">
+<link rel="stylesheet" href="../common/themes/catppuccin.css">
+<link rel="stylesheet" href="../common/themes/nord.css">
+<link rel="stylesheet" href="../common/themes/gnome.css">
+<link rel="stylesheet" href="../common/themes/gruvbox.css">
+<script src="../content/namespace.js"></script>
+<script src="../content/i18n.js"></script>
+<script src="../content/utils.js"></script>
+<script src="../content/api.js"></script>
+<script src="../content/storage.js"></script>
+<script src="../content/kimai.js"></script>
+<script src="../content/cache.js"></script>
+<script src="../common/permissions.js"></script>
+<script src="../common/theme.js"></script>
+<script src="options.js" defer></script>
+</head>
+<body>
+  <header class="ke-opt-topbar">
+    <h1><span class="ke-opt-logo">▶</span> Companion for Kimai — Configurações</h1>
+    <div class="ke-opt-topbar-actions">
+      <button id="ke-opt-save" class="ke-opt-btn ke-opt-btn-primary" type="button">Salvar configurações</button>
+    </div>
+  </header>
+  <main class="ke-opt-wrap">
+
+    <section class="ke-opt-card">
+      <h2>Kimai</h2>
+      <label class="ke-opt-field">
+        <span>URL base do seu Kimai</span>
+        <input id="ke-opt-url" type="url" inputmode="url" placeholder="https://kimai.example.com" spellcheck="false">
+      </label>
+      <p class="ke-opt-hint">Detectada automaticamente ao abrir a página do timesheet. Ajuste aqui se usar mais de uma instalação.</p>
+      <div class="ke-opt-row">
+        <a id="ke-opt-open" href="#" class="ke-opt-link">Abrir meu Kimai</a>
+      </div>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Acesso ao popup</h2>
+      <p class="ke-opt-hint">Autoriza o navegador a chamar a API na URL acima (necessário mesmo com chave).</p>
+      <p id="ke-opt-access-state" class="ke-opt-state" role="status"></p>
+      <div class="ke-opt-row">
+        <button id="ke-opt-grant" class="ke-opt-btn ke-opt-btn-primary" type="button">Autorizar acesso</button>
+        <button id="ke-opt-revoke" class="ke-opt-btn" type="button">Remover acesso</button>
+      </div>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Chave de API</h2>
+      <p class="ke-opt-hint">Crie em <em>Meu perfil → API Access</em> no Kimai. Funciona mesmo sem login na página.</p>
+      <label class="ke-opt-field" id="ke-opt-token-wrap">
+        <span>Chave de API</span>
+        <input id="ke-opt-token" type="password" autocomplete="off" spellcheck="false" placeholder="cole aqui para trocar">
+      </label>
+      <p id="ke-opt-token-state" class="ke-opt-state" role="status"></p>
+      <p class="ke-opt-hint">Crie e gerencie suas chaves em <a id="ke-opt-token-url" href="#" target="_blank" rel="noopener"></a>.</p>
+      <div class="ke-opt-row">
+        <button id="ke-opt-test" class="ke-opt-btn ke-opt-btn-primary" type="button">Testar conexão</button>
+        <button id="ke-opt-disconnect" class="ke-opt-btn ke-opt-btn-danger" type="button">Desconectar</button>
+      </div>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Idioma</h2>
+      <label class="ke-opt-field">
+        <span>Idioma do Kimai (ex.: pt_BR)</span>
+        <select id="ke-opt-locale"></select>
+      </label>
+      <p class="ke-opt-hint">Detectado do seu Kimai logado quando possível; pode ajustar manualmente.</p>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Aparência</h2>
+      <label class="ke-opt-field">
+        <span>Tema</span>
+        <select id="ke-opt-theme"></select>
+      </label>
+      <p class="ke-opt-hint">Vale para o popup, esta página e a página do Kimai inteira.</p>
+      <label class="ke-opt-check">
+        <input type="checkbox" id="ke-opt-hide-date">
+        <span>Ocultar coluna <strong>Data</strong> na tabela do timesheet</span>
+      </label>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Atalhos de teclado</h2>
+      <label class="ke-opt-check">
+        <input type="checkbox" id="ke-opt-sc-enabled" checked>
+        <span>Ativar atalhos de teclado na página do timesheet</span>
+      </label>
+      <p class="ke-opt-hint">Funcionam na página do timesheet (fora de campos de texto). Clique no campo e pressione a combinação — use Alt, Ctrl ou Shift. Backspace limpa.</p>
+      <div class="ke-opt-shortcut">
+        <span>Iniciar nova tarefa</span>
+        <input id="ke-opt-sc-start" type="text" readonly placeholder="pressione as teclas…">
+      </div>
+      <div class="ke-opt-shortcut">
+        <span>Parar tarefa</span>
+        <input id="ke-opt-sc-stop" type="text" readonly placeholder="pressione as teclas…">
+      </div>
+      <div class="ke-opt-shortcut">
+        <span>Recomeçar tarefa</span>
+        <input id="ke-opt-sc-restart" type="text" readonly placeholder="pressione as teclas…">
+      </div>
+      <div class="ke-opt-row">
+        <button id="ke-opt-sc-reset" class="ke-opt-btn" type="button">Restaurar padrões</button>
+      </div>
+      <p class="ke-opt-hint">Abrir o popup por teclado: configure em <em>chrome://extensions → Atalhos de teclado</em> (ação da extensão).</p>
+    </section>
+
+    <section class="ke-opt-card">
+      <h2>Cache</h2>
+      <p class="ke-opt-hint">Listas de clientes/projetos/atividades (24h) e diários (1h) ficam salvos neste dispositivo para abrir rápido.</p>
+      <p id="ke-opt-cache-state" class="ke-opt-state" role="status"></p>
+      <div class="ke-opt-row">
+        <button id="ke-opt-cache-refresh" class="ke-opt-btn ke-opt-btn-primary" type="button">Atualizar cache</button>
+        <button id="ke-opt-cache-clear" class="ke-opt-btn ke-opt-btn-danger" type="button">Limpar cache</button>
+      </div>
+    </section>
+
+    <div id="ke-opt-toast" class="ke-opt-toast" role="status" hidden></div>
+  </main>
+</body>
+</html>

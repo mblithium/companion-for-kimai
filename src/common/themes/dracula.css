@@ -1,0 +1,22 @@
+/* Dracula module. */
+:root[data-ke-theme="dracula"] {
+  --ke-green: #50fa7b;
+  --ke-green-dark: #3ecf66;
+  --ke-red: #ff5555;
+  --ke-on-green: #282a36;
+  --ke-green-text: #50fa7b;
+  --ke-red-btn: #ff5555;
+  --ke-on-red: #282a36;
+  --ke-red-text: #ff9c9c;
+  --ke-link: #8be9fd;
+  --ke-warn: #f1fa8c;
+  --ke-bg: #282a36;
+  --ke-surface: #44475a;
+  --ke-text: #f8f8f2;
+  --ke-border: #6272a4;
+  --ke-input-bg: #44475a;
+  --ke-hover: rgba(189, 147, 249, 0.18);
+  --ke-shadow: rgba(0, 0, 0, 0.5);
+  --ke-group-bg: #343746;
+  --ke-primary-rgb: 80, 250, 123;
+}

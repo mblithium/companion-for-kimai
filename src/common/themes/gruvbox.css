@@ -1,0 +1,22 @@
+/* Gruvbox module. */
+:root[data-ke-theme="gruvbox"] {
+  --ke-green: #b8bb26;
+  --ke-green-dark: #98971a;
+  --ke-red: #fb4934;
+  --ke-on-green: #282828;
+  --ke-green-text: #b8bb26;
+  --ke-red-btn: #cc241d;
+  --ke-on-red: #ffffff;
+  --ke-red-text: #ff8a66;
+  --ke-link: #83a598;
+  --ke-warn: #fabd2f;
+  --ke-bg: #282828;
+  --ke-surface: #3c3836;
+  --ke-text: #ebdbb2;
+  --ke-border: #504945;
+  --ke-input-bg: #3c3836;
+  --ke-hover: rgba(250, 189, 47, 0.14);
+  --ke-shadow: rgba(0, 0, 0, 0.5);
+  --ke-group-bg: #504945;
+  --ke-primary-rgb: 184, 187, 38;
+}

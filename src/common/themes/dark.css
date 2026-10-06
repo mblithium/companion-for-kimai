@@ -1,0 +1,21 @@
+/* Dark theme tokens. */
+:root[data-ke-theme="dark"] {
+  --ke-green: #2fb344;
+  --ke-green-dark: #27a03c;
+  --ke-red: #e05c5c;
+  --ke-on-green: #1c1c1e;
+  --ke-green-text: #2fb344;
+  --ke-red-btn: #e05c5c;
+  --ke-on-red: #1c1c1e;
+  --ke-red-text: #e05c5c;
+  --ke-link: #6ea8fe;
+  --ke-warn: #d9a441;
+  --ke-bg: #1c1c1e;
+  --ke-surface: #2c2c2e;
+  --ke-text: #eeeeee;
+  --ke-border: #555555;
+  --ke-input-bg: #2c2c2e;
+  --ke-hover: rgba(255, 255, 255, 0.12);
+  --ke-shadow: rgba(0, 0, 0, 0.5);
+  --ke-group-bg: #34343a;
+}

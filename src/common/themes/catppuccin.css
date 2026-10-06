@@ -1,0 +1,22 @@
+/* Catppuccin module. */
+:root[data-ke-theme="catppuccin"] {
+  --ke-green: #a6e3a1;
+  --ke-green-dark: #8fce95;
+  --ke-red: #f38ba8;
+  --ke-on-green: #1e1e2e;
+  --ke-green-text: #a6e3a1;
+  --ke-red-btn: #f38ba8;
+  --ke-on-red: #1e1e2e;
+  --ke-red-text: #f38ba8;
+  --ke-link: #89b4fa;
+  --ke-warn: #f9e2af;
+  --ke-bg: #1e1e2e;
+  --ke-surface: #313244;
+  --ke-text: #cdd6f4;
+  --ke-border: #45475a;
+  --ke-input-bg: #313244;
+  --ke-hover: rgba(203, 166, 247, 0.16);
+  --ke-shadow: rgba(0, 0, 0, 0.5);
+  --ke-group-bg: #45475a;
+  --ke-primary-rgb: 166, 227, 161;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "companion-for-kimai",
+  "version": "0.22.4",
+  "private": true,
+  "description": "A browser extension that enhances your Kimai time-tracking workflow.",
+  "author": "Matheus Bastos (https://github.com/mblithium)",
+  "homepage": "https://github.com/mblithium/companion-for-kimai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mblithium/companion-for-kimai.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node tests/harness.js",
+    "check": "node -e \"const fs=require('fs'),cp=require('child_process');const m=JSON.parse(fs.readFileSync('manifest.json','utf8'));const files=[...m.content_scripts[0].js,'src/background/worker.js','src/popup/popup.js','src/options/options.js','src/common/permissions.js','src/common/format.js','src/common/theme.js','scripts/build-zip.js','scripts/select-manifest.js','tests/harness.js','tests/check-pages.js','tests/check-contrast.js'];files.forEach(f=>cp.execFileSync('node',['--check',f],{stdio:'inherit'}));console.log('check ok:',files.length,'arquivos JS');\" && node tests/check-pages.js && node tests/check-contrast.js",
+    "manifest:chrome": "node scripts/select-manifest.js chrome",
+    "manifest:firefox": "node scripts/select-manifest.js firefox",
+    "build": "npm run check && npm test && node scripts/build-zip.js --target all --clean",
+    "build:chrome": "node scripts/build-zip.js --target chrome --clean",
+    "build:firefox": "node scripts/build-zip.js --target firefox --clean"
+  },
+  "license": "MIT"
+}

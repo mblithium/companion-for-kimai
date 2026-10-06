@@ -1,0 +1,47 @@
+/* GNOME Adwaita theme tokens. */
+:root[data-ke-theme="gnome"] {
+  color-scheme: light;
+  --ke-green: #1c71d8;
+  --ke-green-dark: #1a5fb4;
+  --ke-red: #e01b24;
+  --ke-on-green: #ffffff;
+  --ke-green-text: #007c3d;
+  --ke-red-btn: #e01b24;
+  --ke-on-red: #ffffff;
+  --ke-red-text: #c30000;
+  --ke-link: #1c71d8;
+  --ke-warn: #905400;
+  --ke-bg: #fafafb;
+  --ke-surface: #ffffff;
+  --ke-text: #2e3436;
+  --ke-border: #deddda;
+  --ke-input-bg: #ffffff;
+  --ke-hover: rgba(0, 0, 6, 0.07);
+  --ke-shadow: rgba(0, 0, 0, 0.16);
+  --ke-group-bg: #ebebed;
+  --ke-primary-rgb: 28, 113, 216;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-ke-theme="gnome"] {
+    color-scheme: dark;
+    --ke-green: #1c71d8;
+    --ke-green-dark: #1a5fb4;
+    --ke-red: #c01c28;
+    --ke-on-green: #ffffff;
+    --ke-green-text: #78e9ab;
+    --ke-red-btn: #c01c28;
+    --ke-on-red: #ffffff;
+    --ke-red-text: #ff938c;
+    --ke-link: #81d0ff;
+    --ke-warn: #ffc252;
+    --ke-bg: #222226;
+    --ke-surface: #2e2e32;
+    --ke-text: #ffffff;
+    --ke-border: #48484c;
+    --ke-input-bg: #1d1d20;
+    --ke-hover: rgba(255, 255, 255, 0.08);
+    --ke-shadow: rgba(0, 0, 0, 0.5);
+    --ke-group-bg: #38383e;
+  }
+}

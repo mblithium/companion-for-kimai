@@ -1,0 +1,39 @@
+/* Shared theme integration. */
+:root[data-ke-theme="dracula"],
+:root[data-ke-theme="catppuccin"],
+:root[data-ke-theme="nord"],
+:root[data-ke-theme="gnome"],
+:root[data-ke-theme="gruvbox"] {
+  --tblr-body-bg: var(--ke-bg);
+  --tblr-body-color: var(--ke-text);
+  --tblr-bg-surface: var(--ke-surface);
+  --tblr-bg-surface-secondary: var(--ke-bg);
+  --tblr-border-color: var(--ke-border);
+  --tblr-primary: var(--ke-green);
+  --tblr-primary-rgb: var(--ke-primary-rgb);
+  --tblr-link-color: var(--ke-link);
+  --tblr-bg-surface-tertiary: var(--ke-surface);
+  --tblr-navbar-bg: var(--ke-surface);
+  --tblr-dropdown-bg: var(--ke-surface);
+  --tblr-bg-forms: var(--ke-input-bg);
+  --tblr-card-cap-bg: var(--ke-surface);
+  --tblr-secondary: #b8bdd0;
+}
+
+:root[data-ke-theme="dracula"] .navbar-vertical,
+:root[data-ke-theme="dracula"] .dropdown-menu,
+:root[data-ke-theme="dracula"] .offcanvas,
+:root[data-ke-theme="catppuccin"] .navbar-vertical,
+:root[data-ke-theme="catppuccin"] .dropdown-menu,
+:root[data-ke-theme="catppuccin"] .offcanvas,
+:root[data-ke-theme="nord"] .navbar-vertical,
+:root[data-ke-theme="nord"] .dropdown-menu,
+:root[data-ke-theme="nord"] .offcanvas,
+:root[data-ke-theme="gnome"] .navbar-vertical,
+:root[data-ke-theme="gnome"] .dropdown-menu,
+:root[data-ke-theme="gnome"] .offcanvas,
+:root[data-ke-theme="gruvbox"] .navbar-vertical,
+:root[data-ke-theme="gruvbox"] .dropdown-menu,
+:root[data-ke-theme="gruvbox"] .offcanvas {
+  background-color: var(--ke-surface);
+}

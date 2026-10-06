@@ -1,0 +1,22 @@
+/* Light module. */
+:root,
+:root[data-ke-theme="light"] {
+  --ke-green: #2fb344;
+  --ke-green-dark: #27a03c;
+  --ke-red: #d63939;
+  --ke-link: #206bc4;
+  --ke-warn: #96690f;
+  --ke-on-green: #1c1c1e;
+  --ke-green-text: #1e7e34;
+  --ke-red-btn: #d63939;
+  --ke-on-red: #ffffff;
+  --ke-red-text: #d63939;
+  --ke-bg: #ffffff;
+  --ke-surface: #ffffff;
+  --ke-text: #222222;
+  --ke-border: #cccccc;
+  --ke-input-bg: #ffffff;
+  --ke-hover: rgba(127, 127, 127, 0.15);
+  --ke-shadow: rgba(0, 0, 0, 0.18);
+  --ke-group-bg: #e9edf1;
+}
