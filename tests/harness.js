@@ -697,6 +697,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     findAll(popEls['ke-pop-new-project'], 'ke-combo-input').length === 1,
     findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent));
   const popCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
+  const popupHeadCss = popCss.match(/\.ke-pop-head\s*\{([^}]*)\}/);
+  check('popup header fica fixo durante scroll', !!popupHeadCss &&
+    /position:\s*sticky/.test(popupHeadCss[1]) && /top:\s*0/.test(popupHeadCss[1]) &&
+    /background:\s*var\(--ke-bg\)/.test(popupHeadCss[1]));
   const optCss = fs.readFileSync(path.join(ROOT, 'src/options/options.css'), 'utf8');
   const themeCss = ['src/common/theme.css', ...fs.readdirSync(path.join(ROOT, 'src/common/themes'))
     .filter((f) => f.endsWith('.css')).map((f) => path.join('src/common/themes', f))]

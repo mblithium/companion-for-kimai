@@ -2,6 +2,11 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.7] — 2026-10-06
+### Changed
+- O cabeçalho do popup permanece fixo no topo durante a rolagem, mantendo
+  acessíveis o título e os botões de abrir o Kimai e as configurações.
+
 ## [0.22.6] — 2026-10-06
 ### Changed
 - O popup recolhe a seção **Novo timer** quando há timer ativo; o cabeçalho
