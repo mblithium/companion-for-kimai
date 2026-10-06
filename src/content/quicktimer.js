@@ -18,8 +18,13 @@
   async function applyDisplayPrefs() {
     try {
       const s = await KE.storageGet(['keSettings']);
-      const hide = !!(s && s.keSettings && s.keSettings.hideDateColumn);
-      if (document.body) document.body.classList.toggle('ke-hide-date', hide);
+      const settings = (s && s.keSettings) || {};
+      if (document.body) {
+        document.body.classList.toggle('ke-hide-date', !!settings.hideDateColumn);
+        document.body.classList.toggle('ke-hide-sidebar', !!settings.hideSidebar);
+        document.body.classList.toggle('ke-hide-actionbar', !!settings.hideActionBar);
+        document.body.classList.toggle('ke-hide-header', !!settings.hideHeader);
+      }
     } catch (e) {}
   }
 

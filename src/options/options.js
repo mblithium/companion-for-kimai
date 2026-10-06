@@ -202,6 +202,9 @@
       await refreshTokenState();
     })();
     $('ke-opt-hide-date').checked = !!(settings.hideDateColumn);
+    $('ke-opt-hide-sidebar').checked = !!settings.hideSidebar;
+    $('ke-opt-hide-actionbar').checked = !!settings.hideActionBar;
+    $('ke-opt-hide-header').checked = !!settings.hideHeader;
     fillShortcuts(settings.shortcuts);
     $('ke-opt-sc-enabled').checked = !settings || settings.shortcutsEnabled !== false;
     ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => {
@@ -280,7 +283,17 @@
       await KE.localSet({ keApiToken: typed });
       $('ke-opt-token').value = '';
     }
-    await KE.saveSettings({ kimaiBaseUrl: base, theme: themeSel.value, shortcuts: readShortcuts(), shortcutsEnabled: $('ke-opt-sc-enabled').checked, hideDateColumn: $('ke-opt-hide-date').checked, keLocale: localeSel.value });
+    await KE.saveSettings({
+      kimaiBaseUrl: base,
+      theme: themeSel.value,
+      shortcuts: readShortcuts(),
+      shortcutsEnabled: $('ke-opt-sc-enabled').checked,
+      hideDateColumn: $('ke-opt-hide-date').checked,
+      hideSidebar: $('ke-opt-hide-sidebar').checked,
+      hideActionBar: $('ke-opt-hide-actionbar').checked,
+      hideHeader: $('ke-opt-hide-header').checked,
+      keLocale: localeSel.value,
+    });
     document.documentElement.dataset.keTheme = themeSel.value;
     $('ke-opt-url').value = base;
     syncOpen();

@@ -886,6 +886,13 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('limite de grupos', KE.groupByTask(manyGroups, 8).length === 8);
 
   const qtCss = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.css'), 'utf8');
+  check('CSS de Interface oculta menu, ações e cabeçalho',
+    qtCss.includes('body.ke-hide-sidebar .navbar-vertical') &&
+    qtCss.includes('body.ke-hide-actionbar .page-header.d-print-none') &&
+    qtCss.includes('body.ke-hide-header .navbar.navbar-expand-md'));
+  const qtJs = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.js'), 'utf8');
+  check('Interface aplica preferências ao body',
+    ['hideSidebar', 'hideActionBar', 'hideHeader'].every((key) => qtJs.includes(`settings.${key}`)));
   check('ícone circular centraliza o triângulo CSS', /#ke-quick-timer \.ke-play\s*\{[^}]*align-items:\s*center[^}]*justify-content:\s*center/s.test(qtCss) &&
     /#ke-quick-timer \.ke-play-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(qtCss));
   check('botão Iniciar centraliza ícone e texto com gap', /#ke-quick-timer \.ke-btn-start\s*\{[^}]*display:\s*inline-flex[^}]*align-items:\s*center[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(qtCss));
@@ -1299,6 +1306,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await sleep(300);
   const toast = popEls['ke-opt-toast'];
   const toastShown = () => toast.hidden === false && toast.classList.contains('ke-show');
+  check('Interface inicia com opções desmarcadas',
+    popEls['ke-opt-hide-sidebar'].checked === false &&
+    popEls['ke-opt-hide-actionbar'].checked === false &&
+    popEls['ke-opt-hide-header'].checked === false);
   popEls['ke-opt-sc-start'].value = 'X';
   popEls['ke-opt-sc-reset'].fire('click');
   await sleep(20);
@@ -1312,9 +1323,14 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const delays = [];
   global.setTimeout = (fn, ms, ...a) => { delays.push(ms); return origSetTimeout(fn, ms, ...a); };
   popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  popEls['ke-opt-hide-sidebar'].checked = true;
+  popEls['ke-opt-hide-actionbar'].checked = true;
+  popEls['ke-opt-hide-header'].checked = true;
   popEls['ke-opt-save'].fire('click');
   await sleep(100);
   check('salvar válido usa toast', toastShown() && toast.textContent === 'Configurações salvas.', toast.textContent);
+  check('salvar persiste opções de Interface', stored.keSettings.hideSidebar === true &&
+    stored.keSettings.hideActionBar === true && stored.keSettings.hideHeader === true, stored.keSettings);
   check('toast dura 5 segundos', delays.includes(5000), delays.slice(-5));
   global.setTimeout = origSetTimeout;
   storedLocal.keApiToken = 'tok-desconectar';
