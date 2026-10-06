@@ -63,6 +63,7 @@
 
   async function refreshActive() {
     KE.state.active = await KE.fetchActiveTimesheets();
+    setNewTimerCollapsed(KE.state.active.length > 0);
     ui.active.innerHTML = '';
     if (!KE.state.active.length) {
       const empty = document.createElement('div');
@@ -112,6 +113,12 @@
       row.appendChild(stop);
       ui.active.appendChild(row);
     });
+  }
+
+  function setNewTimerCollapsed(collapsed) {
+    if (!ui || !ui.newTimerBody || !ui.newTimerToggle) return;
+    ui.newTimerBody.hidden = collapsed;
+    ui.newTimerToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   }
 
   let groupMode = true;
@@ -433,6 +440,7 @@
       setup: $('ke-pop-setup'), setupMsg: $('ke-pop-setup-msg'), setupBtn: $('ke-pop-setup-btn'),
       error: $('ke-pop-error'), errorMsg: $('ke-pop-error-msg'),
       main: $('ke-pop-main'), active: $('ke-pop-active'), today: $('ke-pop-today'),
+      newTimerToggle: $('ke-pop-new-toggle'), newTimerBody: $('ke-pop-new-body'),
       recent: $('ke-pop-recent'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
       groupToggle: $('ke-pop-group-toggle'),
@@ -444,6 +452,7 @@
     $('ke-pop-label-activity').textContent = KE.T.activity;
     $('ke-pop-label-tags').textContent = KE.T.tags;
     $('ke-pop-settings').addEventListener('click', () => KE.openOptions());
+    ui.newTimerToggle.onclick = () => setNewTimerCollapsed(!ui.newTimerBody.hidden);
     $('ke-pop-open').addEventListener('click', async () => {
       const s = await KE.getSettings();
       KE.openKimai(s.kimaiBaseUrl, s.keLocale);

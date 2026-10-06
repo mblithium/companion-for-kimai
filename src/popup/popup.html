@@ -54,30 +54,32 @@
 
     <section class="ke-pop-sec">
       <div class="ke-pop-sec-head">
-        <h2>Novo timer</h2>
+        <h2><button id="ke-pop-new-toggle" class="ke-pop-section-toggle" type="button" aria-expanded="true" aria-controls="ke-pop-new-body">Novo timer <span class="ke-pop-section-chevron" aria-hidden="true">⌄</span></button></h2>
         <button id="ke-pop-refresh-catalog" class="ke-pop-refresh" type="button" title="Atualizar listas">⟳</button>
       </div>
-      <div class="ke-pop-field">
-        <span class="ke-pop-label" id="ke-pop-label-desc"></span>
-        <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?">
+      <div id="ke-pop-new-body">
+        <div class="ke-pop-field">
+          <span class="ke-pop-label" id="ke-pop-label-desc"></span>
+          <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?">
+        </div>
+        <div class="ke-pop-field">
+          <span class="ke-pop-label" id="ke-pop-label-customer"></span>
+          <div id="ke-pop-new-customer"></div>
+        </div>
+        <div class="ke-pop-field">
+          <span class="ke-pop-label" id="ke-pop-label-project"></span>
+          <div id="ke-pop-new-project"></div>
+        </div>
+        <div class="ke-pop-field">
+          <span class="ke-pop-label" id="ke-pop-label-activity"></span>
+          <div id="ke-pop-new-activity"></div>
+        </div>
+        <div class="ke-pop-field">
+          <span class="ke-pop-label" id="ke-pop-label-tags"></span>
+          <div id="ke-pop-new-tags"></div>
+        </div>
+        <button id="ke-pop-start" class="ke-pop-btn ke-pop-btn-primary" type="button">▶ Iniciar</button>
       </div>
-      <div class="ke-pop-field">
-        <span class="ke-pop-label" id="ke-pop-label-customer"></span>
-        <div id="ke-pop-new-customer"></div>
-      </div>
-      <div class="ke-pop-field">
-        <span class="ke-pop-label" id="ke-pop-label-project"></span>
-        <div id="ke-pop-new-project"></div>
-      </div>
-      <div class="ke-pop-field">
-        <span class="ke-pop-label" id="ke-pop-label-activity"></span>
-        <div id="ke-pop-new-activity"></div>
-      </div>
-      <div class="ke-pop-field">
-        <span class="ke-pop-label" id="ke-pop-label-tags"></span>
-        <div id="ke-pop-new-tags"></div>
-      </div>
-      <button id="ke-pop-start" class="ke-pop-btn ke-pop-btn-primary" type="button">▶ Iniciar</button>
     </section>
 
     <section class="ke-pop-sec">

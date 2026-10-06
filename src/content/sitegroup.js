@@ -30,6 +30,14 @@
     return h + ':' + String(m).padStart(2, '0');
   };
 
+  KE.formatSiteHms = function (totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s - h * 3600) / 60);
+    const sec = s % 60;
+    return [h, m, sec].map((part) => String(part).padStart(2, '0')).join(':');
+  };
+
   KE.parseSiteDate = function (text) {
     const m = String(text || '').trim().match(/(\d{2})\/(\d{2})\/(\d{4})/);
     if (!m) return { key: '', label: '' };
@@ -268,6 +276,65 @@
     });
   }
 
+  function summaryDateKey(row) {
+    if (!row.classList.contains('summary') || !row.classList.contains('info')) return '';
+    return KE.parseSiteDate(cellText(row, 'col_date') || row.textContent).key;
+  }
+
+  function addDailyTotalCell(row, dataColumnCount) {
+    const cells = Array.from(row.children || []).filter((cell) => cell.tagName === 'TD');
+    if (dataColumnCount && cells.length >= dataColumnCount) {
+      const last = cells[dataColumnCount - 1];
+      last.classList.add('ke-day-total');
+      return last;
+    }
+
+    const last = cells[cells.length - 1];
+    const lastSpan = last ? Math.max(1, Number(last.getAttribute('colspan')) || 1) : 1;
+    const coveredColumns = cells.reduce((sum, cell) => sum + Math.max(1, Number(cell.getAttribute('colspan')) || 1), 0);
+    if (last && lastSpan > 1 && (!dataColumnCount || coveredColumns >= dataColumnCount || cells.length === 1)) {
+      last.setAttribute('colspan', String(lastSpan - 1));
+    }
+
+    const total = document.createElement('td');
+    total.className = 'ke-day-total';
+    row.appendChild(total);
+    return total;
+  }
+
+  function refreshDailyTotals(tbody) {
+    const tb = tbody || findSiteTbody();
+    if (!tb) return;
+    const rows = Array.from(tb.children || tb.querySelectorAll('tr'))
+      .filter((row) => row.tagName === 'TR');
+    const dataRow = rows.find(isDataRow);
+    const dataColumnCount = dataRow
+      ? Array.from(dataRow.children || []).filter((cell) => cell.tagName === 'TD').length
+      : 0;
+    const totals = new Map();
+    const summaries = [];
+    let currentDateKey = '';
+
+    rows.forEach((row) => {
+      const summaryKey = summaryDateKey(row);
+      if (summaryKey) {
+        currentDateKey = summaryKey;
+        summaries.push({ row, dateKey: summaryKey });
+        return;
+      }
+      if (!isDataRow(row)) return;
+      const dateKey = KE.parseSiteDate(cellText(row, 'col_date')).key || currentDateKey;
+      if (!dateKey) return;
+      totals.set(dateKey, (totals.get(dateKey) || 0) + KE.parseSiteDuration(cellText(row, 'col_duration')));
+    });
+
+    summaries.forEach(({ row, dateKey }) => {
+      const totalCell = row.querySelector('td.ke-day-total') || addDailyTotalCell(row, dataColumnCount);
+      const text = KE.formatSiteHms(totals.get(dateKey) || 0);
+      if (totalCell.textContent !== text) totalCell.textContent = text;
+    });
+  }
+
   function paintGroupCheck(g, box) {
     if (!box) return;
     const boxes = g.rows.map(memberBox).filter(Boolean);
@@ -398,6 +465,7 @@
 
   KE.applySiteGrouping = function (tbody, on) {
     if (!tbody) return;
+    refreshDailyTotals(tbody);
     const headers = tbody.querySelectorAll('tr.ke-sitegroup');
     headers.forEach((h) => h.remove());
     const kids = Array.from(tbody.children || tbody.querySelectorAll('tr'))
@@ -479,17 +547,21 @@
     if (siteObs) return;
     if (!totalsTimer) {
       try {
-        totalsTimer = setInterval(refreshGroupTotals, 60000);
+        totalsTimer = setInterval(() => {
+          refreshGroupTotals();
+          refreshDailyTotals();
+        }, 60000);
       } catch (e) {}
     }
     let pending = null;
     siteObs = new MutationObserver(() => {
-      if (!sitePref) return;
       clearTimeout(pending);
       pending = setTimeout(() => {
-        ensureBar();
         const tb = findSiteTbody();
         if (!tb) return;
+        refreshDailyTotals(tb);
+        if (!sitePref) return;
+        ensureBar();
         if (siteSig(tb) === lastSig) return;
         KE.applySiteGrouping(tb, true);
       }, 400);

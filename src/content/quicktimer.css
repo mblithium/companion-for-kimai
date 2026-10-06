@@ -56,6 +56,7 @@ body.ke-hide-date .datatable_timesheet tr.info .col_date {
 }
 .ke-sitegroup-bar-refresh:hover:not(:disabled) { opacity: 1; }
 .ke-sitegroup-bar-refresh:disabled { opacity: 0.4; cursor: wait; }
+.datatable_timesheet tr.summary.info .ke-day-total { text-align: right; font-weight: 700; white-space: nowrap; }
 
 .datatable_timesheet tr.ke-sitegroup td {
   background: var(--ke-group-bg, var(--tblr-tertiary-bg, rgba(127, 127, 127, 0.12)));

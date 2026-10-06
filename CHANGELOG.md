@@ -2,6 +2,13 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.6] — 2026-10-06
+### Changed
+- O popup recolhe a seção **Novo timer** quando há timer ativo; o cabeçalho
+  acessível permite expandir e recolher o formulário manualmente.
+- Na listagem do site, as linhas-resumo diárias exibem a soma do tempo em
+  `HH:MM:SS` na última coluna.
+
 ## [0.22.5] — 2026-10-06
 ### Changed
 - GitHub Actions agora cria GitHub Releases para tags de versão, com os

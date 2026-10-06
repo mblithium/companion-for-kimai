@@ -31,6 +31,14 @@ body {
 .ke-pop-sec { margin-bottom: 12px; }
 .ke-pop-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .ke-pop-sec-head h2 { margin: 0; }
+.ke-pop-section-toggle {
+  display: inline-flex; align-items: center; gap: 5px; padding: 0;
+  border: 0; background: transparent; color: inherit; cursor: pointer;
+  font: inherit; text-transform: inherit; letter-spacing: inherit;
+}
+.ke-pop-section-toggle:focus-visible { outline: 2px solid var(--ke-link); outline-offset: 2px; border-radius: 2px; }
+.ke-pop-section-chevron { display: inline-block; transition: transform 0.15s ease; }
+.ke-pop-section-toggle[aria-expanded="false"] .ke-pop-section-chevron { transform: rotate(-90deg); }
 .ke-pop-sec-actions { display: flex; align-items: center; gap: 6px; }
 .ke-pop-pill {
   border: 1px solid var(--ke-border); border-radius: 20px; background: transparent;

@@ -595,6 +595,14 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const popTitles = findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent);
   check('popup mostra ativo', popTitles.length === 1 &&
     popTitles[0] === 'São Paulo Tech / Site São Paulo · Consequuntur dolor', popTitles);
+  check('Novo timer recolhe com timer ativo', popEls['ke-pop-new-body'].hidden &&
+    popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'false');
+  popEls['ke-pop-new-toggle'].onclick();
+  check('cabeçalho reabre Novo timer', popEls['ke-pop-new-body'].hidden === false &&
+    popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'true');
+  popEls['ke-pop-new-toggle'].onclick();
+  check('cabeçalho recolhe Novo timer novamente', popEls['ke-pop-new-body'].hidden &&
+    popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'false');
   const popProj = findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0];
   check('popup projeto preenchido', popProj.value === 'São Paulo Tech / Site São Paulo', popProj.value);
   const groups = findAll(popEls['ke-pop-today'], 'ke-pop-group');
@@ -623,6 +631,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop')[0].fire('click');
   await sleep(200);
   check('popup parar ativo', stoppedIds.join(',') === '801', stoppedIds);
+  check('Novo timer abre após parar último timer', popEls['ke-pop-new-body'].hidden === false &&
+    popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'true');
   check('popup status parar', popEls['ke-pop-status'].textContent === 'Timer parado!', popEls['ke-pop-status'].textContent);
   KE.apiBaseUrl = '';
   KE.apiCredentials = 'same-origin';
@@ -918,7 +928,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   stb.appendChild(siteRow({ id: 'e', date: '15/10/2026', dur: '0:05', cust: 'C1', proj: 'P1', act: 'A1', desc: 'outra', tags: 't2', bill: 'Yes' }));
   check('duração do site', KE.parseSiteDuration('12:03') === 12 * 3600 + 3 * 60 &&
     KE.parseSiteDuration('0:27') === 27 * 60 && KE.parseSiteDuration('1:02:03') === 3723 &&
-    KE.parseSiteDuration('x') === 0 && KE.formatSiteHours(5400) === '1:30');
+    KE.parseSiteDuration('x') === 0 && KE.formatSiteHours(5400) === '1:30' &&
+    KE.formatSiteHms(3723) === '01:02:03');
   const sgroups = KE.groupSiteRows(Array.from(stb.children));
   check('só adjacentes iguais agrupam', sgroups.length === 4 &&
     sgroups.map((g) => g.rows.length).join(',') === '2,1,1,1', sgroups.map((g) => g.rows.length));
@@ -975,8 +986,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     const tr = document.createElement('tr');
     tr.className = 'summary info';
     const td = document.createElement('td');
+    td.setAttribute('colspan', '12');
     td.textContent = text;
     tr.appendChild(td);
+    tr.textContent = text;
     return tr;
   };
   const stbS = document.createElement('tbody');
@@ -1001,6 +1014,27 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   KE.applySiteGrouping(stbS, false);
   check('desligar mantém separadores', stbS.children.map(kindOf).join(',') === 'SEG1,a,b,SEG2,c,d' &&
     findAll(stbS, 'ke-sitegroup').length === 0);
+
+  const dailyTotals = document.createElement('tbody');
+  dailyTotals.appendChild(sumRow('18/10/2026'));
+  dailyTotals.appendChild(siteRow({ id: 'day18a', date: '18/10/2026', dur: '1:15', cust: 'C1', proj: 'P1', act: 'A1' }));
+  dailyTotals.appendChild(siteRow({ id: 'day18b', date: '18/10/2026', dur: '0:45', cust: 'C2', proj: 'P2', act: 'A2' }));
+  dailyTotals.appendChild(sumRow('17/10/2026'));
+  dailyTotals.appendChild(siteRow({ id: 'day17a', date: '17/10/2026', dur: '2:00', cust: 'C3', proj: 'P3', act: 'A3' }));
+  dailyTotals.appendChild(siteRow({ id: 'day17b', date: '17/10/2026', dur: '3:00', cust: 'C4', proj: 'P4', act: 'A4' }));
+  KE.applySiteGrouping(dailyTotals, false);
+  const dailySummaryRows = dailyTotals.children.filter((row) => row.classList.contains('summary'));
+  const dailyTotalText = (row) => findAll(row, 'ke-day-total')[0].textContent;
+  check('soma diária na coluna final em HH:MM:SS', dailySummaryRows.length === 2 &&
+    dailyTotalText(dailySummaryRows[0]) === '02:00:00' && dailyTotalText(dailySummaryRows[1]) === '05:00:00',
+    dailySummaryRows.map(dailyTotalText));
+  check('soma diária ocupa última coluna', dailySummaryRows.every((row) =>
+    row.children[row.children.length - 1].classList.contains('ke-day-total') &&
+    row.children[0].getAttribute('colspan') === '11'));
+  dailyTotals.children[1].querySelector('.col_duration').textContent = '2:15';
+  KE.applySiteGrouping(dailyTotals, false);
+  check('soma diária atualiza sem duplicar célula', dailyTotalText(dailySummaryRows[0]) === '03:00:00' &&
+    findAll(dailySummaryRows[0], 'ke-day-total').length === 1);
 
   const stb2 = document.createElement('tbody');
   stb2.appendChild(siteRow({ id: 'x', date: '18/10/2026', dur: '1:00', cust: 'Solo', proj: 'SP', act: 'SA', desc: 'u1' }));
