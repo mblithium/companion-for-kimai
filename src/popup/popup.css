@@ -29,6 +29,18 @@ body {
   background: var(--ke-green); color: var(--ke-on-green);
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 12px;
+  line-height: 1; padding: 0; box-sizing: border-box; flex: none;
+}
+.ke-pop-logo-icon,
+.ke-pop-start-icon {
+  display: block;
+  width: 0; height: 0; padding: 0;
+  border-top: 6px solid transparent;
+  border-right: 0;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid currentColor;
+  transform: translateX(1px);
+  flex: none;
 }
 .ke-pop-iconbtn {
   border: 1px solid var(--ke-border); border-radius: 6px; background: transparent;
@@ -107,6 +119,7 @@ body {
 }
 .ke-pop-btn:disabled { opacity: 0.6; cursor: wait; }
 .ke-pop-btn-primary { background: var(--ke-green); color: var(--ke-on-green); width: 100%; }
+.ke-pop-start-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center; line-height: 1; }
 .ke-pop-btn-primary:hover { background: var(--ke-green-dark); }
 .ke-pop-btn-stop {
   background: transparent; border: 1px solid var(--ke-red-text); color: var(--ke-red-text);

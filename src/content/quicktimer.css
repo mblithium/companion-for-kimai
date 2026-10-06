@@ -153,6 +153,22 @@ body.ke-hide-date .datatable_timesheet tr.info .col_date {
   background: var(--ke-green, #2fb344);
   color: var(--ke-on-green, #1c1c1e);
   font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  box-sizing: border-box;
+}
+#ke-quick-timer .ke-play-icon,
+#ke-quick-timer .ke-btn-start-icon {
+  display: block;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border-top: 6px solid transparent;
+  border-right: 0;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid currentColor;
+  transform: translateX(1px);
+  flex: none;
 }
 #ke-quick-timer .ke-sub {
   font-size: 12px;
@@ -214,7 +230,17 @@ body.ke-hide-date .datatable_timesheet tr.info .col_date {
   cursor: pointer;
 }
 .ke-card .ke-btn:disabled { opacity: 0.6; cursor: wait; }
-#ke-quick-timer .ke-btn-start { background: var(--ke-green, #2fb344); color: var(--ke-on-green, #1c1c1e); }
+#ke-quick-timer .ke-btn-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  text-align: center;
+  background: var(--ke-green, #2fb344);
+  color: var(--ke-on-green, #1c1c1e);
+}
+#ke-quick-timer .ke-btn-start-label { display: inline-block; }
 #ke-quick-timer .ke-btn-start:hover { background: var(--ke-green-dark, #27a03c); }
 .ke-card .ke-btn-stop {
   background: transparent;

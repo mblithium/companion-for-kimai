@@ -393,6 +393,13 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   let card = null;
   for (let i = 0; i < 100 && !card; i++) { await sleep(20); card = captured.card; }
   check('card injetado', !!card);
+  const titlePlayIcon = findAll(card, 'ke-play-icon')[0];
+  check('ícone do título usa forma geométrica no círculo', !!titlePlayIcon && titlePlayIcon.textContent === '' &&
+    findAll(card, 'ke-play')[0].getAttribute('aria-hidden') === 'true');
+  const quickStartButton = findAll(card, 'ke-btn-start')[0];
+  check('ícone e texto do botão Iniciar são elementos separados',
+    findAll(quickStartButton, 'ke-btn-start-icon')[0].textContent === '' &&
+    findAll(quickStartButton, 'ke-btn-start-label')[0].textContent === KE.T.start);
   const inputs = findAll(card, 'ke-combo-input');
   check('3 comboboxes', inputs.length === 3, inputs.length);
   const [custIn, projIn, actIn] = inputs;
@@ -697,6 +704,12 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     findAll(popEls['ke-pop-new-project'], 'ke-combo-input').length === 1,
     findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent));
   const popCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
+  const popHtmlForIcons = fs.readFileSync(path.join(ROOT, 'src/popup/popup.html'), 'utf8');
+  check('logo do popup usa triângulo CSS no círculo', /class="ke-pop-logo"[^>]*><span class="ke-pop-logo-icon"/.test(popHtmlForIcons) &&
+    /\.ke-pop-logo-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(popCss));
+  check('botão Iniciar do popup separa e centraliza ícone e texto',
+    /id="ke-pop-start"[^>]*class="[^"]*ke-pop-start-btn"[^>]*><span class="ke-pop-start-icon"[^>]*><\/span><span>Iniciar<\/span>/.test(popHtmlForIcons) &&
+    /\.ke-pop-start-btn\s*\{[^}]*display:\s*inline-flex[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(popCss));
   const popupHeadCss = popCss.match(/\.ke-pop-head\s*\{([^}]*)\}/);
   check('popup header fica fixo durante scroll', !!popupHeadCss &&
     /position:\s*sticky/.test(popupHeadCss[1]) && /top:\s*0/.test(popupHeadCss[1]) &&
@@ -873,6 +886,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('limite de grupos', KE.groupByTask(manyGroups, 8).length === 8);
 
   const qtCss = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.css'), 'utf8');
+  check('ícone circular centraliza o triângulo CSS', /#ke-quick-timer \.ke-play\s*\{[^}]*align-items:\s*center[^}]*justify-content:\s*center/s.test(qtCss) &&
+    /#ke-quick-timer \.ke-play-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(qtCss));
+  check('botão Iniciar centraliza ícone e texto com gap', /#ke-quick-timer \.ke-btn-start\s*\{[^}]*display:\s*inline-flex[^}]*align-items:\s*center[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(qtCss));
   check('regra oculta Data', /body\.ke-hide-date[\s\S]*?\.col_date[\s\S]*?display:\s*none/.test(qtCss));
   check('sem exceção p/ grupo', !/tr\.ke-sitegroup[\s\S]*?\.col_date/.test(qtCss));
   check('exceção p/ summary/info', /tr\.summary[\s\S]*?\.col_date[\s\S]*?display:\s*table-cell/.test(qtCss) &&

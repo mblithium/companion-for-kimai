@@ -450,8 +450,9 @@
     const head = KE.el('div', 'ke-head');
     const titleWrap = KE.el('div', 'ke-titles');
     const h = KE.el('div', 'ke-title');
-    const play = KE.el('span', 'ke-play', '▶');
+    const play = KE.el('span', 'ke-play');
     play.setAttribute('aria-hidden', 'true');
+    play.appendChild(KE.el('span', 'ke-play-icon'));
     h.appendChild(play);
     h.appendChild(document.createTextNode(KE.T.title));
     titleWrap.appendChild(h);
@@ -493,8 +494,12 @@
     grid.appendChild(comboField(KE.T.tags, tagsCombo, 'ke-tags'));
 
     const foot = KE.el('div', 'ke-foot');
-    const start = KE.el('button', 'ke-btn ke-btn-start', '▶ ' + KE.T.start);
+    const start = KE.el('button', 'ke-btn ke-btn-start');
     start.type = 'button';
+    const startIcon = KE.el('span', 'ke-btn-start-icon');
+    startIcon.setAttribute('aria-hidden', 'true');
+    start.appendChild(startIcon);
+    start.appendChild(KE.el('span', 'ke-btn-start-label', KE.T.start));
     const full = KE.el('a', 'ke-link', '+ ' + KE.T.openCreate);
     full.href = '#';
     full.addEventListener('click', (ev) => {
