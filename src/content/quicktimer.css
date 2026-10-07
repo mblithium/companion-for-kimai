@@ -68,6 +68,7 @@ body.ke-hide-header .navbar.navbar-expand-md:not(.navbar-vertical) {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.ke-week-total .ke-today-total { margin-right: 16px; }
 .datatable_timesheet tr.summary.info .ke-day-total { text-align: right; font-weight: 700; white-space: nowrap; }
 
 .datatable_timesheet tr.ke-sitegroup td {

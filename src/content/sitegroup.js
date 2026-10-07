@@ -377,7 +377,33 @@
     return label === 'weekTotal' ? 'TOTAL DA SEMANA' : label;
   }
 
-  function upsertWeekTotalLine(card, totalSec) {
+  function dayTotalLabel() {
+    const label = KE.uiText('dayTotal');
+    return label === 'dayTotal' ? 'HOJE' : label;
+  }
+
+  function todayDateKey(now) {
+    const d = now || new Date();
+    return d.getFullYear() + KE.pad(d.getMonth() + 1) + KE.pad(d.getDate());
+  }
+
+  function siteTodayTotalSeconds(tbody, now) {
+    const tb = tbody || findSiteTbody();
+    if (!tb) return 0;
+    const today = todayDateKey(now);
+    let total = 0;
+    Array.from(tb.children || tb.querySelectorAll('tr'))
+      .filter((row) => row.tagName === 'TR')
+      .forEach((row) => {
+        if (!isDataRow(row)) return;
+        if (KE.parseSiteDate(cellText(row, 'col_date')).key !== today) return;
+        total += KE.parseSiteDuration(cellText(row, 'col_duration'));
+      });
+    return total;
+  }
+  KE.siteTodayTotalSeconds = siteTodayTotalSeconds;
+
+  function upsertWeekTotalLine(card, todaySec, weekSec) {
     if (!card || !card.parentNode || typeof card.parentNode.insertBefore !== 'function') return null;
     const parent = card.parentNode;
     let line = null;
@@ -387,17 +413,30 @@
         line = parent.querySelector('.ke-week-total');
       }
     } catch (e) { line = null; }
-    if (!line) {
+    let todayEl = line && line.querySelector ? line.querySelector('.ke-today-total') : null;
+    let weekEl = line && line.querySelector ? line.querySelector('.ke-week-total-value') : null;
+    if (!line || !todayEl || !weekEl) {
       if (weekTotalEl && weekTotalEl.parentNode && weekTotalEl.parentNode !== parent) {
         try { weekTotalEl.remove(); } catch (e) {}
+      }
+      if (line && line.parentNode === parent) {
+        try { line.remove(); } catch (e) {}
       }
       line = document.createElement('div');
       line.className = 'ke-week-total';
       line.setAttribute('role', 'status');
+      todayEl = document.createElement('span');
+      todayEl.className = 'ke-today-total';
+      weekEl = document.createElement('span');
+      weekEl.className = 'ke-week-total-value';
+      line.appendChild(todayEl);
+      line.appendChild(weekEl);
       weekTotalEl = line;
     }
-    const text = weekTotalLabel() + ': ' + KE.formatSiteHms(totalSec);
-    if (line.textContent !== text) line.textContent = text;
+    const todayText = dayTotalLabel() + ' ' + KE.formatSiteHms(todaySec);
+    const weekText = weekTotalLabel() + ': ' + KE.formatSiteHms(weekSec);
+    if (todayEl.textContent !== todayText) todayEl.textContent = todayText;
+    if (weekEl.textContent !== weekText) weekEl.textContent = weekText;
     try { parent.insertBefore(line, card); } catch (e) {}
     return line;
   }
@@ -406,9 +445,11 @@
   function refreshWeekTotal(tbody) {
     const tb = tbody || findSiteTbody();
     if (!tb) return '';
+    const today = siteTodayTotalSeconds(tb);
     const total = siteWeekTotalSeconds(tb);
-    upsertWeekTotalLine(findSiteCard(), total);
-    return weekTotalLabel() + ': ' + KE.formatSiteHms(total);
+    upsertWeekTotalLine(findSiteCard(), today, total);
+    return dayTotalLabel() + ' ' + KE.formatSiteHms(today) + '  ' +
+      weekTotalLabel() + ': ' + KE.formatSiteHms(total);
   }
   KE.refreshSiteWeekTotal = refreshWeekTotal;
 

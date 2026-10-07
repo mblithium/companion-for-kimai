@@ -2,6 +2,13 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.12] — 2026-10-07
+### Added
+- Total do dia atual (`HOJE HH:MM:SS`) à esquerda do total semanal, acima da
+  tabela do timesheet.
+### Fixed
+- Total semanal passa a somar só a semana ISO mais recente da listagem.
+
 ## [0.22.11] — 2026-10-07
 ### Fixed
 - Higiene de `innerHTML`: limpezas de container usam `replaceChildren()`;
