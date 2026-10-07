@@ -78,8 +78,6 @@ content e no popup, sempre com prefixo `ke-`), `src/popup/popup.css`.
   voltam via `renderActive()`.
 - **Agrupar**: `format.groupByTask()` (por projeto+atividade) → linhas de grupo
   com expandir + continuar pelo mais recente; preferência `groupTasks` no sync.
-- **Exibição**: `hideDateColumn` no sync → classe `ke-hide-date` no `<body>`
-  some `.col_date` via CSS; `onStorageChanged` aplica sem recarregar.
 - **Agrupar no site** (`content/sitegroup.js`, puro e testável): botão discreto
   acima da tabela; agrupa só iguais **adjacentes** estilo Clockify
   (cliente+projeto+atividade+descrição), avulsos sem cabeçalho; linha de grupo

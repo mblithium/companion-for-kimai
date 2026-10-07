@@ -28,7 +28,7 @@ function usedNames(pageScript) {
   return used;
 }
 
-for (const html of ['src/popup/popup.html', 'src/options/options.html']) {
+for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options/options.html']) {
   const files = scriptsOf(html);
   for (const f of files) {
     if (!fs.existsSync(path.join(ROOT, f))) {

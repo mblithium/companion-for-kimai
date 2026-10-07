@@ -12,6 +12,7 @@ console.log('módulos sob teste: ' + contentFiles.length);
 const SRC_EXTRA = ['src/common/format.js', 'src/common/permissions.js', 'src/common/theme.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n;\n');
 const SRC_TESTHOOK = '\n;globalThis.__keTest = { KE };';
 const POP_SRC = fs.readFileSync(path.join(ROOT, 'src/popup/popup.js'), 'utf8');
+const FOCUS_SRC = fs.readFileSync(path.join(ROOT, 'src/popup/focus.js'), 'utf8');
 const OPT_SRC = fs.readFileSync(path.join(ROOT, 'src/options/options.js'), 'utf8');
 function workerTestSource() {
   const wsrc = fs.readFileSync(path.join(ROOT, 'src/background/worker.js'), 'utf8');
@@ -234,6 +235,8 @@ const chrome = {
     remove: async () => { chrome.permissions.granted = false; return true; },
   },
   runtime: {
+    getManifest: () => manifest,
+    getURL: (file) => 'chrome-extension://test/' + file,
     openOptionsPage() {},
     onInstalled: listenerReg(),
     onStartup: listenerReg(),
@@ -246,6 +249,10 @@ const chrome = {
     create: async (o) => { chrome.tabs.created.push(o); return o; },
     reload: async (id) => { chrome.tabs.reloaded.push(id); return id; },
     query: async () => tabList.slice(),
+  },
+  windows: {
+    created: [],
+    create: async (options) => { chrome.windows.created.push(options); return { id: chrome.windows.created.length }; },
   },
   alarms: {
     create() {},
@@ -610,6 +617,35 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   popEls['ke-pop-new-toggle'].onclick();
   check('cabeçalho recolhe Novo timer novamente', popEls['ke-pop-new-body'].hidden &&
     popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'false');
+  await popEls['ke-pop-focus'].onclick();
+  check('popup abre tracker em janela flutuante', chrome.windows.created.length === 1 &&
+    chrome.windows.created[0].url === 'chrome-extension://test/src/popup/focus.html' &&
+    chrome.windows.created[0].type === 'popup', chrome.windows.created);
+
+  const previousFocusActive = activeStub;
+  activeStub = [
+    { id: 990, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: new Date(Date.now() - 5 * 60 * 1000).toISOString(), description: 'focus test', tags: ['Alexander'] },
+  ];
+  eval(FOCUS_SRC);
+  await sleep(100);
+  check('tracker mostra timer ativo e opção pausar', popEls['ke-focus-row'].hidden === false &&
+    popEls['ke-focus-task'].textContent.includes('Consequuntur dolor') &&
+    popEls['ke-focus-action'].textContent.includes('Pausar'));
+  activeStub = [];
+  await popEls['ke-focus-action'].onclick();
+  await sleep(100);
+  check('tracker pausa e guarda dados para retomar', stoppedIds.includes('990') &&
+    storedLocal.kePausedTimer.projectId === '200' && storedLocal.kePausedTimer.tags[0] === 'Alexander' &&
+    popEls['ke-focus-action'].textContent.includes('Retomar'));
+  await popEls['ke-focus-action'].onclick();
+  await sleep(100);
+  const resumedByTracker = posted[posted.length - 1];
+  check('tracker retoma o mesmo timer', resumedByTracker.project === 200 &&
+    resumedByTracker.activity === 1655 && resumedByTracker.description === 'focus test' &&
+    resumedByTracker.tags === 'Alexander' && !('kePausedTimer' in storedLocal), resumedByTracker);
+  activeStub = previousFocusActive;
+  posted.length = 0;
+  stoppedIds.length = 0;
   const popProj = findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0];
   check('popup projeto preenchido', popProj.value === 'São Paulo Tech / Site São Paulo', popProj.value);
   const groups = findAll(popEls['ke-pop-today'], 'ke-pop-group');
@@ -892,14 +928,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     qtCss.includes('body.ke-hide-header .navbar.navbar-expand-md'));
   const qtJs = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.js'), 'utf8');
   check('Interface aplica preferências ao body',
-    ['hideSidebar', 'hideActionBar', 'hideHeader'].every((key) => qtJs.includes(`settings.${key}`)));
+    ['hideNavigation', 'hideSidebar', 'hideActionBar', 'hideHeader'].every((key) => qtJs.includes(`settings.${key}`)));
   check('ícone circular centraliza o triângulo CSS', /#ke-quick-timer \.ke-play\s*\{[^}]*align-items:\s*center[^}]*justify-content:\s*center/s.test(qtCss) &&
     /#ke-quick-timer \.ke-play-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(qtCss));
   check('botão Iniciar centraliza ícone e texto com gap', /#ke-quick-timer \.ke-btn-start\s*\{[^}]*display:\s*inline-flex[^}]*align-items:\s*center[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(qtCss));
-  check('regra oculta Data', /body\.ke-hide-date[\s\S]*?\.col_date[\s\S]*?display:\s*none/.test(qtCss));
-  check('sem exceção p/ grupo', !/tr\.ke-sitegroup[\s\S]*?\.col_date/.test(qtCss));
-  check('exceção p/ summary/info', /tr\.summary[\s\S]*?\.col_date[\s\S]*?display:\s*table-cell/.test(qtCss) &&
-    /tr\.info[\s\S]*?\.col_date[\s\S]*?display:\s*table-cell/.test(qtCss));
   KE._initialBsTheme = undefined;
   stubBsTheme = 'dark';
   stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', theme: 'dracula' };
@@ -1304,12 +1336,16 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', keLocale: 'pt_BR' };
   eval(OPT_SRC);
   await sleep(300);
+  check('sobre mostra metadados do manifesto',
+    popEls['ke-opt-about-name'].textContent === manifest.name &&
+    popEls['ke-opt-about-version'].textContent === 'v' + manifest.version &&
+    popEls['ke-opt-about-author'].textContent === manifest.author &&
+    popEls['ke-opt-about-github'].href === manifest.homepage_url);
   const toast = popEls['ke-opt-toast'];
   const toastShown = () => toast.hidden === false && toast.classList.contains('ke-show');
   check('Interface inicia com opções desmarcadas',
-    popEls['ke-opt-hide-sidebar'].checked === false &&
-    popEls['ke-opt-hide-actionbar'].checked === false &&
-    popEls['ke-opt-hide-header'].checked === false);
+    popEls['ke-opt-hide-navigation'].checked === false &&
+    popEls['ke-opt-hide-actionbar'].checked === false);
   popEls['ke-opt-sc-start'].value = 'X';
   popEls['ke-opt-sc-reset'].fire('click');
   await sleep(20);
@@ -1323,14 +1359,14 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const delays = [];
   global.setTimeout = (fn, ms, ...a) => { delays.push(ms); return origSetTimeout(fn, ms, ...a); };
   popEls['ke-opt-url'].value = 'https://kimai.exemplo';
-  popEls['ke-opt-hide-sidebar'].checked = true;
+  popEls['ke-opt-hide-navigation'].checked = true;
   popEls['ke-opt-hide-actionbar'].checked = true;
-  popEls['ke-opt-hide-header'].checked = true;
   popEls['ke-opt-save'].fire('click');
   await sleep(100);
   check('salvar válido usa toast', toastShown() && toast.textContent === 'Configurações salvas.', toast.textContent);
-  check('salvar persiste opções de Interface', stored.keSettings.hideSidebar === true &&
-    stored.keSettings.hideActionBar === true && stored.keSettings.hideHeader === true, stored.keSettings);
+  check('salvar persiste opções de Interface', stored.keSettings.hideNavigation === true &&
+    stored.keSettings.hideActionBar === true && stored.keSettings.hideSidebar === false &&
+    stored.keSettings.hideHeader === false, stored.keSettings);
   check('toast dura 5 segundos', delays.includes(5000), delays.slice(-5));
   global.setTimeout = origSetTimeout;
   storedLocal.keApiToken = 'tok-desconectar';

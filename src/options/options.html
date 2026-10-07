@@ -86,26 +86,18 @@
         <select id="ke-opt-theme"></select>
       </label>
       <p class="ke-opt-hint">Vale para o popup, esta página e a página do Kimai inteira.</p>
-      <label class="ke-opt-check">
-        <input type="checkbox" id="ke-opt-hide-date">
-        <span>Ocultar coluna <strong>Data</strong> na tabela do timesheet</span>
-      </label>
     </section>
 
     <section class="ke-opt-card">
       <h2>Interface</h2>
       <p class="ke-opt-hint">Personalize os elementos exibidos na página do Kimai.</p>
       <label class="ke-opt-check">
-        <input type="checkbox" id="ke-opt-hide-sidebar">
-        <span>Ocultar menu lateral</span>
+        <input type="checkbox" id="ke-opt-hide-navigation">
+        <span>Ocultar interface de navegação (Cabeçalho e páginas)</span>
       </label>
       <label class="ke-opt-check">
         <input type="checkbox" id="ke-opt-hide-actionbar">
         <span>Ocultar barra de ações (busca, exportação etc.)</span>
-      </label>
-      <label class="ke-opt-check">
-        <input type="checkbox" id="ke-opt-hide-header">
-        <span>Ocultar cabeçalho (logo, perfil etc.)</span>
       </label>
     </section>
 
@@ -142,6 +134,18 @@
         <button id="ke-opt-cache-refresh" class="ke-opt-btn ke-opt-btn-primary" type="button">Atualizar cache</button>
         <button id="ke-opt-cache-clear" class="ke-opt-btn ke-opt-btn-danger" type="button">Limpar cache</button>
       </div>
+    </section>
+
+    <section class="ke-opt-card" aria-labelledby="ke-opt-about-heading">
+      <h2 id="ke-opt-about-heading">Sobre a extensão</h2>
+      <p id="ke-opt-about-description" class="ke-opt-hint"></p>
+      <dl class="ke-opt-about">
+        <div><dt>Nome</dt><dd id="ke-opt-about-name"></dd></div>
+        <div><dt>Versão</dt><dd id="ke-opt-about-version"></dd></div>
+        <div><dt>Autor</dt><dd id="ke-opt-about-author"></dd></div>
+        <div><dt>GitHub</dt><dd><a id="ke-opt-about-github" target="_blank" rel="noopener noreferrer"></a></dd></div>
+        <div><dt>Licença</dt><dd>MIT</dd></div>
+      </dl>
     </section>
 
     <div id="ke-opt-toast" class="ke-opt-toast" role="status" hidden></div>

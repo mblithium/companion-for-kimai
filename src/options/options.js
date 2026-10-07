@@ -120,6 +120,21 @@
       : 'Cache vazio.';
     $('ke-opt-cache-state').dataset.kind = '';
   }
+
+  function renderExtensionInfo() {
+    let info = {};
+    try {
+      const runtime = KE.ext().runtime;
+      if (runtime && typeof runtime.getManifest === 'function') info = runtime.getManifest() || {};
+    } catch (e) {}
+    const github = info.homepage_url || 'https://github.com/mblithium/companion-for-kimai';
+    $('ke-opt-about-name').textContent = info.name || 'Companion for Kimai';
+    $('ke-opt-about-version').textContent = info.version ? 'v' + info.version : '—';
+    $('ke-opt-about-author').textContent = info.author || '—';
+    $('ke-opt-about-description').textContent = info.description || '';
+    $('ke-opt-about-github').href = github;
+    $('ke-opt-about-github').textContent = github.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  }
   async function effectiveConfig() {
     const base = KE.normalizeBaseUrl($('ke-opt-url').value);
     const typed = $('ke-opt-token').value.trim();
@@ -153,6 +168,7 @@
 
   async function boot() {
     await KE.applyTheme();
+    renderExtensionInfo();
     $('ke-opt-toast').addEventListener('click', () => setStatus('', ''));
     const settings = await KE.getSettings();
     $('ke-opt-url').value = settings.kimaiBaseUrl || '';
@@ -201,10 +217,8 @@
       syncOpen();
       await refreshTokenState();
     })();
-    $('ke-opt-hide-date').checked = !!(settings.hideDateColumn);
-    $('ke-opt-hide-sidebar').checked = !!settings.hideSidebar;
+    $('ke-opt-hide-navigation').checked = !!(settings.hideNavigation || settings.hideSidebar || settings.hideHeader);
     $('ke-opt-hide-actionbar').checked = !!settings.hideActionBar;
-    $('ke-opt-hide-header').checked = !!settings.hideHeader;
     fillShortcuts(settings.shortcuts);
     $('ke-opt-sc-enabled').checked = !settings || settings.shortcutsEnabled !== false;
     ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => {
@@ -217,7 +231,6 @@
       ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => { $(id).dataset.prev = $(id).value; });
       setStatus('Padrões restaurados nos campos. Salve para aplicar.', '');
     });
-    $('ke-opt-hide-date').checked = !!(settings.hideDateColumn);
     const open = $('ke-opt-open');
     const syncOpen = () => {
       const base = KE.normalizeBaseUrl($('ke-opt-url').value);
@@ -288,10 +301,10 @@
       theme: themeSel.value,
       shortcuts: readShortcuts(),
       shortcutsEnabled: $('ke-opt-sc-enabled').checked,
-      hideDateColumn: $('ke-opt-hide-date').checked,
-      hideSidebar: $('ke-opt-hide-sidebar').checked,
+      hideNavigation: $('ke-opt-hide-navigation').checked,
+      hideSidebar: false,
       hideActionBar: $('ke-opt-hide-actionbar').checked,
-      hideHeader: $('ke-opt-hide-header').checked,
+      hideHeader: false,
       keLocale: localeSel.value,
     });
     document.documentElement.dataset.keTheme = themeSel.value;

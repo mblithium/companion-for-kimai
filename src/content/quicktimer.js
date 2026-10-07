@@ -20,10 +20,10 @@
       const s = await KE.storageGet(['keSettings']);
       const settings = (s && s.keSettings) || {};
       if (document.body) {
-        document.body.classList.toggle('ke-hide-date', !!settings.hideDateColumn);
-        document.body.classList.toggle('ke-hide-sidebar', !!settings.hideSidebar);
+        const hideNavigation = !!(settings.hideNavigation || settings.hideSidebar || settings.hideHeader);
+        document.body.classList.toggle('ke-hide-sidebar', hideNavigation);
         document.body.classList.toggle('ke-hide-actionbar', !!settings.hideActionBar);
-        document.body.classList.toggle('ke-hide-header', !!settings.hideHeader);
+        document.body.classList.toggle('ke-hide-header', hideNavigation);
       }
     } catch (e) {}
   }

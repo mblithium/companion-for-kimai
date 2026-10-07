@@ -1,0 +1,43 @@
+/* Compact floating timer tracker styles. */
+html { color-scheme: light dark; }
+body {
+  box-sizing: border-box;
+  width: 400px;
+  min-height: 140px;
+  margin: 0;
+  padding: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  color: var(--ke-text);
+  background: var(--ke-bg);
+}
+.ke-focus { display: grid; gap: 10px; }
+.ke-focus-head { display: flex; align-items: center; gap: 8px; }
+.ke-focus-head h1 { margin: 0; font-size: 14px; }
+.ke-focus-mark {
+  width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--ke-green); color: var(--ke-on-green); font-size: 12px;
+}
+.ke-focus-row {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  padding: 9px 10px; border: 1px solid var(--ke-border); border-radius: 8px;
+  background: var(--ke-surface);
+}
+.ke-focus-info { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.ke-focus-task, .ke-focus-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ke-focus-task { font-size: 13px; }
+.ke-focus-meta, .ke-focus-empty, .ke-focus-status { font-size: 12px; }
+.ke-focus-meta, .ke-focus-empty { opacity: 0.72; }
+.ke-focus-duration { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.ke-focus-action, .ke-focus-settings {
+  flex: none; border: 0; border-radius: 6px; padding: 7px 11px;
+  background: var(--ke-green); color: var(--ke-on-green); font: inherit; font-weight: 700; cursor: pointer;
+}
+.ke-focus-action:hover, .ke-focus-settings:hover { background: var(--ke-green-dark); }
+.ke-focus-action:disabled { opacity: 0.6; cursor: wait; }
+.ke-focus-action[data-mode="paused"] { background: var(--ke-link); color: #fff; }
+.ke-focus-empty, .ke-focus-status { margin: 0; }
+.ke-focus-status[data-kind="err"] { color: var(--ke-red-text); }
+.ke-focus-status[data-kind="ok"] { color: var(--ke-green-text); }
+.ke-focus-settings { justify-self: start; }
+[hidden] { display: none !important; }

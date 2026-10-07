@@ -31,6 +31,17 @@
     ui.errorMsg.textContent = msg;
     show('error');
   }
+
+  async function openFocusWindow() {
+    const extension = KE.ext();
+    const url = extension.runtime.getURL('src/popup/focus.html');
+    if (extension.windows && typeof extension.windows.create === 'function') {
+      return extension.windows.create({ url, type: 'popup', width: 430, height: 190, focused: true });
+    }
+    if (extension.tabs && typeof extension.tabs.create === 'function') return extension.tabs.create({ url });
+    throw new Error('Floating windows are not supported by this browser.');
+  }
+
   function connectionMessage(base, e) {
     if (isAuthError(e)) return KE.T.authDenied + ' Abra as configurações e use "Testar conexão".';
     const detail = String((e && e.serverMessage) || '').trim();
@@ -452,6 +463,13 @@
     $('ke-pop-label-activity').textContent = KE.T.activity;
     $('ke-pop-label-tags').textContent = KE.T.tags;
     $('ke-pop-settings').addEventListener('click', () => KE.openOptions());
+    $('ke-pop-focus').onclick = async () => {
+      try {
+        await openFocusWindow();
+      } catch (e) {
+        setStatus('Não foi possível abrir o acompanhamento do timer.', 'err');
+      }
+    };
     ui.newTimerToggle.onclick = () => setNewTimerCollapsed(!ui.newTimerBody.hidden);
     $('ke-pop-open').addEventListener('click', async () => {
       const s = await KE.getSettings();

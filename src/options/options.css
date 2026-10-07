@@ -69,6 +69,11 @@ body {
 .ke-opt-state { font-size: 13px; }
 .ke-opt-state[data-kind="ok"] { color: var(--ke-green-text); font-weight: 600; }
 .ke-opt-state[data-kind="warn"] { color: var(--ke-warn); font-weight: 600; }
+.ke-opt-about { display: grid; gap: 8px; margin: 0; font-size: 13px; }
+.ke-opt-about > div { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 10px; }
+.ke-opt-about dt { font-weight: 700; }
+.ke-opt-about dd { margin: 0; overflow-wrap: anywhere; }
+.ke-opt-about a { color: var(--ke-link); }
 
 .ke-opt-toast {
   position: fixed;

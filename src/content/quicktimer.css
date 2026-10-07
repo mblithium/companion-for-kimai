@@ -11,13 +11,6 @@
 }
 
 
-body.ke-hide-date .datatable_timesheet .col_date {
-  display: none !important;
-}
-body.ke-hide-date .datatable_timesheet tr.summary .col_date,
-body.ke-hide-date .datatable_timesheet tr.info .col_date {
-  display: table-cell !important;
-}
 body.ke-hide-sidebar .navbar-vertical { display: none !important; }
 body.ke-hide-sidebar .page-wrapper { margin-left: 0 !important; }
 body.ke-hide-actionbar .page-header.d-print-none { display: none !important; }

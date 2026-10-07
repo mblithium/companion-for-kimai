@@ -2,6 +2,18 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.8] — 2026-10-06
+### Added
+- Painel flutuante compacto para acompanhar o timer ativo e pausá-lo/retomá-lo,
+  preservando projeto, atividade, descrição e tags.
+- Seção de informações da extensão nas configurações, com versão, autor e GitHub.
+### Changed
+- Configurações de Interface para ocultar a navegação ou a barra de ações do Kimai;
+  removida a opção antiga de ocultar a coluna Data.
+- Ícones do timer e dos botões de início alinhados com formas e espaçamentos estáveis.
+- O build dos ZIPs resolve as dependências do manifest e das páginas, sem copiar
+  arquivos de código não referenciados; incluído `sitegroup.js` nas variantes.
+
 ## [0.22.7] — 2026-10-06
 ### Changed
 - O cabeçalho do popup permanece fixo no topo durante a rolagem, mantendo

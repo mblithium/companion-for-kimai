@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../common/theme.css">
+<link rel="stylesheet" href="../common/themes/light.css">
+<link rel="stylesheet" href="../common/themes/dark.css">
+<link rel="stylesheet" href="../common/themes/system.css">
+<link rel="stylesheet" href="../common/themes/dracula.css">
+<link rel="stylesheet" href="../common/themes/catppuccin.css">
+<link rel="stylesheet" href="../common/themes/nord.css">
+<link rel="stylesheet" href="../common/themes/gnome.css">
+<link rel="stylesheet" href="../common/themes/gruvbox.css">
+<link rel="stylesheet" href="focus.css">
+<script src="../content/namespace.js"></script>
+<script src="../content/i18n.js"></script>
+<script src="../content/utils.js"></script>
+<script src="../content/api.js"></script>
+<script src="../content/storage.js"></script>
+<script src="../content/kimai.js"></script>
+<script src="../content/cache.js"></script>
+<script src="../common/permissions.js"></script>
+<script src="../common/format.js"></script>
+<script src="../common/theme.js"></script>
+<script src="focus.js" defer></script>
+</head>
+<body>
+  <main class="ke-focus">
+    <header class="ke-focus-head">
+      <span class="ke-focus-mark" aria-hidden="true">⏱</span>
+      <h1 id="ke-focus-title"></h1>
+    </header>
+    <p id="ke-focus-status" class="ke-focus-status" role="status" hidden></p>
+    <div id="ke-focus-row" class="ke-focus-row" hidden>
+      <div class="ke-focus-info">
+        <strong id="ke-focus-task" class="ke-focus-task"></strong>
+        <span id="ke-focus-meta" class="ke-focus-meta"></span>
+      </div>
+      <time id="ke-focus-duration" class="ke-focus-duration">0:00</time>
+      <button id="ke-focus-action" class="ke-focus-action" type="button"></button>
+    </div>
+    <p id="ke-focus-empty" class="ke-focus-empty" hidden></p>
+    <button id="ke-focus-settings" class="ke-focus-settings" type="button" hidden></button>
+  </main>
+</body>
+</html>

@@ -50,67 +50,76 @@ function checkVersions(manifests) {
 
 function referencedFiles(manifest) {
   const refs = [];
+  const seen = new Set();
+  const addReference = (reference, base = '') => {
+    if (!reference || /^(?:[a-z]+:|\/\/|#)/i.test(reference)) return;
+    const cleanPath = String(reference).split(/[?#]/, 1)[0];
+    if (!cleanPath || cleanPath.startsWith('/')) return;
+    const normalized = path.posix.normalize(path.posix.join(base, cleanPath));
+    if (normalized === '..' || normalized.startsWith('../')) fail(`Referenced path escapes the project: ${reference}`);
+    if (!seen.has(normalized)) {
+      seen.add(normalized);
+      refs.push(normalized);
+    }
+  };
+
   for (const contentScript of manifest.content_scripts || []) {
-    refs.push(...(contentScript.js || []), ...(contentScript.css || []));
+    (contentScript.js || []).forEach((file) => addReference(file));
+    (contentScript.css || []).forEach((file) => addReference(file));
   }
-  refs.push(...Object.values(manifest.icons || {}));
+  Object.values(manifest.icons || {}).forEach((file) => addReference(file));
 
   const action = manifest.action || {};
-  if (action.default_popup) refs.push(action.default_popup);
-  refs.push(...Object.values(action.default_icon || {}));
+  if (action.default_popup) addReference(action.default_popup);
+  Object.values(action.default_icon || {}).forEach((file) => addReference(file));
 
   const options = manifest.options_ui || {};
-  if (options.page) refs.push(options.page);
+  if (options.page) addReference(options.page);
   for (const resourceGroup of manifest.web_accessible_resources || []) {
-    refs.push(...(resourceGroup.resources || []));
+    (resourceGroup.resources || []).forEach((file) => addReference(file));
   }
 
   const background = manifest.background || {};
-  if (background.service_worker) refs.push(background.service_worker);
-  refs.push(...(background.scripts || []));
-
-  const workerPath = path.join(ROOT, 'src', 'background', 'worker.js');
-  if (fs.existsSync(workerPath)) {
-    const source = fs.readFileSync(workerPath, 'utf8');
-    for (const [, imports] of source.matchAll(/importScripts\(([\s\S]*?)\)/g)) {
-      for (const [, importedPath] of imports.matchAll(/'([^']+)'/g)) {
-        refs.push(path.posix.normalize(path.posix.join('src/background', importedPath)));
-      }
-    }
-    for (const [, assetPath] of source.matchAll(/['"](icons\/[^'"]+)['"]/g)) refs.push(assetPath);
-  }
-
-  for (const htmlPath of [action.default_popup, options.page]) {
-    if (!htmlPath) continue;
-    const absolutePath = path.join(ROOT, htmlPath);
-    if (!fs.existsSync(absolutePath)) continue;
-    const html = fs.readFileSync(absolutePath, 'utf8');
-    const base = path.posix.dirname(htmlPath);
-    for (const [, reference] of html.matchAll(/<(?:script|link|img|source|video|audio|iframe|object|embed)\b[^>]+(?:src|href|data)="([^"]+)"/gi)) {
-      if (/^(?:https?:|data:)/i.test(reference)) continue;
-      refs.push(path.posix.normalize(path.posix.join(base, reference)));
-    }
-  }
+  if (background.service_worker) addReference(background.service_worker);
+  (background.scripts || []).forEach((file) => addReference(file));
 
   for (let i = 0; i < refs.length; i++) {
-    const stylesheet = refs[i];
-    if (!/\.css(?:[?#].*)?$/i.test(stylesheet)) continue;
-    const absolutePath = path.resolve(ROOT, stylesheet);
+    const reference = refs[i];
+    const absolutePath = path.resolve(ROOT, reference);
     const relativePath = path.relative(ROOT, absolutePath);
-    if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) continue;
-    if (!fs.existsSync(absolutePath)) continue;
-    const css = fs.readFileSync(absolutePath, 'utf8');
-    const resourcePattern = /url\(\s*['"]?([^)'"\s]+)['"]?\s*\)|@import\s+['"]([^'"]+)['"]/gi;
-    for (const match of css.matchAll(resourcePattern)) {
-      const resource = match[1] || match[2];
-      if (/^(?:[a-z]+:|\/\/|\/|#)/i.test(resource)) continue;
-      const cleanPath = resource.split(/[?#]/, 1)[0];
-      if (!cleanPath) continue;
-      refs.push(path.posix.normalize(path.posix.join(path.posix.dirname(stylesheet), cleanPath)));
+    if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+      fail(`Referenced path escapes the project: ${reference}`);
+    }
+    if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) continue;
+    const source = fs.readFileSync(absolutePath, 'utf8');
+    const extension = path.posix.extname(reference).toLowerCase();
+
+    if (extension === '.html') {
+      const base = path.posix.dirname(reference);
+      for (const [, resource] of source.matchAll(/<(?:script|link|img|source|video|audio|iframe|object|embed)\b[^>]+(?:src|href|data)="([^"]+)"/gi)) {
+        addReference(resource, base);
+      }
+    }
+
+    if (extension === '.css') {
+      const resourcePattern = /url\(\s*['"]?([^)'"\s]+)['"]?\s*\)|@import\s+['"]([^'"]+)['"]/gi;
+      for (const match of source.matchAll(resourcePattern)) addReference(match[1] || match[2], path.posix.dirname(reference));
+    }
+
+    if (extension === '.js') {
+      for (const [, imports] of source.matchAll(/importScripts\(([\s\S]*?)\)/g)) {
+        for (const [, importedPath] of imports.matchAll(/['"]([^'"]+)['"]/g)) {
+          addReference(importedPath, path.posix.dirname(reference));
+        }
+      }
+      for (const [, extensionPath] of source.matchAll(/getURL\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+        addReference(extensionPath.replace(/^\//, ''));
+      }
+      for (const [, assetPath] of source.matchAll(/['"](icons\/[^'"]+)['"]/g)) addReference(assetPath);
     }
   }
 
-  return [...new Set(refs.map((file) => file.replaceAll('\\', '/')))];
+  return refs;
 }
 
 function collectProductionFiles(manifest) {
