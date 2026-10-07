@@ -1225,6 +1225,20 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('API funciona sem coluna de duração', bareResult && bareResult.week === 5400, bareResult);
   check('sem coluna de duração não cria célula estranha', findAll(bareTbody, 'ke-day-total').length === 0 &&
     bareTbody.children.every((r) => r.children.length <= 3));
+  rangeStub = [
+    { id: 10, project: 1, activity: 1, begin: '2026-10-12T08:00:00', end: '2026-10-12T09:00:00', duration: 3600, description: 'semana passada' },
+    { id: 11, project: 1, activity: 1, begin: '2026-10-19T08:00:00', end: '2026-10-19T10:00:00', duration: 7200, description: 'semana atual' },
+  ];
+  const twoWeekApi = document.createElement('tbody');
+  twoWeekApi.appendChild(realSumRow('12/10/2026', '0:00'));
+  twoWeekApi.appendChild(realSumRow('19/10/2026', '0:00'));
+  const twoWeekResult = await KE.refreshSiteTotals(twoWeekApi);
+  check('total semanal via API soma só a semana mais recente', twoWeekResult && twoWeekResult.from === '20261012' &&
+    twoWeekResult.to === '20261019' && twoWeekResult.days === 2 && twoWeekResult.week === 7200, twoWeekResult);
+  check('células diárias via API em semanas distintas',
+    findAll(twoWeekApi, 'ke-day-total')[0].textContent === '01:00:00' &&
+    findAll(twoWeekApi, 'ke-day-total')[1].textContent === '02:00:00');
+  rangeStub = [];
   failMode = 'network';
   const fallbackTbody = document.createElement('tbody');
   fallbackTbody.appendChild(siteRow({ id: 'f1', date: '13/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1' }));
