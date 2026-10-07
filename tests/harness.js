@@ -94,6 +94,12 @@ class StubEl {
     return node;
   }
   prepend(...nodes) { nodes.reverse().forEach((n) => this.insertBefore(n, this.children[0] || null)); }
+  replaceChildren(...nodes) {
+    this.children.forEach((c) => { c.parentNode = null; });
+    this.children = [];
+    this.textContent = '';
+    nodes.forEach((n) => this.appendChild(n));
+  }
   addEventListener(t, f) { (this._handlers[t] = this._handlers[t] || []).push(f); }
   removeEventListener() {}
   setAttribute(k, v) { this.attributes[k] = String(v); }

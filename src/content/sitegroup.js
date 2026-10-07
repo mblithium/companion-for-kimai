@@ -250,7 +250,13 @@
 
   function copyCell(td, rows, field) {
     const first = rows[0].querySelector('.' + field);
-    td.innerHTML = first ? first.innerHTML : '';
+    setClonedHTML(td, first && first.innerHTML);
+  }
+
+  // Safe innerHTML use: html always comes from cells already rendered (and
+  // escaped) by Kimai itself; no network or user string is assigned here.
+  function setClonedHTML(td, html) {
+    td.innerHTML = html || '';
     stripIds(td);
   }
 
@@ -258,8 +264,7 @@
     const cells = rows.map((tr) => tr.querySelector('.col_tags'));
     const html = sameInnerHTML(cells.filter(Boolean));
     if (html !== null && cells.length) {
-      td.innerHTML = html;
-      stripIds(td);
+      setClonedHTML(td, html);
       return;
     }
     const uniq = [];
@@ -497,8 +502,7 @@
         const cells = g.rows.map((r) => r.querySelector('.col_' + field)).filter(Boolean);
         const html = sameInnerHTML(cells);
         if (html !== null && cells.length === g.rows.length) {
-          td.innerHTML = html;
-          stripIds(td);
+          setClonedHTML(td, html);
         }
       } else if (field === 'actions') {
         expBtn = makeToggle();

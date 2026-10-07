@@ -74,7 +74,7 @@
   async function refreshActive() {
     KE.state.active = await KE.fetchActiveTimesheets();
     setNewTimerCollapsed(KE.state.active.length > 0);
-    ui.active.innerHTML = '';
+    ui.active.replaceChildren();
     if (!KE.state.active.length) {
       const empty = document.createElement('div');
       empty.className = 'ke-pop-empty';
@@ -230,7 +230,7 @@
   }
 
   async function refreshToday(force, silent) {
-    ui.today.innerHTML = '';
+    ui.today.replaceChildren();
     let entries = [];
     try {
       entries = (await KE.getTodayCached(force)).entries;
@@ -267,7 +267,7 @@
   }
 
   async function refreshRecent(force, silent) {
-    ui.recent.innerHTML = '';
+    ui.recent.replaceChildren();
     let entries = [];
     try {
       entries = (await KE.getRecentCached(force)).entries;
@@ -479,10 +479,10 @@
     ui.setupBtn.onclick = () => KE.openOptions();
     $('ke-pop-error-settings').onclick = () => KE.openOptions();
     $('ke-pop-error-retry').onclick = () => boot();
-    $('ke-pop-new-customer').innerHTML = '';
-    $('ke-pop-new-project').innerHTML = '';
-    $('ke-pop-new-activity').innerHTML = '';
-    $('ke-pop-new-tags').innerHTML = '';
+    $('ke-pop-new-customer').replaceChildren();
+    $('ke-pop-new-project').replaceChildren();
+    $('ke-pop-new-activity').replaceChildren();
+    $('ke-pop-new-tags').replaceChildren();
     setStatus('', '');
 
     try {

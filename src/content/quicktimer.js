@@ -97,7 +97,7 @@
 
   function renderActive() {
     if (!ui) return;
-    ui.activeList.innerHTML = '';
+    ui.activeList.replaceChildren();
     if (!KE.state.active.length) {
       ui.nowSection.style.display = 'none';
       return;
@@ -174,7 +174,7 @@
     const projId = KE.entityId(t.project);
     const actId = KE.entityId(t.activity);
 
-    row.innerHTML = '';
+    row.replaceChildren();
     const form = KE.el('div', 'ke-edit-form');
     const projCombo = KE.createCombo({ searchPlaceholder: KE.T.searchProject, allowEmpty: false });
     const actCombo = KE.createCombo({ searchPlaceholder: KE.T.searchActivity, allowEmpty: false });

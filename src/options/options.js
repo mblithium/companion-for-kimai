@@ -174,7 +174,7 @@
     let persistedUiLocale = settings.uiLocale || KE.uiLocale;
     $('ke-opt-url').value = settings.kimaiBaseUrl || '';
     const themeSel = $('ke-opt-theme');
-    themeSel.innerHTML = '';
+    themeSel.replaceChildren();
     KE.THEMES.forEach((t) => {
       const o = document.createElement('option');
       o.value = t.id;
@@ -184,7 +184,7 @@
     themeSel.value = await KE.currentTheme();
     const refreshThemeLabels = () => {
       const selectedTheme = themeSel.value;
-      themeSel.innerHTML = '';
+      themeSel.replaceChildren();
       KE.THEMES.forEach((theme) => {
         const option = document.createElement('option');
         option.value = theme.id;
@@ -195,7 +195,7 @@
     };
     const localeSel = $('ke-opt-locale');
     const fillLocales = (current) => {
-      localeSel.innerHTML = '';
+      localeSel.replaceChildren();
       const vals = KE.SUPPORTED_LOCALES.slice();
       if (current && vals.indexOf(current) < 0) vals.unshift(current);
       vals.forEach((v) => {

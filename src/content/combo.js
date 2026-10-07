@@ -69,7 +69,7 @@
       }
       combo._rendered = out;
       if (combo._active >= out.length) combo._active = out.length - 1;
-      list.innerHTML = '';
+      list.replaceChildren();
       if (!out.length) {
         const d = KE.el('div', 'ke-combo-empty', KE.T.noResults);
         list.appendChild(d);
@@ -320,7 +320,7 @@
       }
       combo._rendered = out;
       if (combo._active >= out.length) combo._active = out.length - 1;
-      list.innerHTML = '';
+      list.replaceChildren();
       if (!out.length) {
         list.appendChild(KE.el('div', 'ke-combo-empty', KE.T.noResults));
         return;

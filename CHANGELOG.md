@@ -2,6 +2,11 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.11] — 2026-10-07
+### Fixed
+- Higiene de `innerHTML`: limpezas de container usam `replaceChildren()`;
+  as cópias de HTML entre células foram centralizadas em helper documentado.
+
 ## [0.22.10] — 2026-10-07
 ### Fixed
 - Manifesto Firefox declara `data_collection_permissions.required: ["none"]`,
