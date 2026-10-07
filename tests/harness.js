@@ -748,7 +748,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('logo do popup usa triângulo CSS no círculo', /class="ke-pop-logo"[^>]*><span class="ke-pop-logo-icon"/.test(popHtmlForIcons) &&
     /\.ke-pop-logo-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(popCss));
   check('botão Iniciar do popup separa e centraliza ícone e texto',
-    /id="ke-pop-start"[^>]*class="[^"]*ke-pop-start-btn"[^>]*><span class="ke-pop-start-icon"[^>]*><\/span><span>Iniciar<\/span>/.test(popHtmlForIcons) &&
+    /id="ke-pop-start"[^>]*class="[^"]*ke-pop-start-btn"[^>]*><span class="ke-pop-start-icon"[^>]*><\/span><span[^>]*>Iniciar<\/span>/.test(popHtmlForIcons) &&
     /\.ke-pop-start-btn\s*\{[^}]*display:\s*inline-flex[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(popCss));
   const popupHeadCss = popCss.match(/\.ke-pop-head\s*\{([^}]*)\}/);
   check('popup header fica fixo durante scroll', !!popupHeadCss &&
@@ -1204,6 +1204,22 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   mIn.fire('keydown', { key: 'Enter' });
   check('sem duplicadas', mc.getValues().join(',') === 'Alpha');
   check('chip renderiza', mc.root.querySelectorAll('.ke-chip').length === 1);
+  check('chip remover usa rótulo traduzido', mc.root.querySelector('.ke-chip-x').getAttribute('aria-label') === 'Remover Alpha');
+  check('toggle do multiCombo tem rótulo acessível', findAll(mc.root, 'ke-combo-toggle')[0].getAttribute('aria-label') === 'Expandir opções');
+  const comboSrc = fs.readFileSync(path.join(ROOT, 'src/content/combo.js'), 'utf8');
+  check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
+    comboSrc.includes("KE.uiText('ui.expandOptions')"));
+  const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle'].every((k) =>
+    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
+  const optHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
+  check('título e idiomas das opções traduzíveis', optHtml.includes('<title data-ke-i18n="ui.optionsTitle">') &&
+    optHtml.includes('data-ke-i18n="ui.languagePortuguese"') && optHtml.includes('data-ke-i18n="ui.languageEnglish"'));
+  check('botões de ícone do popup têm aria-label traduzível',
+    ['ke-pop-open', 'ke-pop-settings', 'ke-pop-refresh-catalog', 'ke-pop-refresh-today', 'ke-pop-refresh-recent']
+      .every((id) => new RegExp('id="' + id + '"[^>]*data-ke-i18n-aria-label').test(popHtmlForIcons)));
+  const workerSrc = fs.readFileSync(path.join(ROOT, 'src/background/worker.js'), 'utf8');
+  check('título ocioso do worker usa i18n', workerSrc.includes("KE.uiText('ui.workerIdleTitle')"));
   mIn.value = '';
   mIn.fire('keydown', { key: 'Backspace' });
   check('backspace remove último', mc.getValues().length === 0 && mc.root.querySelectorAll('.ke-chip').length === 0);

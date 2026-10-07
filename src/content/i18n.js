@@ -75,6 +75,114 @@
       saving: 'Salvando…',
       updatedOk: 'Timer atualizado!',
       updateFail: 'Não foi possível atualizar o timer.',
+      ui: {
+        optionsTitle: 'Companion for Kimai — Configurações',
+        saveSettings: 'Salvar configurações',
+        kimai: 'Kimai',
+        baseUrl: 'URL base do seu Kimai',
+        detectedUrlHint: 'Detectada automaticamente ao abrir a página do timesheet. Ajuste aqui se usar mais de uma instalação.',
+        openKimai: 'Abrir meu Kimai',
+        popupAccess: 'Acesso ao popup',
+        popupAccessHint: 'Autoriza o navegador a chamar a API na URL acima (necessário mesmo com chave).',
+        grantAccess: 'Autorizar acesso',
+        removeAccess: 'Remover acesso',
+        apiKey: 'Chave de API',
+        apiKeyHint: 'Crie em Meu perfil → API Access no Kimai. Funciona mesmo sem login na página.',
+        apiKeyPlaceholder: 'cole aqui para trocar',
+        savedApiKey: 'Chave salva neste dispositivo.',
+        noApiKey: 'Nenhuma chave salva.',
+        manageApiKeys: 'Crie e gerencie suas chaves em',
+        testConnection: 'Testar conexão',
+        connect: 'Conectar',
+        disconnect: 'Desconectar',
+        language: 'Idioma',
+        uiLanguage: 'Idioma da interface',
+        languagePortuguese: 'Português (Brasil)',
+        languageEnglish: 'English',
+        kimaiLanguage: 'Idioma do Kimai (ex.: pt_BR)',
+        detectedLanguageHint: 'Detectado do seu Kimai logado quando possível; pode ajustar manualmente.',
+        appearance: 'Aparência',
+        theme: 'Tema',
+        themeHint: 'Vale para o popup, esta página e a página do Kimai inteira.',
+        interface: 'Interface',
+        interfaceHint: 'Personalize os elementos exibidos na página do Kimai.',
+        hideNavigation: 'Ocultar interface de navegação (Cabeçalho e páginas)',
+        hideActionBar: 'Ocultar barra de ações (busca, exportação etc.)',
+        shortcuts: 'Atalhos de teclado',
+        enableShortcuts: 'Ativar atalhos de teclado na página do timesheet',
+        shortcutsHint: 'Funcionam na página do timesheet (fora de campos de texto). Clique no campo e pressione a combinação — use Alt, Ctrl ou Shift. Backspace limpa.',
+        startNewTask: 'Iniciar nova tarefa',
+        stopTask: 'Parar tarefa',
+        restartTask: 'Recomeçar tarefa',
+        restoreDefaults: 'Restaurar padrões',
+        shortcutCaptureHint: 'pressione as teclas…',
+        removeItem: 'Remover',
+        expandOptions: 'Expandir opções',
+        newTagOption: '+ {{name}}',
+        workerIdleTitle: 'Companion for Kimai',
+        extensionHotkeysHint: 'Abrir o popup por teclado: configure em chrome://extensions → Atalhos de teclado (ação da extensão).',
+        cache: 'Cache',
+        cacheHint: 'Listas de clientes/projetos/atividades (24h) e diários (1h) ficam salvos neste dispositivo para abrir rápido.',
+        refreshCache: 'Atualizar cache',
+        clearCache: 'Limpar cache',
+        cacheEmpty: 'Cache vazio.',
+        cacheCount: '{{count}} item(ns) em cache neste dispositivo.',
+        about: 'Sobre a extensão',
+        aboutDescription: 'Uma extensão de navegador que aprimora seu fluxo de trabalho de controle de tempo no Kimai.',
+        name: 'Nome',
+        version: 'Versão',
+        author: 'Autor',
+        github: 'GitHub',
+        license: 'Licença',
+        invalidUrl: 'URL inválida. Use o formato https://seu-kimai.exemplo',
+        validUrlRequired: 'Salve uma URL válida primeiro.',
+        removeAccessUrlRequired: 'Informe uma URL válida para remover o acesso.',
+        accessAuthorized: 'Acesso autorizado para {{origin}}.',
+        accessMissing: 'Sem acesso a {{origin}}.',
+        accessDenied: 'Acesso negado.',
+        tokenLinkHint: 'preencha a URL e autorize o acesso para montar o link',
+        restoreShortcutsMessage: 'Padrões restaurados nos campos. Salve para aplicar.',
+        fillUrlGrantSave: 'Preencha a URL, autorize o acesso e salve para gerar o link da chave.',
+        connecting: 'Testando…',
+        connectionOk: 'Conexão ok ({{count}} timer(s) rodando).',
+        connectionFailed: 'Falhou',
+        connectionFallback: '. Verifique URL, chave e acesso abaixo.',
+        settingsSaved: 'Configurações salvas.',
+        accessGranted: 'Acesso autorizado.',
+        accessRemoved: 'Acesso removido para {{origin}}.',
+        removeAccessFailed: 'Não foi possível remover (retorno: {{result}}). Remova em chrome://extensions, nos detalhes da extensão.',
+        updatingCache: 'Atualizando cache…',
+        tokenRequired: 'Informe a chave de API para atualizar.',
+        cacheUpdated: 'Cache atualizado.',
+        cacheUpdateFailed: 'Falha ao atualizar o cache. Verifique URL e autenticação.',
+        cacheCleared: 'Cache limpo ({{count}} item(ns)).',
+        cacheAlreadyEmpty: 'Cache já estava vazio.',
+        nothingToDisconnect: 'Nada para desconectar.',
+        confirmDisconnect: 'Desconectar?\n\nIsso apaga a chave de API salva neste dispositivo.',
+        disconnected: 'Desconectado.',
+        popupOpenKimai: 'Abrir Kimai',
+        popupSettings: 'Configurações',
+        popupTracker: 'Acompanhar timer',
+        pauseTimerMenu: 'Pausar timer',
+        resumeTimerMenu: 'Continuar timer',
+        popupSetupNoBase: 'Configure a URL do seu Kimai nas configurações para usar o popup.',
+        popupSetupNoToken: 'Informe sua chave de API nas configurações para usar o popup.',
+        popupAuthorize: 'Autorizar acesso',
+        popupErrorSettings: 'Abrir configurações',
+        popupRetry: 'Tentar novamente',
+        activeSection: 'Rodando agora',
+        newTimer: 'Novo timer',
+        refreshCatalog: 'Atualizar listas',
+        continueToday: 'Continuar de hoje',
+        refreshToday: 'Atualizar diários',
+        recent: 'Recentes',
+        refreshRecent: 'Atualizar recentes',
+        popupConnectionAuth: 'Abra as configurações e use "Testar conexão".',
+        popupConnectionStart: 'Não foi possível conectar a {{origin}}. {{why}}Confira URL, login/chave e acesso, depois abra as configurações e use "Testar conexão".',
+        popupOpenTrackerFailed: 'Não foi possível abrir o acompanhamento do timer.',
+        popupLoadFailed: 'Não foi possível carregar o popup: {{error}}',
+        workerRunningTitle: 'Companion for Kimai — rodando: {{task}} ({{elapsed}})',
+      },
     },
     en: {
       title: 'Quick start timer',
@@ -148,6 +256,114 @@
       saving: 'Saving…',
       updatedOk: 'Timer updated!',
       updateFail: 'Could not update the timer.',
+      ui: {
+        optionsTitle: 'Companion for Kimai — Settings',
+        saveSettings: 'Save settings',
+        kimai: 'Kimai',
+        baseUrl: 'Kimai base URL',
+        detectedUrlHint: 'Detected automatically when you open the timesheet. Change it here if you use more than one installation.',
+        openKimai: 'Open my Kimai',
+        popupAccess: 'Popup access',
+        popupAccessHint: 'Allows the browser to call the API at the URL above (required even when using an API key).',
+        grantAccess: 'Grant access',
+        removeAccess: 'Remove access',
+        apiKey: 'API key',
+        apiKeyHint: 'Create one under My Profile → API Access in Kimai. Works even when you are not logged in to the page.',
+        apiKeyPlaceholder: 'paste here to replace',
+        savedApiKey: 'API key saved on this device.',
+        noApiKey: 'No API key saved.',
+        manageApiKeys: 'Create and manage your keys at',
+        testConnection: 'Test connection',
+        connect: 'Connect',
+        disconnect: 'Disconnect',
+        language: 'Language',
+        uiLanguage: 'Interface language',
+        languagePortuguese: 'Português (Brasil)',
+        languageEnglish: 'English',
+        kimaiLanguage: 'Kimai language (e.g. en)',
+        detectedLanguageHint: 'Detected from your logged-in Kimai account when possible; you can change it manually.',
+        appearance: 'Appearance',
+        theme: 'Theme',
+        themeHint: 'Applies to the popup, this page, and the Kimai page.',
+        interface: 'Interface',
+        interfaceHint: 'Choose which elements are shown on the Kimai page.',
+        hideNavigation: 'Hide navigation interface (header and pages)',
+        hideActionBar: 'Hide action bar (search, export, etc.)',
+        shortcuts: 'Keyboard shortcuts',
+        enableShortcuts: 'Enable keyboard shortcuts on the timesheet page',
+        shortcutsHint: 'Works on the timesheet page (outside text fields). Focus a field and press a shortcut using Alt, Ctrl, or Shift. Backspace clears it.',
+        startNewTask: 'Start a new task',
+        stopTask: 'Stop task',
+        restartTask: 'Restart task',
+        restoreDefaults: 'Restore defaults',
+        shortcutCaptureHint: 'press the keys…',
+        removeItem: 'Remove',
+        expandOptions: 'Expand options',
+        newTagOption: '+ {{name}}',
+        workerIdleTitle: 'Companion for Kimai',
+        extensionHotkeysHint: 'To open the popup with a shortcut, configure it under chrome://extensions → Keyboard shortcuts (extension action).',
+        cache: 'Cache',
+        cacheHint: 'Customer/project/activity lists (24h) and daily entries (1h) are saved on this device for faster startup.',
+        refreshCache: 'Refresh cache',
+        clearCache: 'Clear cache',
+        cacheEmpty: 'Cache is empty.',
+        cacheCount: '{{count}} cached item(s) on this device.',
+        about: 'About this extension',
+        aboutDescription: 'A browser extension that enhances your Kimai time-tracking workflow.',
+        name: 'Name',
+        version: 'Version',
+        author: 'Author',
+        github: 'GitHub',
+        license: 'License',
+        invalidUrl: 'Invalid URL. Use a format such as https://your-kimai.example',
+        validUrlRequired: 'Save a valid URL first.',
+        removeAccessUrlRequired: 'Enter a valid URL to remove access.',
+        accessAuthorized: 'Access granted for {{origin}}.',
+        accessMissing: 'No access to {{origin}}.',
+        accessDenied: 'Access denied.',
+        tokenLinkHint: 'enter the URL and grant access to build this link',
+        restoreShortcutsMessage: 'Defaults restored in the fields. Save to apply.',
+        fillUrlGrantSave: 'Enter the URL, grant access, and save to generate the API key link.',
+        connecting: 'Testing…',
+        connectionOk: 'Connection OK ({{count}} timer(s) running).',
+        connectionFailed: 'Failed',
+        connectionFallback: '. Check the URL, key, and access below.',
+        settingsSaved: 'Settings saved.',
+        accessGranted: 'Access granted.',
+        accessRemoved: 'Access removed for {{origin}}.',
+        removeAccessFailed: 'Could not remove access (result: {{result}}). Remove it in chrome://extensions under the extension details.',
+        updatingCache: 'Refreshing cache…',
+        tokenRequired: 'Enter the API key to refresh the cache.',
+        cacheUpdated: 'Cache updated.',
+        cacheUpdateFailed: 'Could not refresh the cache. Check the URL and authentication.',
+        cacheCleared: 'Cache cleared ({{count}} item(s)).',
+        cacheAlreadyEmpty: 'Cache was already empty.',
+        nothingToDisconnect: 'Nothing to disconnect.',
+        confirmDisconnect: 'Disconnect?\n\nThis removes the API key saved on this device.',
+        disconnected: 'Disconnected.',
+        popupOpenKimai: 'Open Kimai',
+        popupSettings: 'Settings',
+        popupTracker: 'Track timer',
+        pauseTimerMenu: 'Pause timer',
+        resumeTimerMenu: 'Continue timer',
+        popupSetupNoBase: 'Set your Kimai URL in settings to use the popup.',
+        popupSetupNoToken: 'Enter your API key in settings to use the popup.',
+        popupAuthorize: 'Grant access',
+        popupErrorSettings: 'Open settings',
+        popupRetry: 'Retry',
+        activeSection: 'Running now',
+        newTimer: 'New timer',
+        refreshCatalog: 'Refresh lists',
+        continueToday: 'Continue from today',
+        refreshToday: 'Refresh entries',
+        recent: 'Recent',
+        refreshRecent: 'Refresh recent entries',
+        popupConnectionAuth: 'Open settings and select "Test connection".',
+        popupConnectionStart: 'Could not connect to {{origin}}. {{why}}Check the URL, login/API key, and access, then open settings and select "Test connection".',
+        popupOpenTrackerFailed: 'Could not open the timer tracker.',
+        popupLoadFailed: 'Could not load the popup: {{error}}',
+        workerRunningTitle: 'Companion for Kimai — running: {{task}} ({{elapsed}})',
+      },
     },
   };
 
@@ -170,4 +386,48 @@
   };
 
   KE.T = KE.STRINGS[KE.detectLang()] || KE.STRINGS.pt;
+
+  KE.setLocale = function (locale) {
+    const language = String(locale || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
+    KE.uiLocale = language === 'en' ? 'en' : 'pt-BR';
+    KE.T = KE.STRINGS[language];
+    try {
+      if (document.documentElement && /^(?:chrome-extension|moz-extension):$/.test(location.protocol)) {
+        document.documentElement.lang = KE.uiLocale;
+      }
+    } catch (e) {}
+    return KE.uiLocale;
+  };
+
+  KE.applyLocale = async function () {
+    let locale = '';
+    try {
+      const settings = await KE.storageGet(['keSettings']);
+      locale = settings && settings.keSettings && settings.keSettings.uiLocale;
+    } catch (e) {}
+    return KE.setLocale(locale || KE.detectLang());
+  };
+
+  KE.uiText = function (key, values) {
+    const text = String(key || '').split('.').reduce((value, part) => value && value[part], KE.T);
+    return String(text == null ? key : text).replace(/\{\{(\w+)\}\}/g, (_match, name) =>
+      values && values[name] != null ? String(values[name]) : '');
+  };
+
+  KE.translatePage = function (root) {
+    const scope = root || document;
+    if (!scope || !scope.querySelectorAll) return;
+    scope.querySelectorAll('[data-ke-i18n]').forEach((node) => {
+      node.textContent = KE.uiText(node.dataset.keI18n);
+    });
+    scope.querySelectorAll('[data-ke-i18n-placeholder]').forEach((node) => {
+      node.placeholder = KE.uiText(node.dataset.keI18nPlaceholder);
+    });
+    scope.querySelectorAll('[data-ke-i18n-title]').forEach((node) => {
+      node.title = KE.uiText(node.dataset.keI18nTitle);
+    });
+    scope.querySelectorAll('[data-ke-i18n-aria-label]').forEach((node) => {
+      node.setAttribute('aria-label', KE.uiText(node.dataset.keI18nAriaLabel));
+    });
+  };
 })();

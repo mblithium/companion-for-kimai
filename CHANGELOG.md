@@ -2,6 +2,12 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.9] — 2026-10-07
+### Added
+- Seletor de idioma da interface (português ou inglês) nas configurações,
+  aplicado ao popup, à página de opções, ao painel flutuante e aos widgets;
+  inclui rótulos de acessibilidade, menus do worker e textos restantes.
+
 ## [0.22.8] — 2026-10-06
 ### Added
 - Painel flutuante compacto para acompanhar o timer ativo e pausá-lo/retomá-lo,

@@ -30,38 +30,38 @@
   <header class="ke-pop-head">
     <span class="ke-pop-logo" aria-hidden="true"><span class="ke-pop-logo-icon"></span></span>
     <h1>Companion for Kimai</h1>
-    <button id="ke-pop-open" class="ke-pop-iconbtn" type="button" title="Abrir Kimai">↗</button>
-    <button id="ke-pop-focus" class="ke-pop-iconbtn" type="button" title="Acompanhar timer" aria-label="Acompanhar timer">⏱</button>
-    <button id="ke-pop-settings" class="ke-pop-iconbtn" type="button" title="Configurações">⚙</button>
+    <button id="ke-pop-open" class="ke-pop-iconbtn" type="button" title="Abrir Kimai" data-ke-i18n-title="ui.popupOpenKimai" data-ke-i18n-aria-label="ui.popupOpenKimai">↗</button>
+    <button id="ke-pop-focus" class="ke-pop-iconbtn" type="button" title="Acompanhar timer" aria-label="Acompanhar timer" data-ke-i18n-title="ui.popupTracker" data-ke-i18n-aria-label="ui.popupTracker">⏱</button>
+    <button id="ke-pop-settings" class="ke-pop-iconbtn" type="button" title="Configurações" data-ke-i18n-title="ui.popupSettings" data-ke-i18n-aria-label="ui.popupSettings">⚙</button>
   </header>
 
   <div id="ke-pop-setup" class="ke-pop-setup" hidden>
     <p id="ke-pop-setup-msg"></p>
-    <button id="ke-pop-setup-btn" class="ke-pop-btn ke-pop-btn-primary" type="button">Abrir configurações</button>
+    <button id="ke-pop-setup-btn" class="ke-pop-btn ke-pop-btn-primary" type="button" data-ke-i18n="ui.popupErrorSettings">Abrir configurações</button>
   </div>
 
   <div id="ke-pop-error" class="ke-pop-error" hidden>
     <div class="ke-pop-error-icon">⚠️</div>
     <p id="ke-pop-error-msg"></p>
-    <button id="ke-pop-error-settings" class="ke-pop-btn ke-pop-btn-primary" type="button">Abrir configurações</button>
-    <button id="ke-pop-error-retry" class="ke-pop-btn" type="button">Tentar novamente</button>
+    <button id="ke-pop-error-settings" class="ke-pop-btn ke-pop-btn-primary" type="button" data-ke-i18n="ui.popupErrorSettings">Abrir configurações</button>
+    <button id="ke-pop-error-retry" class="ke-pop-btn" type="button" data-ke-i18n="ui.popupRetry">Tentar novamente</button>
   </div>
 
   <main id="ke-pop-main" hidden>
     <section class="ke-pop-sec">
-      <h2 id="ke-pop-active-title">Rodando agora</h2>
+      <h2 id="ke-pop-active-title" data-ke-i18n="ui.activeSection">Rodando agora</h2>
       <div id="ke-pop-active"></div>
     </section>
 
     <section class="ke-pop-sec">
       <div class="ke-pop-sec-head">
-        <h2><button id="ke-pop-new-toggle" class="ke-pop-section-toggle" type="button" aria-expanded="true" aria-controls="ke-pop-new-body">Novo timer <span class="ke-pop-section-chevron" aria-hidden="true">⌄</span></button></h2>
-        <button id="ke-pop-refresh-catalog" class="ke-pop-refresh" type="button" title="Atualizar listas">⟳</button>
+        <h2><button id="ke-pop-new-toggle" class="ke-pop-section-toggle" type="button" aria-expanded="true" aria-controls="ke-pop-new-body"><span data-ke-i18n="ui.newTimer">Novo timer</span> <span class="ke-pop-section-chevron" aria-hidden="true">⌄</span></button></h2>
+        <button id="ke-pop-refresh-catalog" class="ke-pop-refresh" type="button" title="Atualizar listas" data-ke-i18n-title="ui.refreshCatalog" data-ke-i18n-aria-label="ui.refreshCatalog">⟳</button>
       </div>
       <div id="ke-pop-new-body">
         <div class="ke-pop-field">
           <span class="ke-pop-label" id="ke-pop-label-desc"></span>
-          <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?">
+          <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?" data-ke-i18n-placeholder="descriptionPh">
         </div>
         <div class="ke-pop-field">
           <span class="ke-pop-label" id="ke-pop-label-customer"></span>
@@ -79,16 +79,16 @@
           <span class="ke-pop-label" id="ke-pop-label-tags"></span>
           <div id="ke-pop-new-tags"></div>
         </div>
-        <button id="ke-pop-start" class="ke-pop-btn ke-pop-btn-primary ke-pop-start-btn" type="button"><span class="ke-pop-start-icon" aria-hidden="true"></span><span>Iniciar</span></button>
+        <button id="ke-pop-start" class="ke-pop-btn ke-pop-btn-primary ke-pop-start-btn" type="button"><span class="ke-pop-start-icon" aria-hidden="true"></span><span data-ke-i18n="start">Iniciar</span></button>
       </div>
     </section>
 
     <section class="ke-pop-sec">
       <div class="ke-pop-sec-head">
-        <h2>Continuar de hoje</h2>
+        <h2 data-ke-i18n="ui.continueToday">Continuar de hoje</h2>
         <span class="ke-pop-sec-actions">
-          <button id="ke-pop-group-toggle" class="ke-pop-pill" type="button" title="Agrupar tarefas">Agrupar</button>
-          <button id="ke-pop-refresh-today" class="ke-pop-refresh" type="button" title="Atualizar diários">⟳</button>
+          <button id="ke-pop-group-toggle" class="ke-pop-pill" type="button" title="Agrupar tarefas" data-ke-i18n-title="ui.groupTasks" data-ke-i18n="groupTasks">Agrupar</button>
+          <button id="ke-pop-refresh-today" class="ke-pop-refresh" type="button" title="Atualizar diários" data-ke-i18n-title="ui.refreshToday" data-ke-i18n-aria-label="ui.refreshToday">⟳</button>
         </span>
       </div>
       <div id="ke-pop-today"></div>
@@ -96,8 +96,8 @@
 
     <section class="ke-pop-sec">
       <div class="ke-pop-sec-head">
-        <h2>Recentes</h2>
-        <button id="ke-pop-refresh-recent" class="ke-pop-refresh" type="button" title="Atualizar recentes">⟳</button>
+        <h2 data-ke-i18n="ui.recent">Recentes</h2>
+        <button id="ke-pop-refresh-recent" class="ke-pop-refresh" type="button" title="Atualizar recentes" data-ke-i18n-title="ui.refreshRecent" data-ke-i18n-aria-label="ui.refreshRecent">⟳</button>
       </div>
       <div id="ke-pop-recent"></div>
     </section>

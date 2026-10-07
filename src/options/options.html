@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>Companion for Kimai — Configurações</title>
+<title data-ke-i18n="ui.optionsTitle">Companion for Kimai — Configurações</title>
 <link rel="stylesheet" href="options.css">
 <link rel="stylesheet" href="../common/theme.css">
 <link rel="stylesheet" href="../common/themes/light.css">
@@ -26,125 +26,132 @@
 </head>
 <body>
   <header class="ke-opt-topbar">
-    <h1><span class="ke-opt-logo">▶</span> Companion for Kimai — Configurações</h1>
+      <h1><span class="ke-opt-logo">▶</span> <span data-ke-i18n="ui.optionsTitle">Companion for Kimai — Configurações</span></h1>
     <div class="ke-opt-topbar-actions">
-      <button id="ke-opt-save" class="ke-opt-btn ke-opt-btn-primary" type="button">Salvar configurações</button>
+        <button id="ke-opt-save" class="ke-opt-btn ke-opt-btn-primary" type="button" data-ke-i18n="ui.saveSettings">Salvar configurações</button>
     </div>
   </header>
   <main class="ke-opt-wrap">
 
     <section class="ke-opt-card">
-      <h2>Kimai</h2>
+      <h2 data-ke-i18n="ui.kimai">Kimai</h2>
       <label class="ke-opt-field">
-        <span>URL base do seu Kimai</span>
+        <span data-ke-i18n="ui.baseUrl">URL base do seu Kimai</span>
         <input id="ke-opt-url" type="url" inputmode="url" placeholder="https://kimai.example.com" spellcheck="false">
       </label>
-      <p class="ke-opt-hint">Detectada automaticamente ao abrir a página do timesheet. Ajuste aqui se usar mais de uma instalação.</p>
+      <p class="ke-opt-hint" data-ke-i18n="ui.detectedUrlHint">Detectada automaticamente ao abrir a página do timesheet. Ajuste aqui se usar mais de uma instalação.</p>
       <div class="ke-opt-row">
-        <a id="ke-opt-open" href="#" class="ke-opt-link">Abrir meu Kimai</a>
+        <a id="ke-opt-open" href="#" class="ke-opt-link" data-ke-i18n="ui.openKimai">Abrir meu Kimai</a>
       </div>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Acesso ao popup</h2>
-      <p class="ke-opt-hint">Autoriza o navegador a chamar a API na URL acima (necessário mesmo com chave).</p>
+      <h2 data-ke-i18n="ui.popupAccess">Acesso ao popup</h2>
+      <p class="ke-opt-hint" data-ke-i18n="ui.popupAccessHint">Autoriza o navegador a chamar a API na URL acima (necessário mesmo com chave).</p>
       <p id="ke-opt-access-state" class="ke-opt-state" role="status"></p>
       <div class="ke-opt-row">
-        <button id="ke-opt-grant" class="ke-opt-btn ke-opt-btn-primary" type="button">Autorizar acesso</button>
-        <button id="ke-opt-revoke" class="ke-opt-btn" type="button">Remover acesso</button>
+        <button id="ke-opt-grant" class="ke-opt-btn ke-opt-btn-primary" type="button" data-ke-i18n="ui.grantAccess">Autorizar acesso</button>
+        <button id="ke-opt-revoke" class="ke-opt-btn" type="button" data-ke-i18n="ui.removeAccess">Remover acesso</button>
       </div>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Chave de API</h2>
-      <p class="ke-opt-hint">Crie em <em>Meu perfil → API Access</em> no Kimai. Funciona mesmo sem login na página.</p>
+      <h2 data-ke-i18n="ui.apiKey">Chave de API</h2>
+      <p class="ke-opt-hint" data-ke-i18n="ui.apiKeyHint">Crie em <em>Meu perfil → API Access</em> no Kimai. Funciona mesmo sem login na página.</p>
       <label class="ke-opt-field" id="ke-opt-token-wrap">
-        <span>Chave de API</span>
-        <input id="ke-opt-token" type="password" autocomplete="off" spellcheck="false" placeholder="cole aqui para trocar">
+        <span data-ke-i18n="ui.apiKey">Chave de API</span>
+        <input id="ke-opt-token" type="password" autocomplete="off" spellcheck="false" placeholder="cole aqui para trocar" data-ke-i18n-placeholder="ui.apiKeyPlaceholder">
       </label>
       <p id="ke-opt-token-state" class="ke-opt-state" role="status"></p>
-      <p class="ke-opt-hint">Crie e gerencie suas chaves em <a id="ke-opt-token-url" href="#" target="_blank" rel="noopener"></a>.</p>
+      <p class="ke-opt-hint"><span data-ke-i18n="ui.manageApiKeys">Crie e gerencie suas chaves em</span> <a id="ke-opt-token-url" href="#" target="_blank" rel="noopener"></a>.</p>
       <div class="ke-opt-row">
-        <button id="ke-opt-test" class="ke-opt-btn ke-opt-btn-primary" type="button">Testar conexão</button>
-        <button id="ke-opt-disconnect" class="ke-opt-btn ke-opt-btn-danger" type="button">Desconectar</button>
+        <button id="ke-opt-test" class="ke-opt-btn ke-opt-btn-primary" type="button" data-ke-i18n="ui.testConnection">Testar conexão</button>
+        <button id="ke-opt-disconnect" class="ke-opt-btn ke-opt-btn-danger" type="button" data-ke-i18n="ui.disconnect">Desconectar</button>
       </div>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Idioma</h2>
+      <h2 data-ke-i18n="ui.language">Idioma</h2>
       <label class="ke-opt-field">
-        <span>Idioma do Kimai (ex.: pt_BR)</span>
+        <span data-ke-i18n="ui.uiLanguage">Idioma da interface</span>
+        <select id="ke-opt-ui-locale">
+          <option value="pt-BR" data-ke-i18n="ui.languagePortuguese">Português (Brasil)</option>
+          <option value="en" data-ke-i18n="ui.languageEnglish">English</option>
+        </select>
+      </label>
+      <label class="ke-opt-field">
+        <span data-ke-i18n="ui.kimaiLanguage">Idioma do Kimai (ex.: pt_BR)</span>
         <select id="ke-opt-locale"></select>
       </label>
-      <p class="ke-opt-hint">Detectado do seu Kimai logado quando possível; pode ajustar manualmente.</p>
+      <p class="ke-opt-hint" data-ke-i18n="ui.detectedLanguageHint">Detectado do seu Kimai logado quando possível; pode ajustar manualmente.</p>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Aparência</h2>
+      <h2 data-ke-i18n="ui.appearance">Aparência</h2>
       <label class="ke-opt-field">
-        <span>Tema</span>
+        <span data-ke-i18n="ui.theme">Tema</span>
         <select id="ke-opt-theme"></select>
       </label>
-      <p class="ke-opt-hint">Vale para o popup, esta página e a página do Kimai inteira.</p>
+      <p class="ke-opt-hint" data-ke-i18n="ui.themeHint">Vale para o popup, esta página e a página do Kimai inteira.</p>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Interface</h2>
-      <p class="ke-opt-hint">Personalize os elementos exibidos na página do Kimai.</p>
+      <h2 data-ke-i18n="ui.interface">Interface</h2>
+      <p class="ke-opt-hint" data-ke-i18n="ui.interfaceHint">Personalize os elementos exibidos na página do Kimai.</p>
       <label class="ke-opt-check">
         <input type="checkbox" id="ke-opt-hide-navigation">
-        <span>Ocultar interface de navegação (Cabeçalho e páginas)</span>
+        <span data-ke-i18n="ui.hideNavigation">Ocultar interface de navegação (Cabeçalho e páginas)</span>
       </label>
       <label class="ke-opt-check">
         <input type="checkbox" id="ke-opt-hide-actionbar">
-        <span>Ocultar barra de ações (busca, exportação etc.)</span>
+        <span data-ke-i18n="ui.hideActionBar">Ocultar barra de ações (busca, exportação etc.)</span>
       </label>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Atalhos de teclado</h2>
+      <h2 data-ke-i18n="ui.shortcuts">Atalhos de teclado</h2>
       <label class="ke-opt-check">
         <input type="checkbox" id="ke-opt-sc-enabled" checked>
-        <span>Ativar atalhos de teclado na página do timesheet</span>
+        <span data-ke-i18n="ui.enableShortcuts">Ativar atalhos de teclado na página do timesheet</span>
       </label>
-      <p class="ke-opt-hint">Funcionam na página do timesheet (fora de campos de texto). Clique no campo e pressione a combinação — use Alt, Ctrl ou Shift. Backspace limpa.</p>
+      <p class="ke-opt-hint" data-ke-i18n="ui.shortcutsHint">Funcionam na página do timesheet (fora de campos de texto). Clique no campo e pressione a combinação — use Alt, Ctrl ou Shift. Backspace limpa.</p>
       <div class="ke-opt-shortcut">
-        <span>Iniciar nova tarefa</span>
-        <input id="ke-opt-sc-start" type="text" readonly placeholder="pressione as teclas…">
+        <span data-ke-i18n="ui.startNewTask">Iniciar nova tarefa</span>
+        <input id="ke-opt-sc-start" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
       </div>
       <div class="ke-opt-shortcut">
-        <span>Parar tarefa</span>
-        <input id="ke-opt-sc-stop" type="text" readonly placeholder="pressione as teclas…">
+        <span data-ke-i18n="ui.stopTask">Parar tarefa</span>
+        <input id="ke-opt-sc-stop" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
       </div>
       <div class="ke-opt-shortcut">
-        <span>Recomeçar tarefa</span>
-        <input id="ke-opt-sc-restart" type="text" readonly placeholder="pressione as teclas…">
+        <span data-ke-i18n="ui.restartTask">Recomeçar tarefa</span>
+        <input id="ke-opt-sc-restart" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
       </div>
       <div class="ke-opt-row">
-        <button id="ke-opt-sc-reset" class="ke-opt-btn" type="button">Restaurar padrões</button>
+        <button id="ke-opt-sc-reset" class="ke-opt-btn" type="button" data-ke-i18n="ui.restoreDefaults">Restaurar padrões</button>
       </div>
-      <p class="ke-opt-hint">Abrir o popup por teclado: configure em <em>chrome://extensions → Atalhos de teclado</em> (ação da extensão).</p>
+      <p class="ke-opt-hint" data-ke-i18n="ui.extensionHotkeysHint">Abrir o popup por teclado: configure em <em>chrome://extensions → Atalhos de teclado</em> (ação da extensão).</p>
     </section>
 
     <section class="ke-opt-card">
-      <h2>Cache</h2>
-      <p class="ke-opt-hint">Listas de clientes/projetos/atividades (24h) e diários (1h) ficam salvos neste dispositivo para abrir rápido.</p>
+      <h2 data-ke-i18n="ui.cache">Cache</h2>
+      <p class="ke-opt-hint" data-ke-i18n="ui.cacheHint">Listas de clientes/projetos/atividades (24h) e diários (1h) ficam salvos neste dispositivo para abrir rápido.</p>
       <p id="ke-opt-cache-state" class="ke-opt-state" role="status"></p>
       <div class="ke-opt-row">
-        <button id="ke-opt-cache-refresh" class="ke-opt-btn ke-opt-btn-primary" type="button">Atualizar cache</button>
-        <button id="ke-opt-cache-clear" class="ke-opt-btn ke-opt-btn-danger" type="button">Limpar cache</button>
+        <button id="ke-opt-cache-refresh" class="ke-opt-btn ke-opt-btn-primary" type="button" data-ke-i18n="ui.refreshCache">Atualizar cache</button>
+        <button id="ke-opt-cache-clear" class="ke-opt-btn ke-opt-btn-danger" type="button" data-ke-i18n="ui.clearCache">Limpar cache</button>
       </div>
     </section>
 
     <section class="ke-opt-card" aria-labelledby="ke-opt-about-heading">
-      <h2 id="ke-opt-about-heading">Sobre a extensão</h2>
-      <p id="ke-opt-about-description" class="ke-opt-hint"></p>
+      <h2 id="ke-opt-about-heading" data-ke-i18n="ui.about">Sobre a extensão</h2>
+      <p id="ke-opt-about-description" class="ke-opt-hint" data-ke-i18n="ui.aboutDescription"></p>
       <dl class="ke-opt-about">
-        <div><dt>Nome</dt><dd id="ke-opt-about-name"></dd></div>
-        <div><dt>Versão</dt><dd id="ke-opt-about-version"></dd></div>
-        <div><dt>Autor</dt><dd id="ke-opt-about-author"></dd></div>
-        <div><dt>GitHub</dt><dd><a id="ke-opt-about-github" target="_blank" rel="noopener noreferrer"></a></dd></div>
-        <div><dt>Licença</dt><dd>MIT</dd></div>
+        <div><dt data-ke-i18n="ui.name">Nome</dt><dd id="ke-opt-about-name"></dd></div>
+        <div><dt data-ke-i18n="ui.version">Versão</dt><dd id="ke-opt-about-version"></dd></div>
+        <div><dt data-ke-i18n="ui.author">Autor</dt><dd id="ke-opt-about-author"></dd></div>
+        <div><dt data-ke-i18n="ui.github">GitHub</dt><dd><a id="ke-opt-about-github" target="_blank" rel="noopener noreferrer"></a></dd></div>
+        <div><dt data-ke-i18n="ui.license">Licença</dt><dd>MIT</dd></div>
       </dl>
     </section>
 

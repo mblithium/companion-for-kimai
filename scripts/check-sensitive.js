@@ -18,7 +18,7 @@ const PATTERNS = [
   {
     kind: 'credential assignment',
     regex: /\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|auth[_-]?token|client[_-]?secret|secret[_-]?key|password|passwd)\b\s*[:=]\s*(['"])([^'"\r\n]{8,})\1/gi,
-    ignore: (_match, captures) => PLACEHOLDER.test(captures[1].trim()) || /^(?:process\.env|import\.meta\.env|env\.)/i.test(captures[1].trim()),
+    ignore: (_match, captures) => PLACEHOLDER.test(captures[1].trim()) || /\s/.test(captures[1]) || /^(?:process\.env|import\.meta\.env|env\.)/i.test(captures[1].trim()),
   },
   {
     kind: 'credential assignment',

@@ -43,11 +43,10 @@
   }
 
   function connectionMessage(base, e) {
-    if (isAuthError(e)) return KE.T.authDenied + ' Abra as configurações e use "Testar conexão".';
+    if (isAuthError(e)) return KE.T.authDenied + ' ' + KE.uiText('ui.popupConnectionAuth');
     const detail = String((e && e.serverMessage) || '').trim();
     const why = detail ? detail.slice(0, 160) + '. ' : (e && e.status ? '(HTTP ' + e.status + ') ' : '');
-    return 'Não foi possível conectar a ' + KE.originOf(base) + '. ' + why +
-      'Confira URL, login/chave e acesso, depois abra as configurações e use "Testar conexão".';
+    return KE.uiText('ui.popupConnectionStart', { origin: KE.originOf(base), why });
   }
 
   function elapsed(beginStr) {
@@ -456,6 +455,8 @@
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
       groupToggle: $('ke-pop-group-toggle'),
     };
+    await KE.applyLocale();
+    KE.translatePage(document);
     await KE.applyTheme();
     $('ke-pop-label-desc').textContent = KE.T.description;
     $('ke-pop-label-customer').textContent = KE.T.customer;
@@ -467,7 +468,7 @@
       try {
         await openFocusWindow();
       } catch (e) {
-        setStatus('Não foi possível abrir o acompanhamento do timer.', 'err');
+        setStatus(KE.uiText('ui.popupOpenTrackerFailed'), 'err');
       }
     };
     ui.newTimerToggle.onclick = () => setNewTimerCollapsed(!ui.newTimerBody.hidden);
@@ -488,23 +489,23 @@
       const settings = await KE.getSettings();
       const base = KE.normalizeBaseUrl(settings.kimaiBaseUrl || '');
       if (!base) {
-        ui.setupMsg.textContent = 'Configure a URL do seu Kimai nas configurações para usar o popup.';
+        ui.setupMsg.textContent = KE.uiText('ui.popupSetupNoBase');
         show('setup');
         return;
       }
       const saved = await KE.localGet(['keApiToken']);
       const token = (saved && saved.keApiToken) || '';
       if (!token) {
-        ui.setupMsg.textContent = 'Informe sua chave de API nas configurações para usar o popup.';
+        ui.setupMsg.textContent = KE.uiText('ui.popupSetupNoToken');
         show('setup');
         return;
       }
       if (!(await KE.hasOriginAccess(base))) {
-        ui.setupMsg.textContent = 'Autorize o acesso a ' + KE.originOf(base) + ' para usar o popup.';
-        ui.setupBtn.textContent = 'Autorizar acesso';
+        ui.setupMsg.textContent = KE.uiText('ui.accessMissing', { origin: KE.originOf(base) });
+        ui.setupBtn.textContent = KE.uiText('ui.popupAuthorize');
         ui.setupBtn.onclick = async () => {
           if (await KE.requestOriginAccess(base)) boot();
-          else setStatus('Acesso negado.', 'err');
+          else setStatus(KE.uiText('ui.accessDenied'), 'err');
         };
         show('setup');
         return;
@@ -588,7 +589,7 @@
       tickToday = setInterval(() => { refreshToday(false, true); refreshRecent(false, true); }, KE.CACHE_TTL.today);
     } catch (e) {
       try { console.error('[Companion] popup falhou', e); } catch (ce) {}
-      ui.setupMsg.textContent = 'Não foi possível carregar o popup: ' + ((e && e.message) || e);
+      ui.setupMsg.textContent = KE.uiText('ui.popupLoadFailed', { error: (e && e.message) || e });
       show('setup');
     }
   }

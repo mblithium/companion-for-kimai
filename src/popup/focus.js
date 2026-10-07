@@ -148,6 +148,8 @@
   }
 
   async function boot() {
+    await KE.applyLocale();
+    KE.translatePage(document);
     ui.title.textContent = KE.T.trackerTitle;
     ui.action.onclick = toggleTimer;
     ui.settings.onclick = () => KE.openOptions();

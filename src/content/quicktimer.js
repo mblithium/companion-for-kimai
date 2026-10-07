@@ -677,11 +677,18 @@
         await KE.storageSet({ keSettings: Object.assign({}, s.keSettings, patch) });
       }
     } catch (e) {}
+    await KE.applyLocale();
     await reloadShortcuts();
     await applyDisplayPrefs();
     await KE.applyTheme();
     await KE.applyPageTheme();
     KE.onStorageChanged(async () => {
+      const previousLocale = KE.uiLocale;
+      await KE.applyLocale();
+      if (previousLocale !== KE.uiLocale) {
+        try { location.reload(); } catch (e) {}
+        return;
+      }
       reloadShortcuts();
       applyDisplayPrefs();
       KE.applyTheme();

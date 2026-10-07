@@ -19,7 +19,7 @@ Ask about a version bump and a commit separately, using clear questions. The app
 
 - Start with `git status --short --branch`, `git remote -v`, and inspect the relevant diff. Preserve user changes and avoid staging unrelated files.
 - Before a commit, run `npm run check:sensitive` and the applicable project checks, review the staged diff, and ask the mandatory commit question if it has not already been answered for this exact change set.
-- Use focused staging and a concise commit message. Never amend, reset, rebase destructively, or force-push without first explaining the impact and receiving explicit approval.
+- Use focused staging and write every commit message in English, using a concise conventional format. Never amend, reset, rebase destructively, or force-push without first explaining the impact and receiving explicit approval.
 - Before publishing, verify the current branch, remote URL, upstream, and commit range. If the remote has commits not present locally, stop and resolve the divergence without overwriting remote history.
 - For a release tag, verify all package/manifest versions match, the changelog section exists, checks/build pass, the version commit is at HEAD, and the matching tag does not already exist locally or remotely. If it exists or the remote diverges, stop and ask; never move or force-update a tag.
 - A configured remote only connects the local repository; it is not permission to fetch private data, commit, or publish. Fetch only when relevant, and follow the push rules above.

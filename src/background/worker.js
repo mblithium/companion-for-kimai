@@ -51,8 +51,10 @@ importScripts(
       await ext().action.setBadgeText({ text: KE.shortElapsed(first && first.begin) });
       await ext().action.setBadgeBackgroundColor({ color: '#2fb344' });
       await ext().action.setTitle({
-        title: 'Companion for Kimai — rodando: ' + KE.describeProjectRef(first.project) +
-          ' (' + KE.elapsedSince(first.begin) + ')',
+        title: KE.uiText('ui.workerRunningTitle', {
+          task: KE.describeProjectRef(first.project),
+          elapsed: KE.elapsedSince(first.begin),
+        }),
       });
     } catch (e) {}
     await updateMenus(true);
@@ -62,15 +64,15 @@ importScripts(
     try {
       await ext().action.setIcon({ path: ICONS.idle });
       await ext().action.setBadgeText({ text: '' });
-      await ext().action.setTitle({ title: 'Companion for Kimai' });
+      await ext().action.setTitle({ title: KE.uiText('ui.workerIdleTitle') });
     } catch (e) {}
     await updateMenus(false);
   }
 
   async function updateMenus(running) {
     try {
-      await ext().contextMenus.update('ke-pause', { visible: running });
-      await ext().contextMenus.update('ke-continue', { visible: !running });
+      await ext().contextMenus.update('ke-pause', { title: '⏸ ' + KE.uiText('ui.pauseTimerMenu'), visible: running });
+      await ext().contextMenus.update('ke-continue', { title: '▶ ' + KE.uiText('ui.resumeTimerMenu'), visible: !running });
     } catch (e) {}
   }
 
@@ -83,8 +85,8 @@ importScripts(
 
   function setupMenus() {
     const createBoth = () => {
-      safeCreate({ id: 'ke-pause', title: '⏸ Pausar timer', contexts: ['action'], visible: false });
-      safeCreate({ id: 'ke-continue', title: '▶ Continuar timer', contexts: ['action'], visible: false });
+      safeCreate({ id: 'ke-pause', title: '⏸ ' + KE.uiText('ui.pauseTimerMenu'), contexts: ['action'], visible: false });
+      safeCreate({ id: 'ke-continue', title: '▶ ' + KE.uiText('ui.resumeTimerMenu'), contexts: ['action'], visible: false });
     };
     try {
       const p = ext().contextMenus.removeAll();
@@ -97,6 +99,8 @@ importScripts(
 
   async function refreshState() {
     try {
+      const settings = await KE.getSettings();
+      if (settings.uiLocale) KE.setLocale(settings.uiLocale);
       if (!(await withApi())) {
         await setIdle();
         return;
@@ -158,6 +162,11 @@ importScripts(
     });
     ext().runtime.onMessage.addListener((msg) => {
       if (msg && msg.type === 'ke-refresh') refreshState();
+    });
+    KE.onStorageChanged((changes, areaName) => {
+      if (areaName && areaName !== 'sync') return;
+      if (changes && !('keSettings' in changes)) return;
+      refreshState();
     });
   } catch (e) {}
 })();

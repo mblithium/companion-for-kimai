@@ -20,7 +20,7 @@
     const toggle = KE.el('button', 'ke-combo-toggle', '▾');
     toggle.type = 'button';
     toggle.tabIndex = -1;
-    toggle.setAttribute('aria-label', opts.toggleLabel || '▾');
+    toggle.setAttribute('aria-label', opts.toggleLabel || KE.uiText('ui.expandOptions'));
     box.appendChild(input);
     box.appendChild(toggle);
     const list = KE.el('div', 'ke-combo-list');
@@ -263,6 +263,7 @@
     const toggle = KE.el('button', 'ke-combo-toggle', '\u25be');
     toggle.type = 'button';
     toggle.tabIndex = -1;
+    toggle.setAttribute('aria-label', KE.uiText('ui.expandOptions'));
     box.appendChild(input);
     box.appendChild(toggle);
     const list = KE.el('div', 'ke-combo-list');
@@ -297,7 +298,7 @@
         const chip = KE.el('span', 'ke-chip', sel.label);
         const x = KE.el('button', 'ke-chip-x', '\u00d7');
         x.type = 'button';
-        x.setAttribute('aria-label', 'Remover ' + sel.label);
+        x.setAttribute('aria-label', KE.uiText('ui.removeItem') + ' ' + sel.label);
         x.addEventListener('mousedown', (ev) => ev.preventDefault());
         x.addEventListener('click', () => removeValue(sel.value));
         chip.appendChild(x);
@@ -314,7 +315,8 @@
         if (!q || KE.norm(it.label).includes(q)) out.push(it);
       });
       if (q && !combo.items.some((it) => KE.norm(it.label) === q) && !isSelected(combo._filter.trim())) {
-        out.unshift({ value: combo._filter.trim(), label: '+ ' + combo._filter.trim(), isNew: true });
+        const name = combo._filter.trim();
+        out.unshift({ value: name, label: KE.uiText('ui.newTagOption', { name }), isNew: true });
       }
       combo._rendered = out;
       if (combo._active >= out.length) combo._active = out.length - 1;

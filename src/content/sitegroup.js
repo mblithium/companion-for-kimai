@@ -368,7 +368,8 @@
   KE.siteWeekTotalSeconds = siteWeekTotalSeconds;
 
   function weekTotalLabel() {
-    return (KE.T && KE.T.weekTotal) || 'TOTAL DA SEMANA';
+    const label = KE.uiText('weekTotal');
+    return label === 'weekTotal' ? 'TOTAL DA SEMANA' : label;
   }
 
   function upsertWeekTotalLine(card, totalSec) {
