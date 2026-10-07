@@ -2,6 +2,11 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.10] — 2026-10-07
+### Fixed
+- Manifesto Firefox declara `data_collection_permissions.required: ["none"]`,
+  exigido pelo validador da AMO para novas submissões.
+
 ## [0.22.9] — 2026-10-07
 ### Added
 - Seletor de idioma da interface (português ou inglês) nas configurações,

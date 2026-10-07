@@ -90,6 +90,7 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
       delete copy.background;
       if (copy.browser_specific_settings && copy.browser_specific_settings.gecko) {
         delete copy.browser_specific_settings.gecko.strict_min_version;
+        delete copy.browser_specific_settings.gecko.data_collection_permissions;
       }
       return copy;
     };
@@ -114,6 +115,12 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
     if (!f.background || !Array.isArray(f.background.scripts) || 'persistent' in f.background) {
       failures++;
       console.log('FALHOU firefox sem background.scripts (sem persistent, removido no MV3)');
+    }
+    const dcp = f.browser_specific_settings && f.browser_specific_settings.gecko &&
+      f.browser_specific_settings.gecko.data_collection_permissions;
+    if (!dcp || JSON.stringify(dcp.required) !== JSON.stringify(['none'])) {
+      failures++;
+      console.log('FALHOU firefox sem data_collection_permissions.required=["none"] (exigido pelo validador AMO)');
     }
     if (!failures) console.log('ok   variantes chrome/firefox consistentes (v' + c.version + ')');
   }
