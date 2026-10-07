@@ -101,6 +101,12 @@ for (const html of ['src/popup/popup.html', 'src/options/options.html']) {
       failures++;
       console.log('FALHOU variantes divergem além de background/gecko-min');
     }
+    const contentScripts = (c.content_scripts && c.content_scripts[0] && c.content_scripts[0].js) || [];
+    if (contentScripts.indexOf('src/content/sitegroup.js') < 0 ||
+        contentScripts.indexOf('src/content/sitegroup.js') > contentScripts.indexOf('src/content/quicktimer.js')) {
+      failures++;
+      console.log('FALHOU sitegroup.js ausente ou fora de ordem antes de quicktimer.js');
+    }
     if (!c.background || !c.background.service_worker) {
       failures++;
       console.log('FALHOU chrome sem background.service_worker');

@@ -7,7 +7,6 @@ const zlib = require('node:zlib');
 
 const ROOT = path.resolve(__dirname, '..');
 const VARIANTS = ['chrome', 'firefox'];
-const JUNK_NAMES = new Set(['.DS_Store', 'Thumbs.db', '.gitkeep']);
 const CRC_TABLE = new Uint32Array(256);
 
 for (let n = 0; n < CRC_TABLE.length; n++) {
@@ -62,6 +61,9 @@ function referencedFiles(manifest) {
 
   const options = manifest.options_ui || {};
   if (options.page) refs.push(options.page);
+  for (const resourceGroup of manifest.web_accessible_resources || []) {
+    refs.push(...(resourceGroup.resources || []));
+  }
 
   const background = manifest.background || {};
   if (background.service_worker) refs.push(background.service_worker);
@@ -75,6 +77,7 @@ function referencedFiles(manifest) {
         refs.push(path.posix.normalize(path.posix.join('src/background', importedPath)));
       }
     }
+    for (const [, assetPath] of source.matchAll(/['"](icons\/[^'"]+)['"]/g)) refs.push(assetPath);
   }
 
   for (const htmlPath of [action.default_popup, options.page]) {
@@ -83,37 +86,46 @@ function referencedFiles(manifest) {
     if (!fs.existsSync(absolutePath)) continue;
     const html = fs.readFileSync(absolutePath, 'utf8');
     const base = path.posix.dirname(htmlPath);
-    for (const [, reference] of html.matchAll(/<(?:script|link)\b[^>]+(?:src|href)="([^"]+)"/g)) {
+    for (const [, reference] of html.matchAll(/<(?:script|link|img|source|video|audio|iframe|object|embed)\b[^>]+(?:src|href|data)="([^"]+)"/gi)) {
       if (/^(?:https?:|data:)/i.test(reference)) continue;
       refs.push(path.posix.normalize(path.posix.join(base, reference)));
+    }
+  }
+
+  for (let i = 0; i < refs.length; i++) {
+    const stylesheet = refs[i];
+    if (!/\.css(?:[?#].*)?$/i.test(stylesheet)) continue;
+    const absolutePath = path.resolve(ROOT, stylesheet);
+    const relativePath = path.relative(ROOT, absolutePath);
+    if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) continue;
+    if (!fs.existsSync(absolutePath)) continue;
+    const css = fs.readFileSync(absolutePath, 'utf8');
+    const resourcePattern = /url\(\s*['"]?([^)'"\s]+)['"]?\s*\)|@import\s+['"]([^'"]+)['"]/gi;
+    for (const match of css.matchAll(resourcePattern)) {
+      const resource = match[1] || match[2];
+      if (/^(?:[a-z]+:|\/\/|\/|#)/i.test(resource)) continue;
+      const cleanPath = resource.split(/[?#]/, 1)[0];
+      if (!cleanPath) continue;
+      refs.push(path.posix.normalize(path.posix.join(path.posix.dirname(stylesheet), cleanPath)));
     }
   }
 
   return [...new Set(refs.map((file) => file.replaceAll('\\', '/')))];
 }
 
-function walkFiles(directory) {
-  const files = [];
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    const absolutePath = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...walkFiles(absolutePath));
-    else if (entry.isFile() && !JUNK_NAMES.has(entry.name) && !entry.name.endsWith('.log')) files.push(absolutePath);
-  }
-  return files;
-}
-
-function collectProductionFiles() {
-  const files = [];
-  for (const directory of ['icons', 'src']) {
-    const absolutePath = path.join(ROOT, directory);
-    if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isDirectory()) fail(`Production directory is missing: ${directory}/`);
-    files.push(...walkFiles(absolutePath));
-  }
-  files.push(path.join(ROOT, 'LICENSE'));
-  for (const file of files) {
-    if (!fs.existsSync(file)) fail(`Production file is missing: ${path.relative(ROOT, file)}`);
-  }
-  return files.map((file) => ({ absolutePath: file, name: path.relative(ROOT, file).split(path.sep).join('/') }));
+function collectProductionFiles(manifest) {
+  const references = [...new Set([...referencedFiles(manifest), 'LICENSE'])].sort();
+  return references.map((name) => {
+    const absolutePath = path.resolve(ROOT, name);
+    const relativePath = path.relative(ROOT, absolutePath);
+    if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+      fail(`Referenced path escapes the project: ${name}`);
+    }
+    if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
+      fail(`Production file is missing: ${name}`);
+    }
+    return { absolutePath, name: relativePath.split(path.sep).join('/') };
+  });
 }
 
 function makeZip(files) {
@@ -177,7 +189,7 @@ function makeZip(files) {
   return Buffer.concat([...localRecords, centralDirectory, end]);
 }
 
-function verifyZip(files, zipData) {
+function verifyZip(files, zipData, manifest) {
   let offset = 0;
   for (const file of files) {
     if (zipData.readUInt32LE(offset) !== 0x04034b50) fail(`Invalid ZIP entry: ${file.name}`);
@@ -198,6 +210,13 @@ function verifyZip(files, zipData) {
   if (zipData.readUInt32LE(offset) !== 0x02014b50) fail('Missing ZIP central directory');
   const names = files.map((file) => file.name);
   if (!names.includes('manifest.json')) fail('Archive does not contain manifest.json');
+  const expected = new Set(['manifest.json', 'LICENSE', ...referencedFiles(manifest)]);
+  const actual = new Set(names);
+  const missing = [...expected].filter((name) => !actual.has(name));
+  const extra = [...actual].filter((name) => !expected.has(name));
+  if (missing.length || extra.length) {
+    fail(`Archive contents do not match manifest dependencies; missing: ${missing.join(', ') || 'none'}; extra: ${extra.join(', ') || 'none'}`);
+  }
   const leaked = names.filter((name) => /^(?:tests|docs|scripts|manifest|dist)\//.test(name) || /^(?:package\.json|README\.md|CHANGELOG\.md)$/.test(name));
   if (leaked.length) fail(`Development files leaked into archive: ${leaked.slice(0, 5).join(', ')}`);
 }
@@ -240,19 +259,16 @@ function main() {
 
     for (const target of targets) {
       const manifest = allManifests[target];
-      const missing = referencedFiles(manifest).filter((name) => !fs.existsSync(path.join(ROOT, name)));
-      if (missing.length) fail(`[${target}] Referenced files are missing:\n  - ${missing.join('\n  - ')}`);
-
       const files = [
         { name: 'manifest.json', absolutePath: null, data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8') },
-        ...collectProductionFiles(),
+        ...collectProductionFiles(manifest),
       ];
       const zipEntries = files.map((file) => {
         if (file.data) return file;
         return { ...file, data: fs.readFileSync(file.absolutePath) };
       });
       const zipData = makeZip(zipEntries);
-      verifyZip(zipEntries, zipData);
+      verifyZip(zipEntries, zipData, manifest);
       fs.mkdirSync(outputDirectory, { recursive: true });
       const zipPath = path.join(outputDirectory, `companion-for-kimai-${target}-${version}.zip`);
       fs.writeFileSync(zipPath, zipData);

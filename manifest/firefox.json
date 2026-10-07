@@ -48,6 +48,7 @@
         "src/content/combo.js",
         "src/content/kimai.js",
         "src/content/cache.js",
+        "src/content/sitegroup.js",
         "src/content/quicktimer.js"
       ],
       "css": [

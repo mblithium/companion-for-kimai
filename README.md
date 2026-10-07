@@ -1,131 +1,111 @@
 # Companion for Kimai
 
-Esta extensão não é oficial.
+This extension is unofficial. [Leia em português](docs/README-PT_BR.md).
 
-Extensão de navegador (Chrome + Firefox) que melhora a página de **timesheet do Kimai**,
-começando pelo recurso mais pedido: **uma barra “Iniciar timer rápido” logo acima dos registros**,
-para não precisar clicar no play do topo.
+A browser extension for Chrome and Firefox that enhances the Kimai timesheet
+page, starting with a **Quick Timer** bar above the records so you do not have
+to use the play button at the top.
 
-Funciona em qualquer instalação do Kimai (ex.: `https://kimai.example.com/pt_BR/timesheet/`).
+It works with any Kimai installation (for example,
+`https://kimai.example.com/en/timesheet/`).
 
-## Instalar (desenvolvimento)
+## Install for development
 
 ### Google Chrome
-1. Na pasta do projeto, rode **`npm run manifest:chrome`** (o `manifest.json` da raiz vem pronto para Firefox).
-2. Acesse `chrome://extensions`.
-3. Ative **Modo do desenvolvedor**.
-4. **Carregar sem compactação** → selecione esta pasta (`companion-for-kimai`).
-5. Abra `https://kimai.example.com/pt_BR/timesheet/` e use a barra acima dos registros.
+
+1. From the project directory, run **`npm run manifest:chrome`**. The root
+   `manifest.json` defaults to the Firefox variant.
+2. Open `chrome://extensions`.
+3. Enable **Developer mode**.
+4. Select **Load unpacked** and choose this project directory.
+5. Open your Kimai timesheet and use the bar above the records.
 
 ### Firefox
-1. O `manifest.json` da raiz já é a variante Firefox (event page) — sem passo extra.
-2. Acesse `about:debugging#/runtime/this-firefox`.
-3. **Carregar extensão temporária** → selecione o `manifest.json`.
-4. Abra a página do timesheet. (Para distribuição final é preciso assinar na AMO.)
 
-> Por que duas variantes? O Chrome MV3 exige `background.service_worker` e o
-> Firefox sem suporte a isso exige `background.scripts` — o `worker.js` é o
-> mesmo nos dois. O `check-pages` garante que as variantes só diferem nisso
-> (+ versão mínima do Gecko).
+1. The root `manifest.json` is already the Firefox variant; no selection step
+   is needed.
+2. Open `about:debugging#/runtime/this-firefox`.
+3. Select **This Firefox** → **Load Temporary Add-on**, then choose
+   `manifest.json`.
+4. Open your timesheet. Production builds must be signed through AMO.
 
-## Instalar (produção — zip)
+> Why are there two variants? Chrome MV3 requires
+> `background.service_worker`; Firefox uses `background.scripts` (an event
+> page). Both variants share `worker.js`. The `check-pages` test verifies that
+> they differ only in background configuration and the minimum Gecko version.
+
+## Install a production ZIP
 
 ```bash
-npm run build            # checks + tests + Chrome and Firefox archives in dist/
-npm run build:chrome     # Chrome archive only (without checks)
-npm run build:firefox    # Firefox archive only (without checks)
-npm run manifest:chrome  # seleciona o manifest do Chrome para desenvolvimento
-npm run manifest:firefox # seleciona o manifest do Firefox para desenvolvimento
+npm run build            # checks, tests, and Chrome/Firefox ZIPs in dist/
+npm run build:chrome     # Chrome ZIP only (without checks)
+npm run build:firefox    # Firefox ZIP only (without checks)
+npm run manifest:chrome  # select the Chrome manifest for development
+npm run manifest:firefox # select the Firefox manifest for development
 ```
 
-Isso gera `dist/companion-for-kimai-chrome-<versão>.zip` e
-`dist/companion-for-kimai-firefox-<versão>.zip`, cada um com o `manifest.json`
-da sua variante + apenas `icons/`, `src/` e `LICENSE` (sem testes, docs ou
-scripts). O build falha se versões divergirem ou faltar algum arquivo
-referenciado no manifest.
+The build creates `dist/companion-for-kimai-chrome-<version>.zip` and
+`dist/companion-for-kimai-firefox-<version>.zip`. Each contains its variant's
+`manifest.json`, the `LICENSE`, and only files referenced by the manifest, its
+HTML pages, or the background worker. The build fails if versions differ or a
+required file is missing.
 
-- **Chrome**: `chrome://extensions` → modo do desenvolvedor → arraste o zip
-  da variante chrome (ou envie à Chrome Web Store).
-- **Firefox**: `about:debugging#/runtime/this-firefox` → Load Temporary Add-on
-  com o zip da variante firefox (ou envie à AMO para assinar).
+- **Chrome:** Open `chrome://extensions`, enable Developer mode, and load the
+  Chrome ZIP (or submit it to the Chrome Web Store).
+- **Firefox:** Open `about:debugging#/runtime/this-firefox` → **This Firefox** →
+  **Load Temporary Add-on** and select the Firefox ZIP. AMO submissions must be
+  signed.
 
-## Como usar
+## Usage
 
-1. Preencha **Descrição** (área maior, `Enter` inicia, `Shift+Enter` quebra linha),
-   **Cliente / Projeto / Atividade** (digite para buscar; `Enter` confirma,
-   `Esc` reverte). **Tags**: combobox com busca nas tags do sistema (Enter
-   adiciona, Backspace remove a última) — as que não existirem são criadas.
-2. Clique em **▶ Iniciar** (ou `Enter` na descrição). O timer aparece no topo
-   da barra com cronômetro ao vivo.
-3. Com timer rodando: ele aparece no widget **Agora**, logo abaixo do Timer
-   rápido, com cronômetro ao vivo — pare por lá, no **Parar** de cada timer;
-   clique no timer (ou no **✎**) para **editar** projeto, atividade, descrição
-   e tags sem parar. A tabela recarrega sozinha.
+1. Enter a **Description** (`Enter` starts the timer; `Shift+Enter` inserts a
+   line break), then choose **Customer / Project / Activity** by typing to
+   search. Press `Enter` to confirm or `Esc` to revert. **Tags** are searchable;
+   press `Enter` to add a tag and `Backspace` to remove the last one. Missing
+   tags are created automatically.
+2. Select **▶ Start** (or press `Enter` in the description). The timer appears
+   at the top of the bar with a live duration.
+3. While a timer is running, it appears in the **Now** widget below Quick Timer.
+   Stop it with that timer's **Stop** button, or click it (or **✎**) to edit the
+   project, activity, description, and tags without stopping it. The table
+   refreshes automatically.
 
-## Popup e configurações
+## Compatibility
 
-- O botão da toolbar abre o popup: **timer(s) rodando** (com Parar), **novo
-  timer** (descrição, cliente, projeto, atividade e tags, todos com label) e
-  **continuar de hoje** (▶ reinicia um timer do dia com os mesmos dados, ⟳
-  atualiza, **Agrupar** junta por tarefa com expandir) + **Recentes** (fora
-  de hoje, com data e ⟳ próprio). Iniciar pelo popup **recarrega as abas do
-  Kimai** para não exibir página desatualizada. **↗** abre o Kimai (no
-  contêiner do Firefox, se houver); **⚙** abre as configurações.
-- Configurações: **URL base do Kimai** (detectada sozinha ao abrir o
-  timesheet), **idioma** (sincroniza com o Kimai logado, editável),
-  **chave de API** (só token agora, com teste de conexão, Conectar/
-  Desconectar e toast de 5s), **temas** (Sistema, Claro, Escuro, Dracula, Catppuccin,
-  Nord, Gruvbox e GNOME/Adwaita (modo claro/escuro acompanha o sistema),
-  **atalhos de teclado**
-  (iniciar/parar/recomeçar) e **autorização de acesso** do popup — pedida só para
-  aquele host (`optional_host_permissions`), sem acesso amplo a todos os sites.
+- Manifest V3: Chrome uses a service worker; Firefox uses an event page via
+  `background.scripts`. Both share the same worker implementation.
+- `browser_specific_settings.gecko.id` is included as required by AMO.
+- Permissions are limited to `storage`, `alarms`, `contextMenus`, and an
+  optional host permission requested only for the configured Kimai host. The
+  content script uses same-origin `fetch`; the popup and worker use the
+  configured API URL.
+- The toolbar icon changes while a timer is running, including an elapsed-time
+  badge. The context menu offers Pause and Continue. Firefox 121 or later is
+  required.
+- Tested against the official demo (`demo.kimai.org`, Kimai 2.68.0) with a
+  logged-in session.
 
-## Compatibilidade
+## Development
 
-- `manifest_version: 3`, sem background worker (só content script) — superfície mínima de API,
-  igual no Chrome e no Firefox.
-- `browser_specific_settings.gecko.id` incluído (exigido pela AMO).
-- Permissões enxutas: `storage` + `alarms` + `contextMenus` (sem alertas) e
-  `optional_host_permissions` pedida só para o host do seu Kimai. O content
-  script usa `fetch` mesma-origem; popup/worker usam a origem configurada.
-- Ícone muda com timer rodando (badge com decorrido); botão-direito no ícone
-  tem Pausar/Continuar. Requer Firefox 121+ (service worker MV3).
-- Testado contra o demo oficial (`demo.kimai.org`, Kimai 2.68.0) com login de sessão.
-
-## Desenvolvimento
-
-Sem build: edite `src/*` e recarregue a extensão. Convenções em
-`docs/ARCHITECTURE.md` (módulos como IIFE publicando em `KE`, paletas em
-`src/common/themes/`, camadas dados × UI). Registre mudanças em `CHANGELOG.md`.
+Edit `src/*` and reload the extension; no compile step is required. See
+`docs/ARCHITECTURE.md` for the module conventions (IIFEs publishing to `KE`),
+theme palettes in `src/common/themes/`, and the data/UI layers. Record changes
+in `CHANGELOG.md`.
 
 ```bash
 npm test          # functional tests
 npm run check     # syntax, page integration, and contrast checks
-npm run build     # checks + tests + production archives in dist/
+npm run build     # checks, tests, and production ZIPs in dist/
 ```
 
 ## CI
 
-O GitHub Actions executa o build das variantes Chrome e Firefox em push para
-`main`, pull requests e tags `v*`. As duas zips ficam disponíveis como artifact
-por 30 dias; o resumo da execução inclui a seção da versão correspondente em
-`CHANGELOG.md`. Ao enviar uma tag `v*` igual à versão de `package.json`, cria
-também um GitHub Release com os dois ZIPs anexados e as notas do changelog.
+GitHub Actions builds Chrome and Firefox on pushes to `main`, pull requests,
+and `v*` tags. Both ZIPs are uploaded as workflow artifacts for 30 days, and
+the run summary includes the matching version's `CHANGELOG.md` section. A `v*`
+tag must match the version in `package.json`; matching tags also create a GitHub
+Release with both ZIPs attached and the changelog notes.
 
-## Problemas conhecidos
-
-- Se o Kimai recusar o início (ex.: projeto com período bloqueado, atividade
-  inválida), a barra agora mostra o **motivo devolvido pelo servidor** após
-  "Não foi possível iniciar o timer.", em vez de só o código HTTP. O detalhe
-  completo vai para o console do navegador (`[Companion] start failed`).
-
-## Roadmap (próximos recursos)
-
-- Favoritos / últimos timers (restart em 1 clique).
-- Duração padrão / hora de início editável.
-- Página de opções (projeto padrão, tags padrão).
-- Atalho de teclado configurável.
-
-## Licença
+## License
 
 MIT.
