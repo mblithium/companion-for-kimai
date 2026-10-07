@@ -145,7 +145,11 @@ const captured = {};
 const mountedCards = [];
 const anchor = new StubEl('div');
 anchor.parentNode = {
-  insertBefore(node) { if (node.id === 'ke-quick-timer') captured.card = node; mountedCards.push(node); return node; },
+  insertBefore(node) {
+    if (node.id === 'ke-quick-timer') captured.card = node;
+    if (node.id === 'ke-quick-timer' || node.id === 'ke-active-now') mountedCards.push(node);
+    return node;
+  },
 };
 const document = {
   __keComboOutside__: false,
@@ -926,6 +930,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     qtCss.includes('body.ke-hide-sidebar .navbar-vertical') &&
     qtCss.includes('body.ke-hide-actionbar .page-header.d-print-none') &&
     qtCss.includes('body.ke-hide-header .navbar.navbar-expand-md'));
+  check('linha do total semanal alinhada à direita',
+    /\.ke-week-total\s*\{[^}]*justify-content:\s*flex-end[^}]*font-variant-numeric:\s*tabular-nums/s.test(qtCss));
   const qtJs = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.js'), 'utf8');
   check('Interface aplica preferências ao body',
     ['hideNavigation', 'hideSidebar', 'hideActionBar', 'hideHeader'].every((key) => qtJs.includes(`settings.${key}`)));
@@ -1094,6 +1100,30 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   KE.applySiteGrouping(dailyTotals, false);
   check('soma diária atualiza sem duplicar célula', dailyTotalText(dailySummaryRows[0]) === '03:00:00' &&
     findAll(dailySummaryRows[0], 'ke-day-total').length === 1);
+
+  const weekTbody = document.createElement('tbody');
+  weekTbody.appendChild(siteRow({ id: 'w1', date: '13/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1' }));
+  weekTbody.appendChild(siteRow({ id: 'w2', date: '14/10/2026', dur: '0:30', cust: 'C2', proj: 'P2', act: 'A2' }));
+  weekTbody.appendChild(siteRow({ id: 'w3', date: '15/10/2026', dur: '2:00', cust: 'C3', proj: 'P3', act: 'A3' }));
+  check('total da semana soma listagem em segundos', KE.siteWeekTotalSeconds(weekTbody) === 12600, KE.siteWeekTotalSeconds(weekTbody));
+  check('semana ISO agrupa domPosterior com a segunda anterior', KE.siteWeekKey('20261018') === KE.siteWeekKey('20261012') &&
+    KE.siteWeekKey('20261018') !== KE.siteWeekKey('20261019'));
+  const twoWeekTbody = document.createElement('tbody');
+  twoWeekTbody.appendChild(siteRow({ id: 'o1', date: '18/10/2026', dur: '10:00', cust: 'C1', proj: 'P1', act: 'A1' }));
+  twoWeekTbody.appendChild(siteRow({ id: 'n1', date: '19/10/2026', dur: '1:00', cust: 'C2', proj: 'P2', act: 'A2' }));
+  check('total da semana ignora semanas anteriores da listagem', KE.siteWeekTotalSeconds(twoWeekTbody) === 3600,
+    KE.siteWeekTotalSeconds(twoWeekTbody));
+  check('total da semana usa rótulos pt/en', KE.STRINGS.pt.weekTotal === 'TOTAL DA SEMANA' && KE.STRINGS.en.weekTotal === 'WEEK TOTAL');
+  const weekCardParent = document.createElement('div');
+  const weekCard = document.createElement('div');
+  weekCardParent.appendChild(weekCard);
+  const weekLine = KE.renderSiteWeekTotal(weekCard, 7384);
+  check('linha do total semanal acima da tabela à direita', !!weekLine &&
+    weekLine.textContent === KE.T.weekTotal + ': 02:03:04' &&
+    weekCardParent.children[0] === weekLine && weekCardParent.children[1] === weekCard);
+  KE.renderSiteWeekTotal(weekCard, 7384);
+  check('linha do total semanal não duplica', weekCardParent.children.length === 2 &&
+    findAll(weekCardParent, 'ke-week-total').length === 1);
 
   const stb2 = document.createElement('tbody');
   stb2.appendChild(siteRow({ id: 'x', date: '18/10/2026', dur: '1:00', cust: 'Solo', proj: 'SP', act: 'SA', desc: 'u1' }));

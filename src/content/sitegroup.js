@@ -6,6 +6,7 @@
   let siteObs = null;
   let lastSig = '';
   let totalsTimer = null;
+  let weekTotalEl = null;
   let bulkSyncing = false;
   const expandedKeys = new Set();
   const baseOrder = new WeakMap();
@@ -42,6 +43,17 @@
     const m = String(text || '').trim().match(/(\d{2})\/(\d{2})\/(\d{4})/);
     if (!m) return { key: '', label: '' };
     return { key: m[3] + m[2] + m[1], label: m[1] + '/' + m[2] + '/' + m[3] };
+  };
+
+  KE.siteWeekKey = function (dateKey) {
+    const key = String(dateKey || '');
+    if (!/^\d{8}$/.test(key)) return '';
+    const thursday = new Date(+key.slice(0, 4), +key.slice(4, 6) - 1, +key.slice(6, 8));
+    thursday.setDate(thursday.getDate() - ((thursday.getDay() + 6) % 7) + 3);
+    const firstThursday = new Date(thursday.getFullYear(), 0, 4);
+    firstThursday.setDate(firstThursday.getDate() - ((firstThursday.getDay() + 6) % 7) + 3);
+    const week = 1 + Math.round((thursday - firstThursday) / 604800000);
+    return thursday.getFullYear() + '-W' + String(week).padStart(2, '0');
   };
 
   function rowKey(tr) {
@@ -335,6 +347,65 @@
     });
   }
 
+  function siteWeekTotalSeconds(tbody) {
+    const tb = tbody || findSiteTbody();
+    if (!tb) return 0;
+    const dated = [];
+    Array.from(tb.children || tb.querySelectorAll('tr'))
+      .filter((row) => row.tagName === 'TR')
+      .forEach((row) => {
+        if (!isDataRow(row)) return;
+        const dateKey = KE.parseSiteDate(cellText(row, 'col_date')).key;
+        if (!dateKey) return;
+        dated.push({ week: KE.siteWeekKey(dateKey), sec: KE.parseSiteDuration(cellText(row, 'col_duration')) });
+      });
+    if (!dated.length) return 0;
+    const latestWeek = dated.map((entry) => entry.week).sort().pop();
+    return dated
+      .filter((entry) => entry.week === latestWeek)
+      .reduce((sum, entry) => sum + entry.sec, 0);
+  }
+  KE.siteWeekTotalSeconds = siteWeekTotalSeconds;
+
+  function weekTotalLabel() {
+    return (KE.T && KE.T.weekTotal) || 'TOTAL DA SEMANA';
+  }
+
+  function upsertWeekTotalLine(card, totalSec) {
+    if (!card || !card.parentNode || typeof card.parentNode.insertBefore !== 'function') return null;
+    const parent = card.parentNode;
+    let line = null;
+    try {
+      if (weekTotalEl && weekTotalEl.parentNode === parent) line = weekTotalEl;
+      else if (parent.querySelector && typeof parent.querySelector === 'function') {
+        line = parent.querySelector('.ke-week-total');
+      }
+    } catch (e) { line = null; }
+    if (!line) {
+      if (weekTotalEl && weekTotalEl.parentNode && weekTotalEl.parentNode !== parent) {
+        try { weekTotalEl.remove(); } catch (e) {}
+      }
+      line = document.createElement('div');
+      line.className = 'ke-week-total';
+      line.setAttribute('role', 'status');
+      weekTotalEl = line;
+    }
+    const text = weekTotalLabel() + ': ' + KE.formatSiteHms(totalSec);
+    if (line.textContent !== text) line.textContent = text;
+    try { parent.insertBefore(line, card); } catch (e) {}
+    return line;
+  }
+  KE.renderSiteWeekTotal = upsertWeekTotalLine;
+
+  function refreshWeekTotal(tbody) {
+    const tb = tbody || findSiteTbody();
+    if (!tb) return '';
+    const total = siteWeekTotalSeconds(tb);
+    upsertWeekTotalLine(findSiteCard(), total);
+    return weekTotalLabel() + ': ' + KE.formatSiteHms(total);
+  }
+  KE.refreshSiteWeekTotal = refreshWeekTotal;
+
   function paintGroupCheck(g, box) {
     if (!box) return;
     const boxes = g.rows.map(memberBox).filter(Boolean);
@@ -466,6 +537,7 @@
   KE.applySiteGrouping = function (tbody, on) {
     if (!tbody) return;
     refreshDailyTotals(tbody);
+    refreshWeekTotal(tbody);
     const headers = tbody.querySelectorAll('tr.ke-sitegroup');
     headers.forEach((h) => h.remove());
     const kids = Array.from(tbody.children || tbody.querySelectorAll('tr'))
@@ -550,6 +622,7 @@
         totalsTimer = setInterval(() => {
           refreshGroupTotals();
           refreshDailyTotals();
+          refreshWeekTotal();
         }, 60000);
       } catch (e) {}
     }
@@ -560,6 +633,7 @@
         const tb = findSiteTbody();
         if (!tb) return;
         refreshDailyTotals(tb);
+        refreshWeekTotal(tb);
         if (!sitePref) return;
         ensureBar();
         if (siteSig(tb) === lastSig) return;

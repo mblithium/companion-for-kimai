@@ -57,6 +57,17 @@ body.ke-hide-header .navbar.navbar-expand-md:not(.navbar-vertical) {
 }
 .ke-sitegroup-bar-refresh:hover:not(:disabled) { opacity: 1; }
 .ke-sitegroup-bar-refresh:disabled { opacity: 0.4; cursor: wait; }
+.ke-week-total {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ke-text, inherit);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .datatable_timesheet tr.summary.info .ke-day-total { text-align: right; font-weight: 700; white-space: nowrap; }
 
 .datatable_timesheet tr.ke-sitegroup td {
