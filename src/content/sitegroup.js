@@ -68,6 +68,7 @@
   function isDataRow(tr) {
 
     if (!tr || tr.tagName !== 'TR' || tr.classList.contains('ke-sitegroup')) return false;
+    if (tr.classList.contains('summary') || tr.classList.contains('info')) return false;
     const cb = memberBox(tr);
     const v = cb ? (cb.value || cb.getAttribute('value') || '') : '';
     if (String(v).trim()) return true;
@@ -319,20 +320,41 @@
     return total;
   }
 
+  function dailyTableInfo(tb) {
+    const rows = Array.from(tb.children || tb.querySelectorAll('tr'))
+      .filter((row) => row.tagName === 'TR');
+    const dataRows = rows.filter(isDataRow);
+    const dataRow = dataRows[0];
+    return {
+      rows,
+      dataColumnCount: dataRow
+        ? Array.from(dataRow.children || []).filter((cell) => cell.tagName === 'TD').length
+        : 0,
+      hasDurationColumn: dataRows.some((row) => !!row.querySelector('.col_duration')),
+    };
+  }
+
+  function writeDailyCell(row, info, text) {
+    let cell = row.querySelector('td.ke-day-total');
+    if (!cell) {
+      cell = row.querySelector('td.col_duration');
+      if (cell) cell.classList.add('ke-day-total');
+    }
+    if (!cell && info.hasDurationColumn) cell = addDailyTotalCell(row, info.dataColumnCount);
+    if (!cell) return false;
+    if (cell.textContent !== text) cell.textContent = text;
+    return true;
+  }
+
   function refreshDailyTotals(tbody) {
     const tb = tbody || findSiteTbody();
     if (!tb) return;
-    const rows = Array.from(tb.children || tb.querySelectorAll('tr'))
-      .filter((row) => row.tagName === 'TR');
-    const dataRow = rows.find(isDataRow);
-    const dataColumnCount = dataRow
-      ? Array.from(dataRow.children || []).filter((cell) => cell.tagName === 'TD').length
-      : 0;
+    const info = dailyTableInfo(tb);
     const totals = new Map();
     const summaries = [];
     let currentDateKey = '';
 
-    rows.forEach((row) => {
+    info.rows.forEach((row) => {
       const summaryKey = summaryDateKey(row);
       if (summaryKey) {
         currentDateKey = summaryKey;
@@ -346,9 +368,7 @@
     });
 
     summaries.forEach(({ row, dateKey }) => {
-      const totalCell = row.querySelector('td.ke-day-total') || addDailyTotalCell(row, dataColumnCount);
-      const text = KE.formatSiteHms(totals.get(dateKey) || 0);
-      if (totalCell.textContent !== text) totalCell.textContent = text;
+      writeDailyCell(row, info, KE.formatSiteHms(totals.get(dateKey) || 0));
     });
   }
 
@@ -382,10 +402,113 @@
     return label === 'dayTotal' ? 'HOJE' : label;
   }
 
-  function todayDateKey(now) {
-    const d = now || new Date();
+  function dateKeyFromDate(d) {
     return d.getFullYear() + KE.pad(d.getMonth() + 1) + KE.pad(d.getDate());
   }
+
+  function todayDateKey(now) {
+    return dateKeyFromDate(now || new Date());
+  }
+
+  function currentWeekRange(now) {
+    const d = now || new Date();
+    const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate());
+    sunday.setDate(monday.getDate() + 6);
+    return [dateKeyFromDate(monday), dateKeyFromDate(sunday)];
+  }
+
+  function entryDayKey(t) {
+    return String((t && t.begin) || '').slice(0, 10).replace(/-/g, '');
+  }
+
+  function entryLiveSeconds(t, nowMs) {
+    if (!t) return 0;
+    if (t.end) return Math.max(0, Math.floor(Number(t.duration) || 0));
+    const beginMs = new Date(t.begin).getTime();
+    if (Number.isNaN(beginMs)) return 0;
+    return Math.max(0, Math.floor(((nowMs || Date.now()) - beginMs) / 1000));
+  }
+
+  KE.fetchTimesheetsBetween = async function (fromKey, toKey) {
+    const stamp = (key, time) => key.slice(0, 4) + '-' + key.slice(4, 6) + '-' + key.slice(6, 8) + ' ' + time;
+    const url = '/api/timesheets?size=1000' +
+      '&begin=' + encodeURIComponent(stamp(fromKey, '00:00:00')) +
+      '&end=' + encodeURIComponent(stamp(toKey, '23:59:59'));
+    const list = KE.asArray(await KE.apiGet(url));
+    return list.filter((t) => {
+      const day = entryDayKey(t);
+      return day >= fromKey && day <= toKey;
+    });
+  };
+
+  function listingDateKeys(tb) {
+    const keys = new Set();
+    Array.from(tb.children || tb.querySelectorAll('tr'))
+      .filter((row) => row.tagName === 'TR')
+      .forEach((row) => {
+        const key = summaryDateKey(row) ||
+          (isDataRow(row) ? KE.parseSiteDate(cellText(row, 'col_date')).key : '');
+        if (key) keys.add(key);
+      });
+    return [...keys].sort();
+  }
+
+  KE.refreshSiteTotals = async function (tbody, nowMs) {
+    const tb = tbody || findSiteTbody();
+    if (!tb) return null;
+    try {
+      const keys = listingDateKeys(tb);
+      let from;
+      let to;
+      if (keys.length) {
+        from = keys[0];
+        to = keys[keys.length - 1];
+      } else {
+        [from, to] = currentWeekRange(nowMs);
+      }
+      const list = await KE.fetchTimesheetsBetween(from, to);
+      const perDay = new Map();
+      list.forEach((t) => {
+        const day = entryDayKey(t);
+        if (!day) return;
+        perDay.set(day, (perDay.get(day) || 0) + entryLiveSeconds(t, nowMs));
+      });
+      if (!perDay.size) {
+        refreshDailyTotals(tb);
+        refreshWeekTotal(tb);
+        return null;
+      }
+      const info = dailyTableInfo(tb);
+      Array.from(tb.children || tb.querySelectorAll('tr'))
+        .filter((row) => row.tagName === 'TR')
+        .forEach((row) => {
+          const dateKey = summaryDateKey(row);
+          if (!dateKey || !perDay.has(dateKey)) return;
+          writeDailyCell(row, info, KE.formatSiteHms(perDay.get(dateKey)));
+        });
+      const weeks = [...perDay.keys()].map((day) => KE.siteWeekKey(day)).sort();
+      const latestWeek = weeks[weeks.length - 1];
+      let weekSum = 0;
+      perDay.forEach((sec, day) => {
+        if (KE.siteWeekKey(day) === latestWeek) weekSum += sec;
+      });
+      const todaySum = perDay.get(todayDateKey(nowMs ? new Date(nowMs) : undefined)) || 0;
+      upsertWeekTotalLine(findSiteCard(), todaySum, weekSum);
+      return {
+        from,
+        to,
+        today: todaySum,
+        week: weekSum,
+        days: perDay.size,
+      };
+    } catch (e) {
+      refreshDailyTotals(tb);
+      refreshWeekTotal(tb);
+      return null;
+    }
+  };
 
   function siteTodayTotalSeconds(tbody, now) {
     const tb = tbody || findSiteTbody();
@@ -584,6 +707,10 @@
     if (!tbody) return;
     refreshDailyTotals(tbody);
     refreshWeekTotal(tbody);
+    try {
+      const pending = KE.refreshSiteTotals(tbody);
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    } catch (e) {}
     const headers = tbody.querySelectorAll('tr.ke-sitegroup');
     headers.forEach((h) => h.remove());
     const kids = Array.from(tbody.children || tbody.querySelectorAll('tr'))
@@ -669,6 +796,10 @@
           refreshGroupTotals();
           refreshDailyTotals();
           refreshWeekTotal();
+          try {
+            const pending = KE.refreshSiteTotals();
+            if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+          } catch (e) {}
         }, 60000);
       } catch (e) {}
     }
@@ -680,6 +811,10 @@
         if (!tb) return;
         refreshDailyTotals(tb);
         refreshWeekTotal(tb);
+        try {
+          const pending = KE.refreshSiteTotals(tb);
+          if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+        } catch (e) {}
         if (!sitePref) return;
         ensureBar();
         if (siteSig(tb) === lastSig) return;

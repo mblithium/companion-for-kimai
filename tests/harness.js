@@ -217,6 +217,7 @@ const patchedTimers = [];
 let activeStub = [];
 let todayStub = [];
 let recentStub = [];
+let rangeStub = [];
 let autoConnectPosts = [];
 let autoConnectDeleted = [];
 let autoConnectPage = '';
@@ -338,6 +339,7 @@ const fetch = async (url, opts) => {
   if (u === '/api/users/me' && method === 'GET') return jsonResp({ username: 'john_user', language: 'en', alias: 'John' });
   if (u === '/api/timesheets/active') return jsonResp(activeStub);
   if (u.startsWith('/api/timesheets?') && method === 'GET') {
+    if (u.includes('size=1000')) { bump('range'); return jsonResp(rangeStub); }
     if (u.includes('size=100')) { bump('recent'); return jsonResp(recentStub); }
     bump('today'); return jsonResp(todayStub);
   }
@@ -1143,6 +1145,94 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('linha de totais não duplica', weekCardParent.children.length === 2 &&
     findAll(weekCardParent, 'ke-week-total').length === 1 &&
     findAll(weekLine, 'ke-today-total').length === 1 && findAll(weekLine, 'ke-week-total-value').length === 1);
+
+  function realSumRow(date, dayTotal) {
+    const tr = document.createElement('tr');
+    tr.className = 'summary info';
+    ['col_id', 'col_date', 'col_starttime', 'col_endtime', 'col_duration', 'col_customer',
+      'col_project', 'col_activity', 'col_description', 'col_tags', 'col_billable', 'col_actions'
+    ].forEach((cls) => {
+      const td = document.createElement('td');
+      td.className = cls;
+      if (cls === 'col_date') td.textContent = date;
+      if (cls === 'col_duration') td.textContent = dayTotal;
+      tr.appendChild(td);
+    });
+    return tr;
+  }
+  const realTbody = document.createElement('tbody');
+  realTbody.appendChild(siteRow({ id: 'a', date: '18/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1', desc: 'd' }));
+  realTbody.appendChild(siteRow({ id: 'b', date: '18/10/2026', dur: '0:30', cust: 'C1', proj: 'P1', act: 'A1', desc: 'd' }));
+  realTbody.appendChild(realSumRow('18/10/2026', '1:30'));
+  realTbody.appendChild(siteRow({ id: 'c', date: '17/10/2026', dur: '2:00', cust: 'C2', proj: 'P2', act: 'A2', desc: 'x' }));
+  realTbody.appendChild(realSumRow('17/10/2026', '2:00'));
+  check('resumo real nunca conta como linha de dados', KE.siteWeekTotalSeconds(realTbody) === 12600, KE.siteWeekTotalSeconds(realTbody));
+  KE.applySiteGrouping(realTbody, false);
+  const realDaily = realTbody.children.filter((row) => row.classList.contains('summary'));
+  check('totais diários ignoram duração do resumo real', realDaily.length === 2 &&
+    findAll(realDaily[0], 'ke-day-total')[0].textContent === '01:30:00' &&
+    findAll(realDaily[1], 'ke-day-total')[0].textContent === '02:00:00');
+  KE.applySiteGrouping(realTbody, true);
+  check('resumos reais ficam parados e visíveis no agrupamento',
+    realTbody.children.filter((r) => r.classList.contains('summary')).length === 2 &&
+    realTbody.children.filter((r) => r.classList.contains('summary')).every((r) => r.style.display !== 'none'));
+
+  rangeStub = [
+    { id: 1, project: 1, activity: 1, begin: '2026-10-13T08:00:00', end: '2026-10-13T09:00:00', duration: 3600, description: 'api' },
+    { id: 2, project: 1, activity: 1, begin: '2026-10-13T10:00:00', end: '2026-10-13T10:30:00', duration: 1800, description: 'api' },
+    { id: 3, project: 1, activity: 1, begin: '2026-10-14T08:00:00', end: '2026-10-14T08:10:00', duration: 600, description: 'api' },
+    { id: 4, project: 1, activity: 1, begin: '2000-01-01T08:00:00', end: '2000-01-01T09:00:00', duration: 99999, description: 'fora' },
+  ];
+  const apiTbody = document.createElement('tbody');
+  apiTbody.appendChild(siteRow({ id: 'a', date: '13/10/2026', dur: '0:00', cust: 'C1', proj: 'P1', act: 'A1' }));
+  apiTbody.appendChild(realSumRow('13/10/2026', '0:00'));
+  const apiResult = await KE.refreshSiteTotals(apiTbody);
+  check('totais vêm da API e não do DOM', apiResult && apiResult.from === '20261013' && apiResult.to === '20261013' &&
+    apiResult.days === 1 && apiResult.week === 5400, apiResult);
+  check('busca da API usa intervalo begin/end', lastReq.url.includes('/api/timesheets?') && lastReq.url.includes('begin=2026-10-13'), lastReq.url);
+  check('célula diária usa duração da API', findAll(apiTbody, 'ke-day-total')[0].textContent === '01:30:00');
+  function bareRow(id, date) {
+    const tr = document.createElement('tr');
+    const cb = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = 'checkbox';
+    inp.className = 'multi_update_single';
+    inp.value = id;
+    cb.appendChild(inp);
+    tr.appendChild(cb);
+    const dc = document.createElement('td');
+    dc.className = 'col_date';
+    dc.textContent = date;
+    tr.appendChild(dc);
+    const pc = document.createElement('td');
+    pc.className = 'col_project';
+    pc.textContent = 'P';
+    tr.appendChild(pc);
+    return tr;
+  }
+  function bareSumRow(date) {
+    const tr = document.createElement('tr');
+    tr.className = 'summary info';
+    const td = document.createElement('td');
+    td.textContent = date;
+    tr.appendChild(td);
+    return tr;
+  }
+  const bareTbody = document.createElement('tbody');
+  bareTbody.appendChild(bareRow('b1', '13/10/2026'));
+  bareTbody.appendChild(bareSumRow('13/10/2026'));
+  const bareResult = await KE.refreshSiteTotals(bareTbody);
+  check('API funciona sem coluna de duração', bareResult && bareResult.week === 5400, bareResult);
+  check('sem coluna de duração não cria célula estranha', findAll(bareTbody, 'ke-day-total').length === 0 &&
+    bareTbody.children.every((r) => r.children.length <= 3));
+  failMode = 'network';
+  const fallbackTbody = document.createElement('tbody');
+  fallbackTbody.appendChild(siteRow({ id: 'f1', date: '13/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1' }));
+  fallbackTbody.appendChild(realSumRow('13/10/2026', '0:00'));
+  check('falha da API usa DOM como fallback', (await KE.refreshSiteTotals(fallbackTbody)) === null &&
+    findAll(fallbackTbody, 'ke-day-total')[0].textContent === '01:00:00');
+  failMode = null;
+  rangeStub = [];
 
   const stb2 = document.createElement('tbody');
   stb2.appendChild(siteRow({ id: 'x', date: '18/10/2026', dur: '1:00', cust: 'Solo', proj: 'SP', act: 'SA', desc: 'u1' }));
