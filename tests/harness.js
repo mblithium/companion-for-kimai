@@ -758,16 +758,26 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const activeEditInputs = activeEditForm.querySelectorAll('input');
   check('edição do ativo sem datas nem duração', activeEditInputs.length === 4 &&
     activeEditInputs.every((n) => n.type === 'text'), activeEditInputs.map((n) => n.type));
-  const activeDescIn = activeEditInputs.find((n) => !n.classList.contains('ke-combo-input'));
+  check('edição do ativo tem rótulos nos campos',
+    findAll(activeEditForm, 'ke-pop-label').map((n) => n.textContent).join('|') ===
+    [KE.T.project, KE.T.activity, KE.T.description, KE.T.tags].join('|'),
+    findAll(activeEditForm, 'ke-pop-label').map((n) => n.textContent));
+  check('edição do ativo usa multi-combo de tags', findAll(activeEditForm, 'ke-multi').length === 1 &&
+    activeEditInputs.filter((n) => n.classList.contains('ke-pop-input') && n.placeholder === KE.T.tagsPh).length === 0);
+  const activeDescIn = activeEditInputs.find((n) => n.getAttribute('maxlength') === '255');
   check('edição do ativo preenche descrição', activeDescIn && activeDescIn.value === 'rodando', activeDescIn && activeDescIn.value);
   patchedTimers.length = 0;
   activeDescIn.value = 'revisado no popup';
+  const activeTagsIn = findAll(activeEditForm, 'ke-multi-input')[0];
+  fireInput(activeTagsIn, 'Alexander');
+  fireKey(activeTagsIn, 'Enter');
+  check('edição do ativo adiciona tag pelo multi-combo', findAll(activeEditForm, 'ke-chip').length === 1);
   findAll(activeEditForm, 'ke-pop-edit-save')[0].fire('click');
   await sleep(300);
   check('edição do ativo salva via PATCH', patchedTimers.length === 1 && patchedTimers[0].id === '801', patchedTimers);
   check('PATCH do ativo sem datas nem duração', patchedTimers.length === 1 &&
     patchedTimers[0].body.project === 200 && patchedTimers[0].body.activity === 1655 &&
-    patchedTimers[0].body.description === 'revisado no popup' && patchedTimers[0].body.tags === '' &&
+    patchedTimers[0].body.description === 'revisado no popup' && patchedTimers[0].body.tags === 'Alexander' &&
     Object.keys(patchedTimers[0].body).sort().join(',') === 'activity,description,project,tags', patchedTimers[0] && patchedTimers[0].body);
   findAll(popEls['ke-pop-active'], 'ke-pop-btn-edit')[0].fire('click');
   await sleep(400);

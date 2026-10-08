@@ -161,11 +161,7 @@
     descInput.placeholder = KE.T.descriptionPh;
     descInput.setAttribute('maxlength', '255');
     descInput.value = t.description || '';
-    const tagsInput = document.createElement('input');
-    tagsInput.className = 'ke-pop-input';
-    tagsInput.type = 'text';
-    tagsInput.placeholder = KE.T.tagsPh;
-    tagsInput.value = KE.tagNames(t.tags).join(', ');
+    const tagsCombo = KE.createMultiCombo({ searchPlaceholder: KE.T.tagsPh });
     const errBox = document.createElement('div');
     errBox.className = 'ke-pop-edit-error';
     errBox.hidden = true;
@@ -181,13 +177,25 @@
     cancelBtn.textContent = KE.T.cancel;
     actions.appendChild(saveBtn);
     actions.appendChild(cancelBtn);
-    form.appendChild(projectCombo.root);
-    form.appendChild(actCombo.root);
-    form.appendChild(descInput);
-    form.appendChild(tagsInput);
-    form.appendChild(errBox);
     form.appendChild(actions);
     row.appendChild(form);
+    const labeled = (labelText, node) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'ke-pop-edit-field';
+      const lab = document.createElement('span');
+      lab.className = 'ke-pop-label';
+      lab.textContent = labelText;
+      wrap.appendChild(lab);
+      wrap.appendChild(node);
+      return wrap;
+    };
+    form.replaceChildren();
+    form.appendChild(labeled(KE.T.project, projectCombo.root));
+    form.appendChild(labeled(KE.T.activity, actCombo.root));
+    form.appendChild(labeled(KE.T.description, descInput));
+    form.appendChild(labeled(KE.T.tags, tagsCombo.root));
+    form.appendChild(errBox);
+    form.appendChild(actions);
     const showError = (msg) => {
       errBox.textContent = msg;
       errBox.hidden = false;
@@ -202,7 +210,8 @@
         showError(KE.T.needProject);
         return;
       }
-      const tagNames = await KE.ensureTags(tagsInput.value.split(',').map((s) => s.trim()).filter(Boolean));
+      tagsCombo.flush();
+      const tagNames = await KE.ensureTags(tagsCombo.getValues());
       const payload = {
         project: Number(project),
         activity: Number(activity),
@@ -221,13 +230,14 @@
     };
     saveBtn.addEventListener('click', () => { doSave().catch(() => {}); });
     cancelBtn.addEventListener('click', () => { refreshActive().catch(() => {}); });
-    [descInput, tagsInput].forEach((inp) => inp.addEventListener('keydown', (ev) => {
+    descInput.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); doSave().catch(() => {}); }
       else if (ev.key === 'Escape') refreshActive().catch(() => {});
-    }));
+    });
 
     projectCombo.setLoading(true);
     actCombo.setLoading(true);
+    tagsCombo.setLoading(true);
     try {
       await KE.getProjectsCached('', false);
       projectCombo.setLoading(false);
@@ -235,9 +245,14 @@
       await KE.getActivitiesCached(projId, false);
       actCombo.setLoading(false);
       actCombo.setItems(activityItems(), actId);
+      await KE.loadTags();
+      tagsCombo.setLoading(false);
+      tagsCombo.setItems(KE.state.tags);
+      tagsCombo.setValues(KE.tagNames(t.tags));
     } catch (e) {
       projectCombo.setLoading(false);
       actCombo.setLoading(false);
+      tagsCombo.setLoading(false);
       showError(KE.T.refreshFail);
       return;
     }
