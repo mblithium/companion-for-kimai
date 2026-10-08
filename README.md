@@ -42,6 +42,7 @@ npm run build:chrome     # Chrome ZIP only (without checks)
 npm run build:firefox    # Firefox ZIP only (without checks)
 npm run manifest:chrome  # select the Chrome manifest for development
 npm run manifest:firefox # select the Firefox manifest for development
+npm run manifest:sync    # sync version/metadata from package.json into manifests
 ```
 
 The build creates `dist/companion-for-kimai-chrome-<version>.zip` and

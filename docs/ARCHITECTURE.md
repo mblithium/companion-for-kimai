@@ -117,5 +117,8 @@ definida nos scripts que a página carrega).
 - Valida antes: versões sincronizadas (manifests + `package.json`), manifest
   parseável e todos os arquivos referenciados (js/css/html/icons/worker)
   presentes; recusa vazar `tests/`, `docs/`, `scripts/`, `manifest/`.
+- Não edite versão/descrição/homepage nos manifests à mão: `package.json` é a
+  fonte da verdade; `npm run manifest:sync` propaga para as variantes e para o
+  `manifest.json` da raiz (com `--set-version X.Y.Z` para bump direto).
 - `npm run build` = `check` + `test` + zips; `build:chrome`/`build:firefox`
   geram só a variante (sem gates).

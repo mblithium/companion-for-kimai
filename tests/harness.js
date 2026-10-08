@@ -916,6 +916,12 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('rótulo tema', KE.themeLabel('dark') === 'Escuro' && KE.themeLabel('x') === 'Sistema');
   check('rótulo dracula', KE.themeLabel('dracula') === 'Dracula' && KE.themeLabel('catppuccin') === 'Catppuccin');
   check('rótulo gnome', KE.themeLabel('gnome') === 'GNOME');
+  const pkgJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const variantVersions = ['manifest/chrome.json', 'manifest/firefox.json']
+    .map((f) => JSON.parse(fs.readFileSync(path.join(ROOT, f), 'utf8')).version);
+  check('manifestos sincronizados com package.json',
+    variantVersions.every((v) => v === pkgJson.version) && manifest.version === pkgJson.version,
+    { package: pkgJson.version, variants: variantVersions, root: manifest.version });
   check('paleta Adwaita adaptável', themeCss.includes('--ke-green: #1c71d8') &&
     themeCss.includes('--ke-green-text: #007c3d') && themeCss.includes('--ke-green-text: #78e9ab') &&
     themeCss.includes('--ke-bg: #fafafb') && themeCss.includes('--ke-bg: #222226'));
