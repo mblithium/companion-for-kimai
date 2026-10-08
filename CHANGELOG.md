@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.15] — 2026-10-08
+### Added
+- Seções "Continuar de hoje" e "Recentes" do popup abrem colapsadas;
+  o clique no título expande/recolhe cada seção.
+### Fixed
+- Atributo `hidden` agora prevalece sobre regras `display` no popup e nas
+  opções (o checkbox de rascunho desativado voltava a aparecer).
+- Alternar "Habilitar rascunho" avisa que é preciso salvar para aplicar.
+
 ## [0.22.14] — 2026-10-08
 ### Added
 - Rascunho incorporado à seção Novo timer do popup: checkbox abaixo da
