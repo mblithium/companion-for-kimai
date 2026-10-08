@@ -77,7 +77,8 @@ arquivo necessário.
 
 Sem build: edite `src/*` e recarregue a extensão. Convenções em
 `docs/ARCHITECTURE.md` (módulos como IIFE publicando em `KE`, paletas em
-`src/common/themes/`, camadas dados × UI). Registre mudanças em `CHANGELOG.md`.
+`src/common/themes/`, camadas dados × UI). Registre mudanças em `CHANGELOG.md`
+(em inglês) e espelhe em `CHANGELOG-PT_BR.md`.
 
 ```bash
 npm test          # functional tests
