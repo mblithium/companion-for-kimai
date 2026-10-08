@@ -99,3 +99,4 @@ body {
 .ke-opt-toast.ke-show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .ke-opt-toast[data-kind="ok"] { border-color: var(--ke-green); }
 .ke-opt-toast[data-kind="err"] { border-color: var(--ke-red-text); }
+[hidden] { display: none !important; }

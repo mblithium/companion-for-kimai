@@ -682,6 +682,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const popDraftHtml = fs.readFileSync(path.join(ROOT, 'src/popup/popup.html'), 'utf8');
   const popDraftCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
   check('rascunho tem link configurar template', /id="ke-pop-draft-config"[^>]*data-ke-i18n="ui.configureTemplate"/.test(popDraftHtml));
+  check('hidden vence qualquer display (rascunho e futuros)',
+    /\[hidden\]\s*\{\s*display:\s*none\s*!important/.test(popDraftCss) &&
+    /\[hidden\]\s*\{\s*display:\s*none\s*!important/.test(
+      fs.readFileSync(path.join(ROOT, 'src/options/options.css'), 'utf8')));
   check('checkbox do rascunho usa mesmo espaçamento dos campos',
     /\.ke-pop-check\s*\{[^}]*margin:\s*0 0 6px/s.test(popDraftCss) &&
     /\.ke-pop-draft-row\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between/s.test(popDraftCss) &&
@@ -1508,7 +1512,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle'].every((k) =>
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle', 'saveToApply'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
@@ -1739,6 +1743,21 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await sleep(50);
   check('desconectar usa toast', toastShown() && toast.textContent === 'Desconectado.', toast.textContent);
   check('desconectar apaga chave', !('keApiToken' in storedLocal));
+  popEls['ke-opt-draft-enabled'].checked = false;
+  popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  popEls['ke-opt-save'].fire('click');
+  await sleep(100);
+  popEls['ke-opt-draft-enabled'].checked = true;
+  popEls['ke-opt-draft-enabled'].fire('change');
+  await sleep(20);
+  check('alternar rascunho avisa que precisa salvar', toastShown() && toast.textContent.includes('Salve para aplicar'), toast.textContent);
+  check('desmarcar rascunho persiste desligado', stored.keSettings.draftEnabled === false, stored.keSettings);
+  storedLocal.keApiToken = 'popup-token';
+  chrome.permissions.granted = true;
+  eval(POP_SRC);
+  await sleep(500);
+  check('popup oculta checkbox com rascunho desligado', popEls['ke-pop-main'].hidden === false &&
+    popEls['ke-pop-draft-row'].hidden === true, popEls['ke-pop-draft-row'].hidden);
   const optDraftHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
   check('seção rascunho existe nas opções', optDraftHtml.includes('id="ke-opt-draft-enabled"') &&
     optDraftHtml.includes('id="ke-opt-draft-form"') && optDraftHtml.includes('id="ke-opt-def-customer"') &&

@@ -78,6 +78,7 @@ body {
 .ke-pop-draft-row .ke-pop-check { margin: 0; }
 .ke-pop-link { background: none; border: none; padding: 0; color: var(--ke-link); font-size: 12px; cursor: pointer; white-space: nowrap; }
 .ke-pop-link:hover { text-decoration: underline; }
+[hidden] { display: none !important; }
 #ke-pop-new-body.ke-draft-locked .ke-pop-field .ke-combo-input:disabled,
 #ke-pop-new-body.ke-draft-locked .ke-pop-field .ke-multi-input:disabled { opacity: 0.6; }
 #ke-pop-new-body.ke-draft-locked .ke-combo-toggle:disabled { opacity: 0.4; cursor: default; }
