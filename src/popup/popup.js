@@ -275,6 +275,17 @@
     ui.newTimerToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   }
 
+  function setSectionCollapsed(toggle, body, collapsed) {
+    if (!toggle || !body) return;
+    body.hidden = collapsed;
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
+  function toggleSection(toggle, body) {
+    if (!toggle || !body) return;
+    setSectionCollapsed(toggle, body, !body.hidden);
+  }
+
   let groupMode = true;
 
   function paintGroupToggle() {
@@ -648,6 +659,7 @@
       main: $('ke-pop-main'), active: $('ke-pop-active'), today: $('ke-pop-today'),
       newTimerToggle: $('ke-pop-new-toggle'), newTimerBody: $('ke-pop-new-body'),
       recent: $('ke-pop-recent'),
+      todayToggle: $('ke-pop-today-toggle'), recentToggle: $('ke-pop-recent-toggle'),
       todaySec: $('ke-pop-today-sec'), recentSec: $('ke-pop-recent-sec'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
       groupToggle: $('ke-pop-group-toggle'),
@@ -670,6 +682,8 @@
       }
     };
     ui.newTimerToggle.onclick = () => setNewTimerCollapsed(!ui.newTimerBody.hidden);
+    ui.todayToggle.onclick = () => toggleSection(ui.todayToggle, ui.today);
+    ui.recentToggle.onclick = () => toggleSection(ui.recentToggle, ui.recent);
     ui.draftCheck.onchange = () => { toggleDraftMode(ui.draftCheck.checked).catch(() => {}); };
     $('ke-pop-draft-config').onclick = () => { openDraftSettings().catch(() => {}); };
     $('ke-pop-open').onclick = async () => {
@@ -778,6 +792,8 @@
 
       show('main');
       ui.draftRow.hidden = settings.draftEnabled !== true;
+      setSectionCollapsed(ui.todayToggle, ui.today, true);
+      setSectionCollapsed(ui.recentToggle, ui.recent, true);
       ui.todaySec.hidden = settings.hideContinueToday === true;
       ui.recentSec.hidden = settings.hideRecents === true;
       await loadGroupMode();

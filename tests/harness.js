@@ -636,6 +636,28 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   popEls['ke-pop-new-toggle'].onclick();
   check('cabeçalho recolhe Novo timer novamente', popEls['ke-pop-new-body'].hidden &&
     popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'false');
+  const popSecHtml = fs.readFileSync(path.join(ROOT, 'src/popup/popup.html'), 'utf8');
+  check('títulos de hoje/recentes são botões com aria-controls',
+    /id="ke-pop-today-toggle"[^>]*aria-controls="ke-pop-today"/.test(popSecHtml) &&
+    /id="ke-pop-recent-toggle"[^>]*aria-controls="ke-pop-recent"/.test(popSecHtml));
+  check('continuar de hoje inicia colapsado', popEls['ke-pop-today'].hidden === true &&
+    popEls['ke-pop-today-toggle'].getAttribute('aria-expanded') === 'false');
+  check('recentes inicia colapsado', popEls['ke-pop-recent'].hidden === true &&
+    popEls['ke-pop-recent-toggle'].getAttribute('aria-expanded') === 'false');
+  popEls['ke-pop-today-toggle'].onclick();
+  check('clicar expande continuar de hoje', popEls['ke-pop-today'].hidden === false &&
+    popEls['ke-pop-today-toggle'].getAttribute('aria-expanded') === 'true');
+  popEls['ke-pop-recent-toggle'].onclick();
+  check('clicar expande recentes', popEls['ke-pop-recent'].hidden === false &&
+    popEls['ke-pop-recent-toggle'].getAttribute('aria-expanded') === 'true');
+  popEls['ke-pop-today-toggle'].onclick();
+  check('clicar de novo recolapsa', popEls['ke-pop-today'].hidden === true);
+  eval(POP_SRC);
+  await sleep(500);
+  check('boot sempre inicia colapsado', popEls['ke-pop-today'].hidden === true &&
+    popEls['ke-pop-recent'].hidden === true &&
+    popEls['ke-pop-today-toggle'].getAttribute('aria-expanded') === 'false' &&
+    popEls['ke-pop-recent-toggle'].getAttribute('aria-expanded') === 'false');
   stored.keSettings.defaultTimer = { customer: '20', project: '200', activity: '1655', tags: ['Alexander'] };
   stored.keSettings.draftEnabled = true;
   eval(POP_SRC);
