@@ -213,6 +213,7 @@
     draftForm.hidden = !draftEnabledBox.checked;
     draftEnabledBox.addEventListener('change', () => {
       draftForm.hidden = !draftEnabledBox.checked;
+      setStatus(KE.uiText('ui.saveToApply'), '');
     });
     const defCustomer = KE.createCombo({ searchPlaceholder: KE.T.searchCustomer, emptyLabel: KE.T.allCustomers, allowEmpty: true });
     const defProject = KE.createCombo({ searchPlaceholder: KE.T.searchProject, allowEmpty: false });
