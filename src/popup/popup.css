@@ -72,6 +72,15 @@ body {
 .ke-pop-refresh:disabled { opacity: 0.4; cursor: wait; }
 .ke-pop-sec h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; margin: 0 0 6px; }
 .ke-pop-field { margin-bottom: 6px; }
+.ke-pop-check { display: flex; gap: 8px; align-items: center; margin: 0 0 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ke-pop-check input { margin: 0; }
+.ke-pop-draft-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 6px; }
+.ke-pop-draft-row .ke-pop-check { margin: 0; }
+.ke-pop-link { background: none; border: none; padding: 0; color: var(--ke-link); font-size: 12px; cursor: pointer; white-space: nowrap; }
+.ke-pop-link:hover { text-decoration: underline; }
+#ke-pop-new-body.ke-draft-locked .ke-pop-field .ke-combo-input:disabled,
+#ke-pop-new-body.ke-draft-locked .ke-pop-field .ke-multi-input:disabled { opacity: 0.6; }
+#ke-pop-new-body.ke-draft-locked .ke-combo-toggle:disabled { opacity: 0.4; cursor: default; }
 .ke-pop-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.65; margin-bottom: 3px; }
 .ke-pop-timer, .ke-pop-today-row {
   display: flex; align-items: center; gap: 8px;
@@ -131,6 +140,17 @@ body {
   padding: 4px 10px; font-size: 12px; flex: none;
 }
 .ke-pop-btn-go:hover { background: var(--ke-green); color: var(--ke-on-green); }
+.ke-pop-btn-edit {
+  background: transparent; border: 1px solid var(--ke-green-text); color: var(--ke-green-text);
+  padding: 4px 10px; font-size: 12px; flex: none;
+}
+.ke-pop-btn-edit:hover { background: var(--ke-green); color: var(--ke-on-green); }
+.ke-pop-edit-form { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ke-pop-edit-actions { display: flex; gap: 8px; }
+.ke-pop-edit-save, .ke-pop-edit-cancel { width: auto; flex: 1; }
+.ke-pop-edit-cancel { background: transparent; border: 1px solid var(--ke-border); color: inherit; }
+.ke-pop-edit-error { font-size: 12px; font-weight: 600; color: var(--ke-red-text); }
+.ke-pop-edit-error[hidden] { display: none; }
 .ke-pop-status { font-size: 12px; min-height: 1.2em; margin-top: 4px; }
 .ke-pop-status[data-kind="ok"] { color: var(--ke-green-text); font-weight: 600; }
 .ke-pop-status[data-kind="err"] { color: var(--ke-red-text); font-weight: 600; }

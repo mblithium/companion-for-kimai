@@ -2,6 +2,20 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.14] — 2026-10-08
+### Added
+- Rascunho incorporado à seção Novo timer do popup: checkbox abaixo da
+  descrição preenche e trava Cliente/Projeto/Atividade/Tags com o Timer
+  padrão das configurações; Iniciar usa esses valores.
+- Botão de edição (✎) ao lado do Parar em cada timer ativo do popup,
+  com formulário inline (projeto, atividade, descrição, tags).
+
+## [0.22.13] — 2026-10-07
+### Added
+- Botão de edição na linha colapsada do grupo: altera Cliente, Projeto,
+  Atividade, Descrição e Tags dos itens agrupados via PATCH por lançamento,
+  sem tocar em datas ou duração.
+
 ## [0.22.12] — 2026-10-07
 ### Added
 - Total do dia atual (`HOJE HH:MM:SS`) à esquerda do total semanal, acima da

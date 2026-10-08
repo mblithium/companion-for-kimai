@@ -207,6 +207,111 @@
       localeSel.value = current || 'en';
     };
     fillLocales(settings.keLocale);
+    const draftEnabledBox = $('ke-opt-draft-enabled');
+    const draftForm = $('ke-opt-draft-form');
+    draftEnabledBox.checked = settings.draftEnabled === true;
+    draftForm.hidden = !draftEnabledBox.checked;
+    draftEnabledBox.addEventListener('change', () => {
+      draftForm.hidden = !draftEnabledBox.checked;
+    });
+    const defCustomer = KE.createCombo({ searchPlaceholder: KE.T.searchCustomer, emptyLabel: KE.T.allCustomers, allowEmpty: true });
+    const defProject = KE.createCombo({ searchPlaceholder: KE.T.searchProject, allowEmpty: false });
+    const defActivity = KE.createCombo({ searchPlaceholder: KE.T.searchActivity, allowEmpty: false });
+    const defTags = KE.createMultiCombo({ searchPlaceholder: KE.T.tagsPh });
+    $('ke-opt-def-customer').replaceChildren();
+    $('ke-opt-def-project').replaceChildren();
+    $('ke-opt-def-activity').replaceChildren();
+    $('ke-opt-def-tags').replaceChildren();
+    $('ke-opt-def-customer').appendChild(defCustomer.root);
+    $('ke-opt-def-project').appendChild(defProject.root);
+    $('ke-opt-def-activity').appendChild(defActivity.root);
+    $('ke-opt-def-tags').appendChild(defTags.root);
+    const savedDefault = settings.defaultTimer || {};
+    defCustomer.onSelect = () => { loadDefaultProjects(defCustomer.getValue()); };
+    defProject.onSelect = () => { loadDefaultActivities(defProject.getValue()); };
+    let catalogCfg = null;
+    async function catalogGet(path) {
+      if (catalogCfg) applyConfig(catalogCfg);
+      return KE.apiGet(path);
+    }
+    async function loadDefaultProjects(customerId, selectedProject) {
+      defProject.setLoading(true);
+      try {
+        let url = '/api/projects?visible=1&ignoreDates=1&size=1000';
+        if (customerId) url += '&customers%5B%5D=' + encodeURIComponent(customerId);
+        KE.applyProjects(await catalogGet(url));
+        defProject.setLoading(false);
+        defProject.setItems(KE.state.projects.map((p) => ({ value: String(p.id), label: KE.projectLabel(p) })), selectedProject || '');
+      } catch (e) {
+        defProject.setLoading(false);
+      }
+    }
+    async function loadDefaultActivities(projectId, selectedActivity) {
+      defActivity.setLoading(true);
+      try {
+        let list = [];
+        if (projectId) {
+          const filtered = KE.asArray(await catalogGet('/api/activities?visible=1&size=1000&projects%5B%5D=' + encodeURIComponent(projectId)));
+          const globals = KE.asArray(await catalogGet('/api/activities?visible=1&size=1000&globals=true'));
+          const seen = new Set();
+          list = filtered.concat(globals).filter((a) => {
+            const k = String(a.id);
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+        } else {
+          list = KE.asArray(await catalogGet('/api/activities?visible=1&size=1000&globals=true'));
+        }
+        list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+        KE.applyActivities(list);
+        defActivity.setLoading(false);
+        defActivity.setItems(KE.state.activities.map((a) => ({ value: String(a.id), label: a.name || ('#' + a.id) })), selectedActivity || '');
+      } catch (e) {
+        defActivity.setLoading(false);
+      }
+    }
+    async function loadDefaultCatalogs() {
+      const cfg = await effectiveConfig();
+      if (!cfg.base || !cfg.token || !(await KE.hasOriginAccess(cfg.base))) {
+        $('ke-opt-def-state').textContent = KE.uiText('ui.catalogUnavailable');
+        return false;
+      }
+      catalogCfg = cfg;
+      applyConfig(cfg);
+      try {
+        KE.applyCustomers(await catalogGet('/api/customers?visible=1&size=1000'));
+        defCustomer.setLoading(false);
+        defCustomer.setItems(KE.state.customers.map((c) => ({ value: String(c.id), label: c.name || ('#' + c.id) })), savedDefault.customer || '');
+        await loadDefaultProjects(defCustomer.getValue() || savedDefault.customer || '', savedDefault.project || '');
+        await loadDefaultActivities(defProject.getValue() || savedDefault.project || '', savedDefault.activity || '');
+        const rawTags = KE.asArray(await catalogGet('/api/tags?visible=1&size=1000'));
+        KE.state.tags = rawTags.map((t) => {
+          if (typeof t === 'string') return { value: t, label: t };
+          return { value: String((t && (t.name || t.id)) || ''), label: (t && t.name) || String((t && t.id) || '') };
+        }).filter((t) => t.value);
+        KE.state.tags.sort((a, b) => a.label.localeCompare(b.label));
+        defTags.setLoading(false);
+        defTags.setItems(KE.state.tags);
+        defTags.setValues(savedDefault.tags || []);
+        $('ke-opt-def-state').textContent = '';
+        return true;
+      } catch (e) {
+        $('ke-opt-def-state').textContent = KE.uiText('ui.catalogUnavailable');
+        return false;
+      } finally {
+        KE.apiBaseUrl = '';
+        KE.authToken = '';
+        KE.apiCredentials = 'same-origin';
+      }
+    }
+    loadDefaultCatalogs().catch(() => {});
+    const readDefaultTimer = () => ({
+      customer: defCustomer.getValue() || '',
+      project: defProject.getValue() || '',
+      activity: defActivity.getValue() || '',
+      tags: defTags.getValues(),
+    });
     const uiLocaleSel = $('ke-opt-ui-locale');
     uiLocaleSel.value = KE.uiLocale;
     uiLocaleSel.addEventListener('change', async () => {
@@ -308,7 +413,7 @@
     document.documentElement.dataset.keTheme = themeSel.value;
   });
 
-  $('ke-opt-save').addEventListener('click', async () => {
+  $('ke-opt-save').onclick = async () => {
     const base = KE.normalizeBaseUrl($('ke-opt-url').value);
     if (!base) {
       setStatus(KE.uiText('ui.invalidUrl'), 'err');
@@ -320,10 +425,18 @@
       await KE.localSet({ keApiToken: typed });
       $('ke-opt-token').value = '';
     }
+    const defaultTimer = readDefaultTimer();
+    const draftEnabled = draftEnabledBox.checked;
+    if (draftEnabled && !(defaultTimer.project && defaultTimer.activity)) {
+      setStatus(KE.uiText('ui.needDefaultTimer'), 'err');
+      return;
+    }
     await KE.saveSettings({
       kimaiBaseUrl: base,
       theme: themeSel.value,
       uiLocale: uiLocaleSel.value,
+      draftEnabled,
+      defaultTimer,
       shortcuts: readShortcuts(),
       shortcutsEnabled: $('ke-opt-sc-enabled').checked,
       hideNavigation: $('ke-opt-hide-navigation').checked,
@@ -343,7 +456,7 @@
     await refreshCacheState();
     setStatus(KE.uiText('ui.settingsSaved'), 'ok');
     if (localeChanged) await KE.reloadKimaiTabs(base);
-  });
+  };
 
     open.addEventListener('click', (ev) => {
       if (open.href === '#' || open.getAttribute('href') === '#') ev.preventDefault();

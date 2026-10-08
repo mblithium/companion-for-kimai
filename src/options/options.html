@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title data-ke-i18n="ui.optionsTitle">Companion for Kimai — Configurações</title>
 <link rel="stylesheet" href="options.css">
+<link rel="stylesheet" href="../content/combo.css">
 <link rel="stylesheet" href="../common/theme.css">
 <link rel="stylesheet" href="../common/themes/light.css">
 <link rel="stylesheet" href="../common/themes/dark.css">
@@ -20,6 +21,7 @@
 <script src="../content/storage.js"></script>
 <script src="../content/kimai.js"></script>
 <script src="../content/cache.js"></script>
+<script src="../content/combo.js"></script>
 <script src="../common/permissions.js"></script>
 <script src="../common/theme.js"></script>
 <script src="options.js" defer></script>
@@ -106,6 +108,35 @@
         <input type="checkbox" id="ke-opt-hide-actionbar">
         <span data-ke-i18n="ui.hideActionBar">Ocultar barra de ações (busca, exportação etc.)</span>
       </label>
+    </section>
+
+    <section class="ke-opt-card" id="ke-opt-draft-card">
+      <h2 data-ke-i18n="ui.draft">Rascunho</h2>
+      <label class="ke-opt-check">
+        <input type="checkbox" id="ke-opt-draft-enabled">
+        <span data-ke-i18n="ui.enableDraft">Habilitar rascunho</span>
+      </label>
+      <div id="ke-opt-draft-form">
+        <h3 data-ke-i18n="ui.defaultTimer">Timer padrão</h3>
+        <p class="ke-opt-hint" data-ke-i18n="ui.defaultTimerHint">Usado para iniciar pelo Rascunho. Exige Projeto e Atividade.</p>
+        <p id="ke-opt-def-state" class="ke-opt-state" role="status"></p>
+        <label class="ke-opt-field">
+          <span data-ke-i18n="customer">Cliente</span>
+          <div id="ke-opt-def-customer"></div>
+        </label>
+        <label class="ke-opt-field">
+          <span data-ke-i18n="project">Projeto</span>
+          <div id="ke-opt-def-project"></div>
+        </label>
+        <label class="ke-opt-field">
+          <span data-ke-i18n="activity">Atividade</span>
+          <div id="ke-opt-def-activity"></div>
+        </label>
+        <label class="ke-opt-field">
+          <span data-ke-i18n="tags">Tags</span>
+          <div id="ke-opt-def-tags"></div>
+        </label>
+      </div>
     </section>
 
     <section class="ke-opt-card">

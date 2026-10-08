@@ -598,6 +598,231 @@
     }
   }
 
+  let openEditorRow = null;
+  let openEditorHeader = null;
+  function closeGroupEditor() {
+    try {
+      if (openEditorRow) openEditorRow.remove();
+    } catch (e) {}
+    openEditorRow = null;
+    openEditorHeader = null;
+  }
+
+  function memberIds(g) {
+    return g.rows.map((r) => {
+      const cb = memberBox(r);
+      return cb ? String(cb.value || cb.getAttribute('value') || '').trim() : '';
+    }).filter(Boolean);
+  }
+
+  function commonValue(values) {
+    return values.length && values.every((v) => v === values[0]) ? values[0] : '';
+  }
+
+  function customerIdOfProject(projectId) {
+    const p = KE.state.projectById.get(String(projectId));
+    if (!p) return '';
+    if (p.customer != null && typeof p.customer !== 'object') return String(p.customer);
+    if (p.customer && typeof p.customer === 'object' && p.customer.id != null) return String(p.customer.id);
+    const name = p.parentTitle || p.customerName || '';
+    const hit = KE.state.customers.find((c) => c.name === name);
+    return hit ? String(hit.id) : '';
+  }
+
+  function projectItems(customerId) {
+    return KE.state.projects
+      .filter((p) => {
+        if (!customerId) return true;
+        if (String(KE.entityId(p.customer)) === String(customerId)) return true;
+        const c = KE.state.customers.find((x) => String(x.id) === String(customerId));
+        return !!c && (p.parentTitle === c.name || p.customerName === c.name);
+      })
+      .map((p) => ({ value: String(p.id), label: KE.projectLabel(p) }));
+  }
+
+  function activityItems() {
+    return KE.state.activities.map((a) => ({ value: String(a.id), label: a.name || ('#' + a.id) }));
+  }
+
+  async function openGroupEditor(headerTr, g) {
+    if (openEditorRow && openEditorHeader === headerTr) {
+      closeGroupEditor();
+      return;
+    }
+    closeGroupEditor();
+    const ids = memberIds(g);
+    if (!ids.length || !headerTr.parentNode) return;
+    const tbody = headerTr.parentNode;
+    const editTr = document.createElement('tr');
+    editTr.className = 'ke-sitegroup-edit';
+    const td = document.createElement('td');
+    const colCount = headerTr.querySelectorAll('td').length;
+    td.setAttribute('colspan', String(Math.max(1, colCount)));
+    const form = KE.el('div', 'ke-sitegroup-edit-form');
+    const customerCombo = KE.createCombo({ searchPlaceholder: KE.T.searchCustomer, emptyLabel: KE.T.allCustomers, allowEmpty: true });
+    const projectCombo = KE.createCombo({ searchPlaceholder: KE.T.searchProject, allowEmpty: false });
+    const actCombo = KE.createCombo({ searchPlaceholder: KE.T.searchActivity, allowEmpty: false });
+    const descInput = document.createElement('input');
+    descInput.className = 'ke-input';
+    descInput.type = 'text';
+    descInput.placeholder = KE.T.descriptionPh;
+    descInput.setAttribute('maxlength', '255');
+    const tagsInput = document.createElement('input');
+    tagsInput.className = 'ke-input';
+    tagsInput.type = 'text';
+    tagsInput.placeholder = KE.T.tagsPh;
+    const errBox = KE.el('div', 'ke-sitegroup-edit-error');
+    errBox.hidden = true;
+    const actions = KE.el('div', 'ke-sitegroup-edit-actions');
+    const saveBtn = KE.el('button', 'ke-btn ke-btn-save', KE.T.save);
+    saveBtn.type = 'button';
+    const cancelBtn = KE.el('button', 'ke-btn ke-btn-cancel', KE.T.cancel);
+    cancelBtn.type = 'button';
+    actions.appendChild(saveBtn);
+    actions.appendChild(cancelBtn);
+    const labeled = (label, node) => {
+      const wrap = KE.el('label', 'ke-sitegroup-edit-field');
+      wrap.appendChild(KE.el('span', 'ke-sitegroup-edit-label', label));
+      wrap.appendChild(node);
+      return wrap;
+    };
+    form.appendChild(labeled(KE.T.customer, customerCombo.root));
+    form.appendChild(labeled(KE.T.project, projectCombo.root));
+    form.appendChild(labeled(KE.T.activity, actCombo.root));
+    form.appendChild(labeled(KE.T.description, descInput));
+    form.appendChild(labeled(KE.T.tags, tagsInput));
+    form.appendChild(errBox);
+    form.appendChild(actions);
+    td.appendChild(form);
+    editTr.appendChild(td);
+    const siblings = Array.from(tbody.children || []);
+    tbody.insertBefore(editTr, siblings[siblings.indexOf(headerTr) + 1] || null);
+    openEditorRow = editTr;
+    openEditorHeader = headerTr;
+    expandedKeys.delete(g.key);
+    headerTr.classList.remove('ke-open');
+    headerTr.querySelectorAll('.ke-sitegroup-toggle').forEach((b) => {
+      b.textContent = '▸';
+      b.setAttribute('aria-expanded', 'false');
+    });
+    g.rows.forEach((r) => {
+      r.style.display = 'none';
+      r.classList.remove('ke-sitemember');
+    });
+
+    const showError = (msg) => {
+      errBox.textContent = msg;
+      errBox.hidden = false;
+    };
+    cancelBtn.addEventListener('click', () => closeGroupEditor());
+    [descInput, tagsInput].forEach((inp) => inp.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); doGroupSave(); }
+      else if (ev.key === 'Escape') closeGroupEditor();
+    }));
+
+    customerCombo.setLoading(true);
+    projectCombo.setLoading(true);
+    actCombo.setLoading(true);
+    saveBtn.disabled = true;
+    try {
+      const members = [];
+      for (const id of ids) {
+        members.push(await KE.apiGet('/api/timesheets/' + encodeURIComponent(id)));
+      }
+      await KE.loadCustomers();
+      await KE.loadProjects('');
+      const projIds = members.map((t) => KE.entityId(t.project));
+      const actIds = members.map((t) => KE.entityId(t.activity));
+      const descs = members.map((t) => t.description || '');
+      const tagsList = members.map((t) => KE.tagNames(t.tags).join(', '));
+      customerCombo.setLoading(false);
+      customerCombo.setItems(
+        KE.state.customers.map((c) => ({ value: String(c.id), label: c.name || ('#' + c.id) })),
+        customerIdOfProject(commonValue(projIds))
+      );
+      projectCombo.setLoading(false);
+      projectCombo.setItems(projectItems(customerCombo.getValue()), commonValue(projIds));
+      await KE.loadActivities(commonValue(projIds));
+      actCombo.setLoading(false);
+      actCombo.setItems(activityItems(), commonValue(actIds));
+      descInput.value = commonValue(descs);
+      tagsInput.value = commonValue(tagsList);
+      saveBtn.disabled = false;
+    } catch (e) {
+      customerCombo.setLoading(false);
+      projectCombo.setLoading(false);
+      actCombo.setLoading(false);
+      saveBtn.disabled = false;
+      showError(KE.T.refreshFail);
+      return;
+    }
+
+    customerCombo.onSelect = async (v) => {
+      projectCombo.setLoading(true);
+      try {
+        await KE.loadProjects(v || '');
+        projectCombo.setLoading(false);
+        projectCombo.setItems(projectItems(v || ''));
+      } catch (e) {
+        projectCombo.setLoading(false);
+        showError(KE.T.refreshFail);
+      }
+    };
+    projectCombo.onSelect = async (v) => {
+      actCombo.setLoading(true);
+      try {
+        await KE.loadActivities(v || '');
+        actCombo.setLoading(false);
+        actCombo.setItems(activityItems());
+      } catch (e) {
+        actCombo.setLoading(false);
+        showError(KE.T.refreshFail);
+      }
+    };
+
+    async function doGroupSave() {
+      projectCombo.flush(true);
+      actCombo.flush(true);
+      const projectId = projectCombo.getValue();
+      const activityId = actCombo.getValue();
+      if (!projectId || !activityId) {
+        showError(KE.T.needProject);
+        (!projectId ? projectCombo : actCombo).focus();
+        return;
+      }
+      const tagNames = await KE.ensureTags(tagsInput.value.split(',').map((s) => s.trim()).filter(Boolean));
+      const payload = {
+        project: Number(projectId),
+        activity: Number(activityId),
+        description: descInput.value.trim(),
+        tags: tagNames.join(','),
+      };
+      saveBtn.disabled = true;
+      const original = saveBtn.textContent;
+      saveBtn.textContent = KE.T.saving;
+      errBox.hidden = true;
+      let failed = 0;
+      for (const id of ids) {
+        try {
+          await KE.apiPatch('/api/timesheets/' + encodeURIComponent(id), payload);
+        } catch (e) {
+          failed++;
+        }
+      }
+      saveBtn.disabled = false;
+      saveBtn.textContent = original;
+      if (failed) {
+        showError(KE.T.updateFail + ' (' + failed + '/' + ids.length + ')');
+        return;
+      }
+      closeGroupEditor();
+      try { KE.notifyKimaiUpdate(); } catch (e) {}
+      try { KE.notifyBackground(); } catch (e) {}
+      await KE.syncSiteGroupUI();
+    }
+    saveBtn.addEventListener('click', () => { doGroupSave().catch(() => {}); });
+  }
+
   function buildHeader(g, colClasses) {
     const tr = document.createElement('tr');
     tr.className = 'ke-sitegroup';
@@ -612,6 +837,7 @@
       });
     };
     const toggle = () => {
+      closeGroupEditor();
       const nowOpen = !expandedKeys.has(g.key);
       if (nowOpen) expandedKeys.add(g.key);
       else expandedKeys.delete(g.key);
@@ -670,16 +896,36 @@
         }
       } else if (field === 'actions') {
         expBtn = makeToggle();
-        td.appendChild(expBtn);
+        td.appendChild(headerActions(expBtn));
       }
       tr.appendChild(td);
     });
     if (!expBtn) {
       const first = tr.querySelector('td');
       expBtn = makeToggle();
-      if (first && first.firstChild) first.insertBefore(expBtn, first.firstChild);
-      else if (first) first.appendChild(expBtn);
-      else tr.appendChild(expBtn);
+      const box = headerActions(expBtn);
+      if (first && first.firstChild) first.insertBefore(box, first.firstChild);
+      else (first || tr).appendChild(box);
+    }
+    function headerActions(toggleEl) {
+      const box = document.createElement('span');
+      box.className = 'ke-sitegroup-header-actions';
+      box.appendChild(makeEditBtn());
+      box.appendChild(toggleEl);
+      return box;
+    }
+    function makeEditBtn() {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ke-sitegroup-edit-btn';
+      btn.textContent = '✎';
+      btn.title = KE.T.edit;
+      btn.setAttribute('aria-label', KE.T.edit);
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        openGroupEditor(tr, g).catch(() => {});
+      });
+      return btn;
     }
     function makeToggle() {
       const exp = document.createElement('button');
@@ -713,6 +959,11 @@
     } catch (e) {}
     const headers = tbody.querySelectorAll('tr.ke-sitegroup');
     headers.forEach((h) => h.remove());
+    tbody.querySelectorAll('tr.ke-sitegroup-edit').forEach((h) => h.remove());
+    if (openEditorRow && (!openEditorRow.parentNode || openEditorRow.parentNode !== tbody)) {
+      openEditorRow = null;
+      openEditorHeader = null;
+    }
     const kids = Array.from(tbody.children || tbody.querySelectorAll('tr'))
       .filter((tr) => tr.tagName === 'TR' && !tr.classList.contains('ke-sitegroup'));
     if (!on) {
@@ -783,7 +1034,7 @@
 
   function siteSig(tbody) {
     return Array.from(tbody.children || [])
-      .filter((tr) => tr.tagName === 'TR' && !tr.classList.contains('ke-sitegroup'))
+      .filter((tr) => tr.tagName === 'TR' && !tr.classList.contains('ke-sitegroup') && !tr.classList.contains('ke-sitegroup-edit'))
       .map(rowSig)
       .join('\n');
   }

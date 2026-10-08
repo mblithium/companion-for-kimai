@@ -135,7 +135,9 @@ class StubEl {
     return null;
   }
   fire(type, ev) {
-    (this._handlers[type] || []).forEach((f) => f(Object.assign({ preventDefault() {}, stopPropagation() {} }, ev)));
+    const full = Object.assign({ preventDefault() {}, stopPropagation() {} }, ev);
+    if (typeof this['on' + type] === 'function') this['on' + type].call(this, full);
+    (this._handlers[type] || []).forEach((f) => f(full));
   }
 }
 Object.defineProperty(StubEl.prototype, 'className', {
@@ -214,6 +216,7 @@ const posted = [];
 const createdTags = [];
 const stoppedIds = [];
 const patchedTimers = [];
+const singleStub = {};
 let activeStub = [];
 let todayStub = [];
 let recentStub = [];
@@ -358,6 +361,10 @@ const fetch = async (url, opts) => {
     const id = u.match(/\/api\/timesheets\/(\d+)$/)[1];
     patchedTimers.push({ id, body: JSON.parse(opts.body) });
     return jsonResp({ id: Number(id) });
+  }
+  if (/\/api\/timesheets\/\d+$/.test(u) && method === 'GET') {
+    const id = u.match(/\/api\/timesheets\/(\d+)$/)[1];
+    if (singleStub[id]) return jsonResp(singleStub[id]);
   }
   if (/\/api\/timesheets\/\d+\/stop/.test(u)) {
     stoppedIds.push(u.match(/\/api\/timesheets\/(\d+)\/stop/)[1]);
@@ -629,6 +636,65 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   popEls['ke-pop-new-toggle'].onclick();
   check('cabeçalho recolhe Novo timer novamente', popEls['ke-pop-new-body'].hidden &&
     popEls['ke-pop-new-toggle'].getAttribute('aria-expanded') === 'false');
+  stored.keSettings.defaultTimer = { customer: '20', project: '200', activity: '1655', tags: ['Alexander'] };
+  stored.keSettings.draftEnabled = true;
+  eval(POP_SRC);
+  await sleep(500);
+  check('linha rascunho aparece com flag ativa', popEls['ke-pop-draft-row'].hidden === false);
+  const preDraftProject = findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value;
+  const preDraftChips = findAll(popEls['ke-pop-new-tags'], 'ke-chip').length;
+  popEls['ke-pop-draft'].checked = true;
+  popEls['ke-pop-draft'].fire('change');
+  await sleep(400);
+  check('rascunho preenche projeto padrão', findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value === 'São Paulo Tech / Site São Paulo',
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value);
+  check('rascunho preenche tags padrão', findAll(popEls['ke-pop-new-tags'], 'ke-chip').length === 1);
+  check('rascunho trava campos abaixo da descrição',
+    findAll(popEls['ke-pop-new-customer'], 'ke-combo-input')[0].disabled === true &&
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].disabled === true &&
+    findAll(popEls['ke-pop-new-activity'], 'ke-combo-input')[0].disabled === true &&
+    findAll(popEls['ke-pop-new-tags'], 'ke-multi-input')[0].disabled === true &&
+    popEls['ke-pop-new-desc'].disabled === false);
+  posted.length = 0;
+  popEls['ke-pop-new-desc'].value = 'via rascunho';
+  popEls['ke-pop-start'].fire('click');
+  await sleep(400);
+  check('iniciar com rascunho usa padrão', posted.length === 1 && posted.every((p) => p.project === 200 &&
+    p.activity === 1655 && p.description === 'via rascunho' && p.tags === 'Alexander'), posted);
+  popEls['ke-pop-draft'].checked = false;
+  popEls['ke-pop-draft'].fire('change');
+  await sleep(400);
+  check('desmarcar destrava e restaura', findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].disabled === false &&
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value === preDraftProject &&
+    findAll(popEls['ke-pop-new-tags'], 'ke-chip').length === preDraftChips,
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value);
+  delete stored.keSettings.defaultTimer;
+  popEls['ke-pop-draft'].checked = true;
+  popEls['ke-pop-draft'].fire('change');
+  await sleep(200);
+  check('sem padrão não trava', popEls['ke-pop-draft'].checked === false &&
+    popEls['ke-pop-status'].textContent.includes('Timer padrão') &&
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].disabled === false, popEls['ke-pop-status'].textContent);
+  delete stored.keSettings.draftEnabled;
+  eval(POP_SRC);
+  await sleep(500);
+  check('rascunho desabilitado oculta a linha', popEls['ke-pop-draft-row'].hidden === true);
+  const popDraftHtml = fs.readFileSync(path.join(ROOT, 'src/popup/popup.html'), 'utf8');
+  const popDraftCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
+  check('rascunho tem link configurar template', /id="ke-pop-draft-config"[^>]*data-ke-i18n="ui.configureTemplate"/.test(popDraftHtml));
+  check('checkbox do rascunho usa mesmo espaçamento dos campos',
+    /\.ke-pop-check\s*\{[^}]*margin:\s*0 0 6px/s.test(popDraftCss) &&
+    /\.ke-pop-draft-row\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between/s.test(popDraftCss) &&
+    /\.ke-pop-draft-row \.ke-pop-check\s*\{[^}]*margin:\s*0/s.test(popDraftCss));
+  check('chave configurar template em pt/en', KE.STRINGS.pt.ui.configureTemplate === 'Configurar template' &&
+    KE.STRINGS.en.ui.configureTemplate === 'Configure template');
+  check('seção rascunho das opções tem âncora',
+    fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-draft-card"'));
+  chrome.tabs.created.length = 0;
+  await popEls['ke-pop-draft-config'].onclick();
+  check('link abre configurações do rascunho', chrome.tabs.created.length === 1 &&
+    chrome.tabs.created[0].url === 'chrome-extension://test/src/options/options.html#ke-opt-draft-card', chrome.tabs.created);
+  posted.length = 0;
   await popEls['ke-pop-focus'].onclick();
   check('popup abre tracker em janela flutuante', chrome.windows.created.length === 1 &&
     chrome.windows.created[0].url === 'chrome-extension://test/src/popup/focus.html' &&
@@ -682,6 +748,34 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     findAll(popEls['ke-pop-today'], 'ke-pop-group').length === 0);
   check('preferência persiste', stored.keSettings.groupTasks === false, stored.keSettings);
   check('toggle desmarca', popEls['ke-pop-group-toggle'].classList.contains('ke-on') === false);
+  const activeRow = findAll(popEls['ke-pop-active'], 'ke-pop-timer')[0];
+  const activeEditBtn = findAll(activeRow, 'ke-pop-btn-edit')[0];
+  check('timer ativo tem botão editar', !!activeEditBtn && activeEditBtn.getAttribute('aria-label') === KE.T.edit);
+  activeEditBtn.fire('click');
+  await sleep(400);
+  const activeEditForm = findAll(popEls['ke-pop-active'], 'ke-pop-edit-form')[0];
+  check('edição do ativo abre formulário', !!activeEditForm);
+  const activeEditInputs = activeEditForm.querySelectorAll('input');
+  check('edição do ativo sem datas nem duração', activeEditInputs.length === 4 &&
+    activeEditInputs.every((n) => n.type === 'text'), activeEditInputs.map((n) => n.type));
+  const activeDescIn = activeEditInputs.find((n) => !n.classList.contains('ke-combo-input'));
+  check('edição do ativo preenche descrição', activeDescIn && activeDescIn.value === 'rodando', activeDescIn && activeDescIn.value);
+  patchedTimers.length = 0;
+  activeDescIn.value = 'revisado no popup';
+  findAll(activeEditForm, 'ke-pop-edit-save')[0].fire('click');
+  await sleep(300);
+  check('edição do ativo salva via PATCH', patchedTimers.length === 1 && patchedTimers[0].id === '801', patchedTimers);
+  check('PATCH do ativo sem datas nem duração', patchedTimers.length === 1 &&
+    patchedTimers[0].body.project === 200 && patchedTimers[0].body.activity === 1655 &&
+    patchedTimers[0].body.description === 'revisado no popup' && patchedTimers[0].body.tags === '' &&
+    Object.keys(patchedTimers[0].body).sort().join(',') === 'activity,description,project,tags', patchedTimers[0] && patchedTimers[0].body);
+  findAll(popEls['ke-pop-active'], 'ke-pop-btn-edit')[0].fire('click');
+  await sleep(400);
+  findAll(popEls['ke-pop-active'], 'ke-pop-edit-cancel')[0].fire('click');
+  await sleep(200);
+  check('cancelar restaura linha do ativo sem PATCH', patchedTimers.length === 1 &&
+    findAll(popEls['ke-pop-active'], 'ke-pop-edit-form').length === 0 &&
+    findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop').length === 1);
   activeStub = [];
   findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop')[0].fire('click');
   await sleep(200);
@@ -1274,6 +1368,71 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const h3 = findAll(stb3, 'ke-sitegroup')[0];
   check('sem coluna actions o toggle vai na 1ª célula',
     !!h3 && h3.children.filter((n) => n.tagName === 'TD')[0].querySelector('.ke-sitegroup-toggle') !== null);
+
+  singleStub['901'] = { id: 901, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T08:00:00', end: '2026-10-13T09:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  singleStub['902'] = { id: 902, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T10:00:00', end: '2026-10-13T11:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  const editTbody = document.createElement('tbody');
+  editTbody.appendChild(siteRow({ id: '901', date: '13/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1', desc: 'job' }));
+  editTbody.appendChild(siteRow({ id: '902', date: '13/10/2026', dur: '1:00', cust: 'C1', proj: 'P1', act: 'A1', desc: 'job' }));
+  KE.applySiteGrouping(editTbody, true);
+  const editHead = findAll(editTbody, 'ke-sitegroup')[0];
+  const editBtn = findAll(editHead, 'ke-sitegroup-edit-btn')[0];
+  check('cabeçalho do grupo tem botão de edição', !!editBtn && editBtn.getAttribute('aria-label') === KE.T.edit, editBtn && editBtn.getAttribute('aria-label'));
+  const headerBox = findAll(editHead, 'ke-sitegroup-header-actions')[0];
+  check('editar fica ao lado esquerdo do expandir', !!headerBox &&
+    headerBox.children[0].classList.contains('ke-sitegroup-edit-btn') &&
+    headerBox.children[1].classList.contains('ke-sitegroup-toggle'));
+  editBtn.fire('click');
+  await sleep(300);
+  const editRow = findAll(editTbody, 'ke-sitegroup-edit')[0];
+  check('edição do grupo abre linha própria', !!editRow && editTbody.children.indexOf(editRow) === editTbody.children.indexOf(editHead) + 1);
+  const editInputs = (editRow.querySelectorAll('input') || []).concat(editRow.querySelectorAll('textarea') || []);
+  check('edição do grupo sem datas nem duração', editRow && !editRow.querySelector('.col_date') && !editRow.querySelector('.col_duration') &&
+    editInputs.length === 5, editInputs.length);
+  const editDesc = editInputs.find((n) => n.type === 'text' && !n.classList.contains('ke-combo-input') && !n.classList.contains('ke-multi-input'));
+  check('edição do grupo preenche descrição comum', editDesc && editDesc.value === 'job', editDesc && editDesc.value);
+  patchedTimers.length = 0;
+  editDesc.value = 'revisado';
+  findAll(editRow, 'ke-btn-save')[0].fire('click');
+  await sleep(300);
+  check('edição do grupo salva via PATCH por membro', patchedTimers.length === 2 &&
+    patchedTimers.every((p) => ['901', '902'].includes(p.id)), patchedTimers.map((p) => p.id));
+  check('PATCH do grupo sem datas nem duração', patchedTimers.every((p) =>
+    p.body.project === 200 && p.body.activity === 1655 && p.body.description === 'revisado' &&
+    p.body.tags === 'Alexander' && !('begin' in p.body) && !('end' in p.body) && !('duration' in p.body)), patchedTimers);
+  findAll(editTbody, 'ke-sitegroup-edit-btn')[0].fire('click');
+  await sleep(300);
+  const editRow2 = findAll(editTbody, 'ke-sitegroup-edit')[0];
+  findAll(editRow2, 'ke-btn-cancel')[0].fire('click');
+  check('cancelar fecha edição do grupo sem PATCH', patchedTimers.length === 2 && findAll(editTbody, 'ke-sitegroup-edit').length === 0);
+  delete singleStub['901'];
+  delete singleStub['902'];
+
+  singleStub['901'] = { id: 901, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T08:00:00', end: '2026-10-13T09:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  singleStub['902'] = { id: 902, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T10:00:00', end: '2026-10-13T11:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  const collapseHead = findAll(editTbody, 'ke-sitegroup')[0];
+  findAll(collapseHead, 'ke-sitegroup-toggle')[0].fire('click');
+  await sleep(50);
+  const visibleMembers = () => editTbody.children.filter((n) => n.tagName === 'TR' && !n.classList.contains('ke-sitegroup') && !n.classList.contains('ke-sitegroup-edit') && n.style.display !== 'none');
+  check('grupo expande antes da edição', visibleMembers().length === 2, visibleMembers().length);
+  findAll(collapseHead, 'ke-sitegroup-edit-btn')[0].fire('click');
+  await sleep(300);
+  check('edição colapsa a lista', findAll(editTbody, 'ke-sitegroup-edit').length === 1 && visibleMembers().length === 0);
+  findAll(editTbody, 'ke-sitegroup-toggle')[0].fire('click');
+  await sleep(50);
+  check('alternar sai do modo de edição', findAll(editTbody, 'ke-sitegroup-edit').length === 0 && visibleMembers().length === 2);
+
+  singleStub['901'] = { id: 901, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T08:00:00', end: '2026-10-13T09:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  singleStub['902'] = { id: 902, project: { id: 200, name: 'Site São Paulo', parentTitle: 'São Paulo Tech' }, activity: { id: 1655, name: 'Consequuntur dolor' }, begin: '2026-10-13T10:00:00', end: '2026-10-13T11:00:00', duration: 3600, description: 'job', tags: ['Alexander'] };
+  const toggleEditBtn = findAll(editTbody, 'ke-sitegroup-edit-btn')[0];
+  toggleEditBtn.fire('click');
+  await sleep(300);
+  check('edição abre pelo botão', findAll(editTbody, 'ke-sitegroup-edit').length === 1);
+  toggleEditBtn.fire('click');
+  await sleep(50);
+  check('clicar em editar de novo fecha sem recarregar', findAll(editTbody, 'ke-sitegroup-edit').length === 0);
+  delete singleStub['901'];
+  delete singleStub['902'];
   check('timesheetPath pt', KE.timesheetPath('https://kimai.exemplo/', 'pt_BR') === 'https://kimai.exemplo/pt_BR/timesheet/');
   check('timesheetPath padrão en', KE.timesheetPath('https://kimai.exemplo') === 'https://kimai.exemplo/en/timesheet/');
   check('apiTokenUrl', KE.apiTokenUrl('https://kimai.exemplo/', 'pt_BR', 'maria.silva') === 'https://kimai.exemplo/pt_BR/profile/maria.silva/api-token');
@@ -1543,6 +1702,83 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await sleep(50);
   check('desconectar usa toast', toastShown() && toast.textContent === 'Desconectado.', toast.textContent);
   check('desconectar apaga chave', !('keApiToken' in storedLocal));
+  const optDraftHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
+  check('seção rascunho existe nas opções', optDraftHtml.includes('id="ke-opt-draft-enabled"') &&
+    optDraftHtml.includes('id="ke-opt-draft-form"') && optDraftHtml.includes('id="ke-opt-def-customer"') &&
+    optDraftHtml.includes('id="ke-opt-def-project"') && optDraftHtml.includes('id="ke-opt-def-activity"') &&
+    optDraftHtml.includes('id="ke-opt-def-tags"') && !optDraftHtml.includes('id="ke-opt-def-desc"') &&
+    optDraftHtml.includes('data-ke-i18n="ui.enableDraft"'));
+  stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', keLocale: 'pt_BR' };
+  storedLocal.keApiToken = 'popup-token';
+  chrome.permissions.granted = true;
+  eval(OPT_SRC);
+  await sleep(600);
+  check('rascunho inicia desabilitado', popEls['ke-opt-draft-enabled'].checked === false &&
+    popEls['ke-opt-draft-form'].hidden === true);
+  popEls['ke-opt-draft-enabled'].checked = true;
+  popEls['ke-opt-draft-enabled'].fire('change');
+  check('habilitar mostra formulário', popEls['ke-opt-draft-form'].hidden === false);
+  const defCustIn = findAll(popEls['ke-opt-def-customer'], 'ke-combo-input')[0];
+  fireInput(defCustIn, 'São Paulo Tech');
+  fireKey(defCustIn, 'ArrowDown');
+  fireKey(defCustIn, 'Enter');
+  await sleep(200);
+  const defProjIn = findAll(popEls['ke-opt-def-project'], 'ke-combo-input')[0];
+  fireInput(defProjIn, 'Site São Paulo');
+  fireKey(defProjIn, 'ArrowDown');
+  fireKey(defProjIn, 'Enter');
+  await sleep(200);
+  const defActIn = findAll(popEls['ke-opt-def-activity'], 'ke-combo-input')[0];
+  fireInput(defActIn, 'Consequuntur');
+  fireKey(defActIn, 'ArrowDown');
+  fireKey(defActIn, 'Enter');
+  await sleep(200);
+  const defTagsIn = findAll(popEls['ke-opt-def-tags'], 'ke-multi-input')[0];
+  fireInput(defTagsIn, 'Alexander');
+  fireKey(defTagsIn, 'Enter');
+  await sleep(100);
+  popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  popEls['ke-opt-save'].fire('click');
+  await sleep(150);
+  check('salvar persiste timer padrão', stored.keSettings.draftEnabled === true &&
+    stored.keSettings.defaultTimer.customer === '20' && stored.keSettings.defaultTimer.project === '200' &&
+    stored.keSettings.defaultTimer.activity === '1655' && !('description' in stored.keSettings.defaultTimer) &&
+    stored.keSettings.defaultTimer.tags.join(',') === 'Alexander', stored.keSettings.defaultTimer);
+  delete stored.keSettings.defaultTimer;
+  eval(OPT_SRC);
+  await sleep(600);
+  popEls['ke-opt-draft-enabled'].checked = true;
+  popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  popEls['ke-opt-save'].fire('click');
+  await sleep(150);
+  check('salvar exige projeto e atividade com rascunho ativo', toastShown() &&
+    toast.textContent.includes('Timer padrão') && !stored.keSettings.defaultTimer, toast.textContent);
+  stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', keLocale: 'pt_BR' };
+  storedLocal.keApiToken = 'popup-token';
+  chrome.permissions.granted = true;
+  const apiGetOrig = KE.apiGet;
+  KE.apiGet = async function (path, opts) {
+    if (!KE.apiBaseUrl || !KE.authToken) throw new Error('sem configuração de API');
+    const out = await apiGetOrig.call(this, path, opts);
+    KE.apiBaseUrl = '';
+    KE.authToken = '';
+    KE.apiCredentials = 'same-origin';
+    return out;
+  };
+  eval(OPT_SRC);
+  await sleep(800);
+  KE.apiGet = apiGetOrig;
+  const raceProjIn = findAll(popEls['ke-opt-def-project'], 'ke-combo-input')[0];
+  raceProjIn.fire('focus');
+  check('catálogos sobrevivem a reset concorrente', findAll(popEls['ke-opt-def-project'], 'ke-combo-opt').length > 0);
+  fireInput(raceProjIn, 'Site São Paulo');
+  check('busca de projeto filtra após reset', findAll(popEls['ke-opt-def-project'], 'ke-combo-opt').length === 1);
+  const raceCustIn = findAll(popEls['ke-opt-def-customer'], 'ke-combo-input')[0];
+  fireInput(raceCustIn, 'Altenwerth');
+  fireKey(raceCustIn, 'ArrowDown');
+  fireKey(raceCustIn, 'Enter');
+  await sleep(300);
+  check('troca de cliente recarrega projetos', findAll(popEls['ke-opt-def-project'], 'ke-combo-opt').length === 2);
 
   console.log(failures === 0 ? '\nTODOS OS TESTES PASSARAM' : '\n' + failures + ' TESTE(S) FALHARAM');
   process.exit(failures === 0 ? 0 : 1);

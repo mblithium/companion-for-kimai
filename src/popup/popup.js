@@ -42,6 +42,18 @@
     throw new Error('Floating windows are not supported by this browser.');
   }
 
+  async function openDraftSettings() {
+    const extension = KE.ext();
+    try {
+      const url = extension.runtime.getURL('src/options/options.html') + '#ke-opt-draft-card';
+      if (extension.tabs && typeof extension.tabs.create === 'function') {
+        await extension.tabs.create({ url });
+        return;
+      }
+    } catch (e) {}
+    KE.openOptions();
+  }
+
   function connectionMessage(base, e) {
     if (isAuthError(e)) return KE.T.authDenied + ' ' + KE.uiText('ui.popupConnectionAuth');
     const detail = String((e && e.serverMessage) || '').trim();
@@ -118,11 +130,128 @@
           setStatus(popError(e, KE.T.stopFail), 'err');
         }
       });
+      const edit = document.createElement('button');
+      edit.className = 'ke-pop-btn ke-pop-btn-edit';
+      edit.type = 'button';
+      edit.textContent = '✎';
+      edit.title = KE.T.edit;
+      edit.setAttribute('aria-label', KE.T.edit);
+      edit.addEventListener('click', () => { openActiveEdit(row, t.id).catch(() => {}); });
       row.appendChild(dot);
       row.appendChild(info);
+      row.appendChild(edit);
       row.appendChild(stop);
       ui.active.appendChild(row);
     });
+  }
+
+  async function openActiveEdit(row, timerId) {
+    const t = KE.state.active.find((x) => String(x.id) === String(timerId));
+    if (!t) return;
+    const projId = KE.entityId(t.project);
+    const actId = KE.entityId(t.activity);
+    row.replaceChildren();
+    const form = document.createElement('div');
+    form.className = 'ke-pop-edit-form';
+    const projectCombo = KE.createCombo({ searchPlaceholder: KE.T.searchProject, allowEmpty: false });
+    const actCombo = KE.createCombo({ searchPlaceholder: KE.T.searchActivity, allowEmpty: false });
+    const descInput = document.createElement('input');
+    descInput.className = 'ke-pop-input';
+    descInput.type = 'text';
+    descInput.placeholder = KE.T.descriptionPh;
+    descInput.setAttribute('maxlength', '255');
+    descInput.value = t.description || '';
+    const tagsInput = document.createElement('input');
+    tagsInput.className = 'ke-pop-input';
+    tagsInput.type = 'text';
+    tagsInput.placeholder = KE.T.tagsPh;
+    tagsInput.value = KE.tagNames(t.tags).join(', ');
+    const errBox = document.createElement('div');
+    errBox.className = 'ke-pop-edit-error';
+    errBox.hidden = true;
+    const actions = document.createElement('div');
+    actions.className = 'ke-pop-edit-actions';
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'ke-pop-btn ke-pop-btn-primary ke-pop-edit-save';
+    saveBtn.type = 'button';
+    saveBtn.textContent = KE.T.save;
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'ke-pop-btn ke-pop-edit-cancel';
+    cancelBtn.type = 'button';
+    cancelBtn.textContent = KE.T.cancel;
+    actions.appendChild(saveBtn);
+    actions.appendChild(cancelBtn);
+    form.appendChild(projectCombo.root);
+    form.appendChild(actCombo.root);
+    form.appendChild(descInput);
+    form.appendChild(tagsInput);
+    form.appendChild(errBox);
+    form.appendChild(actions);
+    row.appendChild(form);
+    const showError = (msg) => {
+      errBox.textContent = msg;
+      errBox.hidden = false;
+    };
+
+    const doSave = async () => {
+      projectCombo.flush(true);
+      actCombo.flush(true);
+      const project = projectCombo.getValue();
+      const activity = actCombo.getValue();
+      if (!project || !activity) {
+        showError(KE.T.needProject);
+        return;
+      }
+      const tagNames = await KE.ensureTags(tagsInput.value.split(',').map((s) => s.trim()).filter(Boolean));
+      const payload = {
+        project: Number(project),
+        activity: Number(activity),
+        description: descInput.value.trim(),
+        tags: tagNames.join(','),
+      };
+      saveBtn.disabled = true;
+      try {
+        await KE.apiPatch('/api/timesheets/' + encodeURIComponent(t.id), payload);
+        setStatus(KE.T.updatedOk, 'ok');
+        await refresh();
+      } catch (e) {
+        saveBtn.disabled = false;
+        showError(popError(e, KE.T.updateFail));
+      }
+    };
+    saveBtn.addEventListener('click', () => { doSave().catch(() => {}); });
+    cancelBtn.addEventListener('click', () => { refreshActive().catch(() => {}); });
+    [descInput, tagsInput].forEach((inp) => inp.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); doSave().catch(() => {}); }
+      else if (ev.key === 'Escape') refreshActive().catch(() => {});
+    }));
+
+    projectCombo.setLoading(true);
+    actCombo.setLoading(true);
+    try {
+      await KE.getProjectsCached('', false);
+      projectCombo.setLoading(false);
+      projectCombo.setItems(KE.state.projects.map((p) => ({ value: String(p.id), label: KE.projectLabel(p) })), projId);
+      await KE.getActivitiesCached(projId, false);
+      actCombo.setLoading(false);
+      actCombo.setItems(activityItems(), actId);
+    } catch (e) {
+      projectCombo.setLoading(false);
+      actCombo.setLoading(false);
+      showError(KE.T.refreshFail);
+      return;
+    }
+    projectCombo.onSelect = async (v) => {
+      actCombo.setLoading(true);
+      try {
+        await KE.getActivitiesCached(v || '', false);
+        actCombo.setLoading(false);
+        actCombo.setItems(activityItems());
+      } catch (e) {
+        actCombo.setLoading(false);
+        showError(KE.T.refreshFail);
+      }
+    };
   }
 
   function setNewTimerCollapsed(collapsed) {
@@ -439,6 +568,56 @@
     }
   }
 
+  let draftSnapshot = null;
+
+  function setDraftLocked(locked) {
+    [ui.customer, ui.project, ui.activity, ui.tags].forEach((combo) => {
+      if (combo && typeof combo.setEnabled === 'function') combo.setEnabled(!locked);
+    });
+    ui.newTimerBody.classList.toggle('ke-draft-locked', locked);
+  }
+
+  async function toggleDraftMode(checked) {
+    if (!checked) {
+      ui.draftCheck.checked = false;
+      if (draftSnapshot) {
+        ui.customer.setItems(customerItems(), draftSnapshot.customer);
+        await KE.getProjectsCached('', false);
+        ui.project.setItems(projectItemsFiltered(), draftSnapshot.project);
+        await KE.getActivitiesCached(draftSnapshot.project, false);
+        ui.activity.setItems(activityItems(), draftSnapshot.activity);
+        await KE.loadTags();
+        ui.tags.setItems(KE.state.tags);
+        ui.tags.setValues(draftSnapshot.tags);
+        draftSnapshot = null;
+      }
+      setDraftLocked(false);
+      return;
+    }
+    const settings = await KE.getSettings();
+    const def = (settings && settings.defaultTimer) || {};
+    if (!def.project || !def.activity) {
+      ui.draftCheck.checked = false;
+      setStatus(KE.uiText('ui.needDefaultTimer'), 'err');
+      return;
+    }
+    draftSnapshot = {
+      customer: ui.customer.getValue(),
+      project: ui.project.getValue(),
+      activity: ui.activity.getValue(),
+      tags: ui.tags.getValues(),
+    };
+    ui.customer.setItems(customerItems(), def.customer || '');
+    await KE.getProjectsCached('', false);
+    ui.project.setItems(projectItemsFiltered(), def.project || '');
+    await KE.getActivitiesCached(def.project || '', false);
+    ui.activity.setItems(activityItems(), def.activity || '');
+    await KE.loadTags();
+    ui.tags.setItems(KE.state.tags);
+    ui.tags.setValues(def.tags || []);
+    setDraftLocked(true);
+  }
+
   async function refresh() {
     await refreshActive();
     await refreshToday();
@@ -454,6 +633,7 @@
       recent: $('ke-pop-recent'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
       groupToggle: $('ke-pop-group-toggle'),
+      draftRow: $('ke-pop-draft-row'), draftCheck: $('ke-pop-draft'),
     };
     await KE.applyLocale();
     KE.translatePage(document);
@@ -463,7 +643,7 @@
     $('ke-pop-label-project').textContent = KE.T.project;
     $('ke-pop-label-activity').textContent = KE.T.activity;
     $('ke-pop-label-tags').textContent = KE.T.tags;
-    $('ke-pop-settings').addEventListener('click', () => KE.openOptions());
+    $('ke-pop-settings').onclick = () => KE.openOptions();
     $('ke-pop-focus').onclick = async () => {
       try {
         await openFocusWindow();
@@ -472,10 +652,12 @@
       }
     };
     ui.newTimerToggle.onclick = () => setNewTimerCollapsed(!ui.newTimerBody.hidden);
-    $('ke-pop-open').addEventListener('click', async () => {
+    ui.draftCheck.onchange = () => { toggleDraftMode(ui.draftCheck.checked).catch(() => {}); };
+    $('ke-pop-draft-config').onclick = () => { openDraftSettings().catch(() => {}); };
+    $('ke-pop-open').onclick = async () => {
       const s = await KE.getSettings();
       KE.openKimai(s.kimaiBaseUrl, s.keLocale);
-    });
+    };
     ui.setupBtn.onclick = () => KE.openOptions();
     $('ke-pop-error-settings').onclick = () => KE.openOptions();
     $('ke-pop-error-retry').onclick = () => boot();
@@ -529,18 +711,18 @@
       $('ke-pop-new-tags').appendChild(ui.tags.root);
       ui.customer.onSelect = () => { handleCustomerChange(); };
       ui.project.onSelect = () => { handleProjectChange(); };
-      ui.start.addEventListener('click', startNew);
-      ui.desc.addEventListener('keydown', (ev) => {
+      ui.start.onclick = () => { startNew().catch(() => {}); };
+      ui.desc.onkeydown = (ev) => {
         if (ev.key === 'Enter') { ev.preventDefault(); startNew(); }
-      });
-      ui.groupToggle.addEventListener('click', async () => {
+      };
+      ui.groupToggle.onclick = async () => {
         groupMode = !groupMode;
         paintGroupToggle();
         try {
           await KE.saveSettings({ groupTasks: groupMode });
         } catch (e) {}
         await refreshToday(false, true);
-      });
+      };
       $('ke-pop-refresh-catalog').onclick = async () => {
         const btn = $('ke-pop-refresh-catalog');
         btn.disabled = true;
@@ -577,6 +759,7 @@
       };
 
       show('main');
+      ui.draftRow.hidden = settings.draftEnabled !== true;
       await loadGroupMode();
       const formError = await loadNewForm(false);
       if (formError) {

@@ -137,6 +137,10 @@
       else { input.placeholder = opts.searchPlaceholder || ''; render(); }
     };
     combo.focus = () => input.focus();
+    combo.setEnabled = (enabled) => {
+      input.disabled = !enabled;
+      toggle.disabled = !enabled;
+    };
     combo.flush = (silent) => {
       const fire = (v) => { if (!silent && combo.onSelect) combo.onSelect(v); };
       if (input.value === '') {
@@ -367,6 +371,11 @@
     }
 
     combo.getValues = () => combo.selected.map((s) => s.value);
+    combo.setValues = (values) => {
+      const wanted = new Set((values || []).map((v) => String(v)));
+      combo.selected = combo.items.filter((it) => wanted.has(String(it.value)));
+      renderChips();
+    };
     combo.setItems = (items) => {
       combo.items = (items || []).map((i) => ({ value: String(i.value), label: String(i.label) }));
       combo._filter = '';
@@ -402,6 +411,10 @@
       return true;
     };
     combo.focus = () => input.focus();
+    combo.setEnabled = (enabled) => {
+      input.disabled = !enabled;
+      toggle.disabled = !enabled;
+    };
 
     input.addEventListener('focus', () => {
       combo._filter = '';

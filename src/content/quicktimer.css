@@ -100,9 +100,84 @@ body.ke-hide-header .navbar.navbar-expand-md:not(.navbar-vertical) {
   font-size: 13px;
   padding: 2px 6px;
 }
+.ke-sitegroup-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
 .ke-sitegroup-check {
   cursor: pointer;
 }
+.ke-sitegroup-edit-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 6px;
+}
+.datatable_timesheet tr.ke-sitegroup-edit td {
+  background: var(--ke-group-bg, var(--tblr-tertiary-bg, rgba(127, 127, 127, 0.12)));
+}
+.ke-sitegroup-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+.ke-sitegroup-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: normal;
+}
+.ke-sitegroup-edit-label {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.ke-sitegroup-edit .ke-input {
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--ke-border, var(--tblr-border-color, #ccc));
+  border-radius: 6px;
+  background: var(--ke-input-bg, var(--tblr-bg-forms, transparent));
+  color: var(--ke-text, inherit);
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ke-sitegroup-edit-actions { display: flex; gap: 8px; }
+.ke-sitegroup-edit .ke-btn-save {
+  background: var(--ke-green, #2fb344);
+  color: var(--ke-on-green, #1c1c1e);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ke-sitegroup-edit .ke-btn-save:hover { background: var(--ke-green-dark, #27a03c); }
+.ke-sitegroup-edit .ke-btn-save:disabled { opacity: 0.6; cursor: wait; }
+.ke-sitegroup-edit .ke-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--tblr-border-color, #ccc);
+  color: inherit;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ke-sitegroup-edit .ke-btn-cancel:hover { background: rgba(127, 127, 127, 0.15); }
+.ke-sitegroup-edit-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ke-red-text, #d63939);
+}
+.ke-sitegroup-edit-error[hidden] { display: none; }
 
 #ke-quick-timer.ke-card,
 #ke-active-now.ke-card {
