@@ -33,6 +33,7 @@ body {
   padding: 16px; margin: 16px 0;
 }
 .ke-opt-card h2 { font-size: 15px; margin: 0 0 10px; }
+.ke-opt-card h3 { font-size: 13px; margin: 14px 0 2px; }
 .ke-opt-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
 .ke-opt-field input,
 .ke-opt-field select {

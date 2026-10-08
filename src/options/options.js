@@ -346,6 +346,8 @@
     })();
     $('ke-opt-hide-navigation').checked = !!(settings.hideNavigation || settings.hideSidebar || settings.hideHeader);
     $('ke-opt-hide-actionbar').checked = !!settings.hideActionBar;
+    $('ke-opt-hide-recent').checked = !!settings.hideRecents;
+    $('ke-opt-hide-continue').checked = !!settings.hideContinueToday;
     fillShortcuts(settings.shortcuts);
     $('ke-opt-sc-enabled').checked = !settings || settings.shortcutsEnabled !== false;
     ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => {
@@ -443,6 +445,8 @@
       hideSidebar: false,
       hideActionBar: $('ke-opt-hide-actionbar').checked,
       hideHeader: false,
+      hideRecents: $('ke-opt-hide-recent').checked,
+      hideContinueToday: $('ke-opt-hide-continue').checked,
       keLocale: localeSel.value,
     });
     KE.setLocale(uiLocaleSel.value);

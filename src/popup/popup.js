@@ -359,6 +359,7 @@
   }
 
   async function refreshToday(force, silent) {
+    if (ui.todaySec && ui.todaySec.hidden) return true;
     ui.today.replaceChildren();
     let entries = [];
     try {
@@ -396,6 +397,7 @@
   }
 
   async function refreshRecent(force, silent) {
+    if (ui.recentSec && ui.recentSec.hidden) return true;
     ui.recent.replaceChildren();
     let entries = [];
     try {
@@ -631,6 +633,7 @@
       main: $('ke-pop-main'), active: $('ke-pop-active'), today: $('ke-pop-today'),
       newTimerToggle: $('ke-pop-new-toggle'), newTimerBody: $('ke-pop-new-body'),
       recent: $('ke-pop-recent'),
+      todaySec: $('ke-pop-today-sec'), recentSec: $('ke-pop-recent-sec'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
       groupToggle: $('ke-pop-group-toggle'),
       draftRow: $('ke-pop-draft-row'), draftCheck: $('ke-pop-draft'),
@@ -760,6 +763,8 @@
 
       show('main');
       ui.draftRow.hidden = settings.draftEnabled !== true;
+      ui.todaySec.hidden = settings.hideContinueToday === true;
+      ui.recentSec.hidden = settings.hideRecents === true;
       await loadGroupMode();
       const formError = await loadNewForm(false);
       if (formError) {

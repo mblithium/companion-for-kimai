@@ -1494,6 +1494,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
   check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
+  check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
+    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   const optHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
   check('título e idiomas das opções traduzíveis', optHtml.includes('<title data-ke-i18n="ui.optionsTitle">') &&
     optHtml.includes('data-ke-i18n="ui.languagePortuguese"') && optHtml.includes('data-ke-i18n="ui.languageEnglish"'));
@@ -1673,7 +1675,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const toastShown = () => toast.hidden === false && toast.classList.contains('ke-show');
   check('Interface inicia com opções desmarcadas',
     popEls['ke-opt-hide-navigation'].checked === false &&
-    popEls['ke-opt-hide-actionbar'].checked === false);
+    popEls['ke-opt-hide-actionbar'].checked === false &&
+    popEls['ke-opt-hide-recent'].checked === false &&
+    popEls['ke-opt-hide-continue'].checked === false);
   popEls['ke-opt-sc-start'].value = 'X';
   popEls['ke-opt-sc-reset'].fire('click');
   await sleep(20);
@@ -1689,12 +1693,29 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   popEls['ke-opt-url'].value = 'https://kimai.exemplo';
   popEls['ke-opt-hide-navigation'].checked = true;
   popEls['ke-opt-hide-actionbar'].checked = true;
+  popEls['ke-opt-hide-recent'].checked = true;
+  popEls['ke-opt-hide-continue'].checked = true;
   popEls['ke-opt-save'].fire('click');
   await sleep(100);
   check('salvar válido usa toast', toastShown() && toast.textContent === 'Configurações salvas.', toast.textContent);
   check('salvar persiste opções de Interface', stored.keSettings.hideNavigation === true &&
     stored.keSettings.hideActionBar === true && stored.keSettings.hideSidebar === false &&
-    stored.keSettings.hideHeader === false, stored.keSettings);
+    stored.keSettings.hideHeader === false && stored.keSettings.hideRecents === true &&
+    stored.keSettings.hideContinueToday === true, stored.keSettings);
+  const prevPopupSettings = stored.keSettings;
+  stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', hideRecents: true, hideContinueToday: true };
+  storedLocal.keApiToken = 'popup-token';
+  chrome.permissions.granted = true;
+  eval(POP_SRC);
+  await sleep(500);
+  check('popup oculta seções desativadas', popEls['ke-pop-main'].hidden === false &&
+    popEls['ke-pop-today-sec'].hidden === true && popEls['ke-pop-recent-sec'].hidden === true);
+  stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo' };
+  eval(POP_SRC);
+  await sleep(500);
+  check('popup mostra seções por padrão', popEls['ke-pop-today-sec'].hidden === false &&
+    popEls['ke-pop-recent-sec'].hidden === false);
+  stored.keSettings = prevPopupSettings;
   check('toast dura 5 segundos', delays.includes(5000), delays.slice(-5));
   global.setTimeout = origSetTimeout;
   storedLocal.keApiToken = 'tok-desconectar';
