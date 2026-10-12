@@ -4,6 +4,15 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.22.16] — 2026-10-12
+### Changed
+- Variante Chrome dispensa a permissão `cookies` (mantida no Firefox para
+  suporte a contêineres); ferramentas e verificações passam a tratar
+  `permissions` como chave específica da variante.
+### Added
+- Seção "Sobre" nos dois READMEs (funcionalidades, transparência, bugs e
+  melhorias).
+
 ## [0.22.15] — 2026-10-08
 ### Added
 - Seções "Continuar de hoje" e "Recentes" do popup abrem colapsadas;

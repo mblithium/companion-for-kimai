@@ -17,10 +17,13 @@ function writeJson(rel, obj) {
 }
 
 // Variant-specific keys: everything else must stay identical across variants.
+// `permissions` is variant-specific: Firefox keeps `cookies` for container
+// support, while Chrome and derivatives ship without it.
 function stripVariant(manifest) {
   const copy = JSON.parse(JSON.stringify(manifest));
   delete copy.version;
   delete copy.background;
+  delete copy.permissions;
   if (copy.browser_specific_settings && copy.browser_specific_settings.gecko) {
     delete copy.browser_specific_settings.gecko.strict_min_version;
     delete copy.browser_specific_settings.gecko.data_collection_permissions;
@@ -70,7 +73,7 @@ function main() {
     const loaded = Object.fromEntries(VARIANTS.map((target) => [`manifest/${target}.json`, readJson(`manifest/${target}.json`)]));
     const stripped = Object.values(loaded).map(stripVariant);
     if (JSON.stringify(stripped[0]) !== JSON.stringify(stripped[1])) {
-      throw new Error('Variants differ beyond version/background/gecko settings; fix manifest/chrome.json and manifest/firefox.json manually');
+      throw new Error('Variants differ beyond version/background/permissions/gecko settings; fix manifest/chrome.json and manifest/firefox.json manually');
     }
 
     const changed = [];

@@ -4,6 +4,15 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.22.16] — 2026-10-12
+### Changed
+- Chrome build drops the `cookies` permission (kept on Firefox for
+  container support); variant tooling and checks now treat `permissions`
+  as variant-specific.
+### Added
+- "About" section in both READMEs (features, transparency, bugs and
+  improvements).
+
 ## [0.22.15] — 2026-10-08
 ### Added
 - Popup "Continue today" and "Recent" sections now open collapsed;

@@ -88,6 +88,9 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
     const strip = (m) => {
       const copy = JSON.parse(JSON.stringify(m));
       delete copy.background;
+      // `cookies` is Firefox-only (container support); every other
+      // permission must match across variants.
+      if (Array.isArray(copy.permissions)) copy.permissions = copy.permissions.filter((p) => p !== 'cookies');
       if (copy.browser_specific_settings && copy.browser_specific_settings.gecko) {
         delete copy.browser_specific_settings.gecko.strict_min_version;
         delete copy.browser_specific_settings.gecko.data_collection_permissions;
@@ -100,7 +103,15 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
     }
     if (JSON.stringify(strip(c)) !== JSON.stringify(strip(f))) {
       failures++;
-      console.log('FALHOU variantes divergem além de background/gecko-min');
+      console.log('FALHOU variantes divergem além de background/gecko-min/cookies-firefox');
+    }
+    if (!Array.isArray(f.permissions) || f.permissions.indexOf('cookies') < 0) {
+      failures++;
+      console.log('FALHOU firefox sem permissão cookies (suporte a contêineres)');
+    }
+    if (Array.isArray(c.permissions) && c.permissions.indexOf('cookies') >= 0) {
+      failures++;
+      console.log('FALHOU chrome com permissão cookies (só Firefox usa contêineres)');
     }
     const contentScripts = (c.content_scripts && c.content_scripts[0] && c.content_scripts[0].js) || [];
     if (contentScripts.indexOf('src/content/sitegroup.js') < 0 ||

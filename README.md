@@ -9,6 +9,32 @@ to use the play button at the top.
 It works with any Kimai installation (for example,
 `https://kimai.example.com/en/timesheet/`).
 
+## About
+
+Companion for Kimai adds a Quick Timer bar to the timesheet page, a popup for
+managing timers, entry grouping, and system-aware themes — built for daily use
+with any Kimai installation.
+
+### Features
+
+- ⚡ Quick Timer bar above the records — no more hunting for the play button;
+- ▶ "Now" widget showing your running timer at a glance;
+- ➕ Popup to start timers, continue today's work, and reuse recent entries;
+- 🗂 Entry grouping, with inline editing;
+- ⌨ Keyboard shortcuts to start, stop, restart, and open the popup;
+- 🎨 7 themes including GNOME/Adwaita, with light/dark following the system;
+- 🔑 Secure API-key login, stored only on your device — no tracking or data collection.
+
+### Transparency
+
+This extension is developed by a third party (we are not part of the Kimai
+team); the code is open and can be audited. There are no trackers, and usage
+is strictly between the extension and your Kimai installation.
+
+### Bugs and Improvements
+
+For any bug or improvement suggestion, let us know.
+
 ## Install for development
 
 ### Google Chrome
@@ -77,7 +103,9 @@ required file is missing.
   `background.scripts`. Both share the same worker implementation.
 - `browser_specific_settings.gecko.id` is included as required by AMO.
 - Permissions are limited to `storage`, `alarms`, `contextMenus`, and an
-  optional host permission requested only for the configured Kimai host. The
+  optional host permission requested only for the configured Kimai host.
+  Firefox also requests `cookies` to open Kimai in the same container;
+  the Chrome build ships without it. The
   content script uses same-origin `fetch`; the popup and worker use the
   configured API URL.
 - The toolbar icon changes while a timer is running, including an elapsed-time

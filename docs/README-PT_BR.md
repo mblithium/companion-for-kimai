@@ -7,6 +7,28 @@ começando pelo recurso mais pedido: **uma barra “Iniciar timer rápido” log
 
 Funciona em qualquer instalação do Kimai (ex.: `https://kimai.example.com/pt_BR/timesheet/`).
 
+## Sobre
+
+O Companion for Kimai adiciona uma barra de Timer rápido à página do timesheet, um popup para gerenciar timers, agrupamento de lançamentos e temas que acompanham o sistema — feito para o uso diário em qualquer instalação do Kimai.
+
+### Funcionalidades
+
+- ⚡ Barra de Timer rápido acima dos registros — chega de procurar o botão de play;
+- ▶ Widget "Agora" mostrando seu timer em execução de relance;
+- ➕ Popup para iniciar timers, continuar o trabalho de hoje e reaproveitar entradas recentes;
+- 🗂 Agrupamento de lançamentos, com edição inline;
+- ⌨ Atalhos de teclado para iniciar, parar, recomeçar e abrir o popup;
+- 🎨 7 temas incluindo GNOME/Adwaita, com claro/escuro seguindo o sistema;
+- 🔑 Login seguro por chave de API, guardada só no seu dispositivo — sem rastreamento nem coleta de dados.
+
+### Transparência
+
+Esta extensão é desenvolvida por terceiros (não fazemos parte da equipe do Kimai), o código é aberto e pode ser auditado. Não há nenhum rastreador e o uso é estritamente entre a extensão e sua instalação do Kimai.
+
+### Bugs e Melhorias
+
+Qualquer bug ou sugestão de melhoria, nos avise.
+
 ## Instalar (desenvolvimento)
 
 ### Google Chrome
@@ -67,7 +89,9 @@ arquivo necessário.
   (`background.scripts`), com o mesmo worker compartilhado.
 - `browser_specific_settings.gecko.id` incluído (exigido pela AMO).
 - Permissões enxutas: `storage` + `alarms` + `contextMenus` (sem alertas) e
-  `optional_host_permissions` pedida só para o host do seu Kimai. O content
+  `optional_host_permissions` pedida só para o host do seu Kimai. O Firefox
+  pede ainda `cookies` para abrir o Kimai no mesmo contêiner; a variante
+  Chrome não inclui essa permissão. O content
   script usa `fetch` mesma-origem; popup/worker usam a origem configurada.
 - Ícone muda com timer rodando (badge com decorrido); botão-direito no ícone
   tem Pausar/Continuar. Requer Firefox 121+.
