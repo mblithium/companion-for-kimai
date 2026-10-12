@@ -59,9 +59,10 @@
         <button id="ke-pop-refresh-catalog" class="ke-pop-refresh" type="button" title="Atualizar listas" data-ke-i18n-title="ui.refreshCatalog" data-ke-i18n-aria-label="ui.refreshCatalog">⟳</button>
       </div>
       <div id="ke-pop-new-body">
-        <div class="ke-pop-field">
+        <div class="ke-pop-field ke-pop-desc-field">
           <span class="ke-pop-label" id="ke-pop-label-desc"></span>
-          <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?" data-ke-i18n-placeholder="descriptionPh">
+          <input id="ke-pop-new-desc" class="ke-pop-input" type="text" maxlength="255" placeholder="O que você vai fazer?" data-ke-i18n-placeholder="descriptionPh" aria-controls="ke-pop-desc-suggest" aria-expanded="false" autocomplete="off">
+          <div id="ke-pop-desc-suggest" class="ke-pop-suggest" role="listbox" hidden></div>
         </div>
         <div class="ke-pop-draft-row" id="ke-pop-draft-row" hidden>
           <label class="ke-pop-check">

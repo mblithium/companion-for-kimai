@@ -91,14 +91,13 @@ content e no popup, sempre com prefixo `ke-`), `src/popup/popup.css`.
 - Importa os módulos puros via `importScripts` (sem DOM: sem combo/popup).
 - `alarms` a cada 1 min + mensagens `ke-refresh` (content avisa após
   start/stop/edit) → ícone rodando/parado, badge `5m`/`2h`, título detalhado.
-- Menu do botão-direito (`contexts: ["action"]`): ⏸ Pausar (para todos) e
-  ▶ Continuar (recomeça o mais recente), com visibilidade por estado.
 - Usa a mesma config do popup (base + chave); sem config/acesso, some.
 - Duas variantes de manifest (`manifest/chrome.json` com service worker,
   `manifest/firefox.json` com event page `scripts` sem `persistent`;
   mesmo worker): a raiz vem com a variante Firefox; troque via
   `npm run manifest:chrome` ou `npm run manifest:firefox`. O `check-pages`
-  valida que só diferem em background e Gecko-mínimo.
+  valida que só diferem em background, permissões (`cookies` só no Firefox)
+  e Gecko-mínimo.
 
 ## Testes
 

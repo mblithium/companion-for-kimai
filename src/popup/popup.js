@@ -483,6 +483,7 @@
   let kimaiBase = '';
 
   async function startNew() {
+    hideDescSuggest();
     ui.project.flush(true);
     ui.activity.flush(true);
     ui.tags.flush();
@@ -605,6 +606,114 @@
     ui.newTimerBody.classList.toggle('ke-draft-locked', locked);
   }
 
+  let suggestItems = [];
+  let suggestActive = -1;
+  let suggestSeq = 0;
+
+  function hideDescSuggest() {
+    suggestSeq++;
+    suggestItems = [];
+    suggestActive = -1;
+    if (ui && ui.suggest) ui.suggest.hidden = true;
+    if (ui && ui.desc) ui.desc.setAttribute('aria-expanded', 'false');
+  }
+
+  function paintDescSuggest() {
+    if (!ui.suggest) return;
+    ui.suggest.replaceChildren();
+    suggestItems.forEach((t, idx) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'ke-pop-suggest-item' + (idx === suggestActive ? ' ke-active' : '');
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', idx === suggestActive ? 'true' : 'false');
+      const useLabel = KE.uiText('ui.useSuggestion');
+      item.title = useLabel;
+      item.setAttribute('aria-label', String(t.description || '') + ' — ' + useLabel);
+      const name = document.createElement('span');
+      name.className = 'ke-pop-suggest-title';
+      name.textContent = t.description || '';
+      const sub = document.createElement('span');
+      sub.className = 'ke-pop-suggest-sub';
+      const proj = KE.describeProjectRef(t.project);
+      const act = KE.describeActivityRef(t.activity);
+      sub.textContent = act ? proj + ' · ' + act : proj;
+      item.appendChild(name);
+      item.appendChild(sub);
+      item.onclick = () => { applyDescSuggestion(t).catch(() => {}); };
+      ui.suggest.appendChild(item);
+    });
+    ui.suggest.hidden = suggestItems.length === 0;
+    ui.desc.setAttribute('aria-expanded', suggestItems.length ? 'true' : 'false');
+  }
+
+  async function updateDescSuggest() {
+    const my = ++suggestSeq;
+    suggestItems = [];
+    suggestActive = -1;
+    if (!ui.suggest || !ui.desc || (ui.draftCheck && ui.draftCheck.checked)) {
+      hideDescSuggest();
+      return;
+    }
+    const query = KE.norm(ui.desc.value.trim());
+    if (query.length < 2) {
+      hideDescSuggest();
+      return;
+    }
+    let pool = [];
+    try {
+      const results = await Promise.all([KE.getTodayCached(false), KE.getRecentCached(false)]);
+      results.forEach((r) => { pool = pool.concat((r && r.entries) || []); });
+    } catch (e) {
+      hideDescSuggest();
+      return;
+    }
+    if (my !== suggestSeq) return;
+    const seen = new Set();
+    suggestItems = [];
+    for (const t of pool) {
+      const desc = String((t && t.description) || '').trim();
+      if (!desc || seen.has(desc)) continue;
+      if (KE.norm(desc).indexOf(query) < 0) continue;
+      seen.add(desc);
+      suggestItems.push(t);
+      if (suggestItems.length >= 5) break;
+    }
+    paintDescSuggest();
+  }
+
+  function customerIdForProject(t, projId) {
+    const direct = KE.entityId(t && t.project && t.project.customer);
+    if (direct) return direct;
+    const found = (KE.state.projects || []).find((p) => String(p.id) === String(projId));
+    if (found) {
+      const viaId = KE.entityId(found.customer);
+      if (viaId) return viaId;
+      if (found.parentTitle) {
+        const cust = (KE.state.customers || []).find((c) => String(c.name) === String(found.parentTitle));
+        if (cust) return String(cust.id);
+      }
+    }
+    return '';
+  }
+
+  async function applyDescSuggestion(t) {
+    if (!t) return;
+    hideDescSuggest();
+    const projId = KE.entityId(t.project);
+    const actId = KE.entityId(t.activity);
+    ui.customer.setItems(customerItems(), customerIdForProject(t, projId));
+    await KE.getProjectsCached('', false);
+    ui.project.setItems(projectItemsFiltered(), projId);
+    await KE.getActivitiesCached(projId, false);
+    ui.activity.setItems(activityItems(), actId);
+    await KE.loadTags();
+    ui.tags.setItems(KE.state.tags);
+    ui.tags.setValues(KE.tagNames(t.tags));
+    ui.desc.value = t.description || '';
+    try { ui.desc.focus(); } catch (e) {}
+  }
+
   async function toggleDraftMode(checked) {
     if (!checked) {
       ui.draftCheck.checked = false;
@@ -662,6 +771,7 @@
       todayToggle: $('ke-pop-today-toggle'), recentToggle: $('ke-pop-recent-toggle'),
       todaySec: $('ke-pop-today-sec'), recentSec: $('ke-pop-recent-sec'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
+      suggest: $('ke-pop-desc-suggest'),
       groupToggle: $('ke-pop-group-toggle'),
       draftRow: $('ke-pop-draft-row'), draftCheck: $('ke-pop-draft'),
     };
@@ -744,8 +854,29 @@
       ui.customer.onSelect = () => { handleCustomerChange(); };
       ui.project.onSelect = () => { handleProjectChange(); };
       ui.start.onclick = () => { startNew().catch(() => {}); };
+      ui.desc.oninput = () => { updateDescSuggest().catch(() => {}); };
+      ui.desc.onblur = () => { setTimeout(hideDescSuggest, 150); };
       ui.desc.onkeydown = (ev) => {
-        if (ev.key === 'Enter') { ev.preventDefault(); startNew(); }
+        if (ev.key === 'Escape' && ui.suggest && !ui.suggest.hidden) {
+          ev.preventDefault();
+          hideDescSuggest();
+          return;
+        }
+        if ((ev.key === 'ArrowDown' || ev.key === 'ArrowUp') && ui.suggest && !ui.suggest.hidden && suggestItems.length) {
+          ev.preventDefault();
+          const n = suggestItems.length;
+          suggestActive = ev.key === 'ArrowDown' ? (suggestActive + 1) % n : (suggestActive - 1 + n) % n;
+          paintDescSuggest();
+          return;
+        }
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          if (ui.suggest && !ui.suggest.hidden && suggestActive >= 0 && suggestItems[suggestActive]) {
+            applyDescSuggestion(suggestItems[suggestActive]).catch(() => {});
+          } else {
+            startNew().catch(() => {});
+          }
+        }
       };
       ui.groupToggle.onclick = async () => {
         groupMode = !groupMode;

@@ -88,13 +88,12 @@ arquivo necessário.
 - `manifest_version: 3`; o Chrome usa service worker e o Firefox usa event page
   (`background.scripts`), com o mesmo worker compartilhado.
 - `browser_specific_settings.gecko.id` incluído (exigido pela AMO).
-- Permissões enxutas: `storage` + `alarms` + `contextMenus` (sem alertas) e
+- Permissões enxutas: `storage` + `alarms` (sem alertas) e
   `optional_host_permissions` pedida só para o host do seu Kimai. O Firefox
   pede ainda `cookies` para abrir o Kimai no mesmo contêiner; a variante
   Chrome não inclui essa permissão. O content
   script usa `fetch` mesma-origem; popup/worker usam a origem configurada.
-- Ícone muda com timer rodando (badge com decorrido); botão-direito no ícone
-  tem Pausar/Continuar. Requer Firefox 121+.
+- Ícone muda com timer rodando (badge com decorrido). Requer Firefox 121+.
 - Testado contra o demo oficial (`demo.kimai.org`, Kimai 2.68.0) com login de sessão.
 
 ## Desenvolvimento

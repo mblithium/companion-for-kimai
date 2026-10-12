@@ -239,8 +239,6 @@ function listenerReg() {
 }
 const actionCalls = [];
 const sentMessages = [];
-const menuCreated = [];
-const menuUpdates = [];
 const chrome = {
   permissions: {
     granted: true,
@@ -277,12 +275,6 @@ const chrome = {
     setBadgeText: async (o) => { actionCalls.push(['setBadgeText', o]); },
     setBadgeBackgroundColor: async (o) => { actionCalls.push(['setBadgeBackgroundColor', o]); },
     setTitle: async (o) => { actionCalls.push(['setTitle', o]); },
-  },
-  contextMenus: {
-    create(o) { menuCreated.push(o); return o.id; },
-    update: async (id, props) => { menuUpdates.push({ id, props }); },
-    removeAll: async () => { menuCreated.length = 0; },
-    onClicked: listenerReg(),
   },
   i18n: { getUILanguage: () => 'pt-BR' },
   storage: {
@@ -1009,22 +1001,15 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   actionCalls.length = 0;
   stoppedIds.length = 0;
   posted.length = 0;
-  menuCreated.length = 0;
-  menuUpdates.length = 0;
   eval(workerTestSource());
   await chrome.runtime.onInstalled.fn();
   await sleep(300);
-  check('menus do botão criados',
-    menuCreated.some((m) => m.id === 'ke-pause' && (m.contexts || []).includes('action')) &&
-    menuCreated.some((m) => m.id === 'ke-continue' && (m.contexts || []).includes('action')), menuCreated.map((m) => m.id));
   const iconCall = actionCalls.find((c) => c[0] === 'setIcon');
   check('ícone rodando', !!iconCall && String(iconCall[1].path[16]).includes('running16.png'), iconCall && iconCall[1]);
   const badgeCall = actionCalls.find((c) => c[0] === 'setBadgeText');
   check('badge decorrido', !!badgeCall && badgeCall[1].text === '5m', badgeCall && badgeCall[1]);
   const titleCall = actionCalls.find((c) => c[0] === 'setTitle');
   check('título detalhado', !!titleCall && titleCall[1].title.includes('Site São Paulo'), titleCall && titleCall[1]);
-  check('menu pausar visível rodando',
-    menuUpdates.some((u) => u.id === 'ke-pause' && u.props.visible === true), menuUpdates);
   activeStub = [];
   await chrome.alarms.onAlarm.fn({ name: 'ke-tick' });
   await sleep(300);
@@ -1032,22 +1017,6 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('ícone volta ao normal', !!idleIcon && String(idleIcon[1].path[16]).includes('icon16.png'), idleIcon && idleIcon[1]);
   const clearBadge = actionCalls.filter((c) => c[0] === 'setBadgeText').pop();
   check('badge limpo', !!clearBadge && clearBadge[1].text === '', clearBadge && clearBadge[1]);
-  activeStub = [
-    { id: 901, project: 200, activity: 1655, begin: new Date(Date.now() - 5 * 60 * 1000).toISOString(), description: 'w' },
-  ];
-  stoppedIds.length = 0;
-  await chrome.contextMenus.onClicked.fn({ menuItemId: 'ke-pause' });
-  await sleep(200);
-  check('menu pausar para timers', stoppedIds.join(',') === '901', stoppedIds);
-  posted.length = 0;
-  await chrome.contextMenus.onClicked.fn({ menuItemId: 'ke-continue' });
-  await sleep(200);
-  check('menu continuar reinicia', posted.length === 1 && posted[0].project === 200 && posted[0].description === 'r', posted[0]);
-  todayStub = [];
-  posted.length = 0;
-  await chrome.contextMenus.onClicked.fn({ menuItemId: 'ke-continue' });
-  await sleep(200);
-  check('continuar sem histórico não cria', posted.length === 0, posted.length);
   await chrome.runtime.onMessage.fn({ type: 'ke-refresh' });
   await sleep(200);
   check('mensagem atualiza worker', true);
@@ -1534,7 +1503,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle', 'saveToApply'].every((k) =>
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle', 'saveToApply', 'useSuggestion'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
@@ -1592,7 +1561,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   recentStub = [
     { id: 801, project: 144, activity: 1661, begin: '2000-01-02T09:00:00', end: '2000-01-02T10:00:00', duration: 1800, description: 'ontem' },
     { id: 802, project: 144, activity: 1661, begin: '2000-01-01T09:00:00', end: '2000-01-01T10:00:00', duration: 1800, description: 'ontem' },
-    { id: 803, project: 200, activity: 1655, begin: '2000-01-03T09:00:00', end: '2000-01-03T10:00:00', duration: 600, description: 'outro dia' },
+    { id: 803, project: 200, activity: 1655, begin: '2000-01-03T09:00:00', end: '2000-01-03T10:00:00', duration: 600, description: 'outro dia', tags: [{ name: 'Alexander' }] },
   ];
   Object.keys(storedLocal).forEach((k) => { if (k.indexOf('keCache') === 0) delete storedLocal[k]; });
   eval(POP_SRC);
@@ -1636,6 +1605,64 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await sleep(400);
   check('start do popup com tags', posted.some((p) => p.tags === 'Alexander' && p.project === 200), posted.slice(-2));
   check('recarrega só abas do Kimai', chrome.tabs.reloaded.indexOf(7) >= 0 && chrome.tabs.reloaded.indexOf(8) < 0, chrome.tabs.reloaded);
+  check('campo descrição tem caixa de sugestões', popHtml.includes('id="ke-pop-desc-suggest"') &&
+    popHtml.includes('aria-controls="ke-pop-desc-suggest"'));
+  const popSuggestCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
+  check('sugestões têm dropdown posicionado',
+    /\.ke-pop-desc-field\s*\{[^}]*position:\s*relative/s.test(popSuggestCss) &&
+    /\.ke-pop-suggest\s*\{[^}]*position:\s*absolute/s.test(popSuggestCss) &&
+    /\.ke-pop-suggest-item\.ke-active\s*\{[^}]*background-color/s.test(popSuggestCss));
+  popEls['ke-pop-new-desc'].value = 'ont';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  const suggestBox = popEls['ke-pop-desc-suggest'];
+  const suggestFirst = findAll(suggestBox, 'ke-pop-suggest-item');
+  check('descrição sugere recentes relacionados', suggestBox.hidden === false && suggestFirst.length === 1 &&
+    findAll(suggestFirst[0], 'ke-pop-suggest-title')[0].textContent === 'ontem' &&
+    suggestFirst[0].getAttribute('role') === 'option', suggestFirst.length);
+  suggestFirst[0].onclick();
+  await sleep(400);
+  check('sugestão preenche descrição e combos', popEls['ke-pop-new-desc'].value === 'ontem' &&
+    findAll(popEls['ke-pop-new-customer'], 'ke-combo-input')[0].value === 'Altenwerth-Donnelly' &&
+    findAll(popEls['ke-pop-new-project'], 'ke-combo-input')[0].value === 'Altenwerth-Donnelly / Tempore commodi' &&
+    findAll(popEls['ke-pop-new-activity'], 'ke-combo-input')[0].value === 'Corrupti aut' &&
+    suggestBox.hidden === true);
+  posted.length = 0;
+  popEls['ke-pop-start'].fire('click');
+  await sleep(400);
+  check('start após sugestão usa valores', posted.length === 1 && posted[0].project === 144 &&
+    posted[0].activity === 1661 && posted[0].description === 'ontem', posted.slice(-1));
+  popEls['ke-pop-new-desc'].value = 'xyz-nada';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  check('sem relação oculta sugestões', suggestBox.hidden === true);
+  popEls['ke-pop-new-desc'].value = 'o';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  check('texto curto oculta sugestões', suggestBox.hidden === true);
+  popEls['ke-pop-new-desc'].value = 'outro';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  check('sugestão com tags aparece', findAll(suggestBox, 'ke-pop-suggest-item').length === 1);
+  findAll(suggestBox, 'ke-pop-suggest-item')[0].onclick();
+  await sleep(400);
+  check('sugestão preenche tags', findAll(popEls['ke-pop-new-tags'], 'ke-chip').length === 1 &&
+    popEls['ke-pop-new-desc'].value === 'outro dia');
+  const postedBeforeKeys = posted.length;
+  popEls['ke-pop-new-desc'].value = 'ont';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  popEls['ke-pop-new-desc'].fire('keydown', { key: 'ArrowDown' });
+  popEls['ke-pop-new-desc'].fire('keydown', { key: 'Enter' });
+  await sleep(400);
+  check('teclado aplica sugestão sem iniciar', popEls['ke-pop-new-desc'].value === 'ontem' &&
+    posted.length === postedBeforeKeys, posted.length);
+  popEls['ke-pop-draft'].checked = true;
+  popEls['ke-pop-new-desc'].value = 'ont';
+  popEls['ke-pop-new-desc'].fire('input');
+  await sleep(300);
+  check('rascunho travado suprime sugestões', suggestBox.hidden === true);
+  popEls['ke-pop-draft'].checked = false;
   tabList = [
     { id: 11, url: 'https://kimai.exemplo/en/timesheet/' },
     { id: 12, url: 'HTTPS://KIMAI.EXEMPLO/en/x' },

@@ -83,6 +83,24 @@ body {
 #ke-pop-new-body.ke-draft-locked .ke-pop-field .ke-multi-input:disabled { opacity: 0.6; }
 #ke-pop-new-body.ke-draft-locked .ke-combo-toggle:disabled { opacity: 0.4; cursor: default; }
 .ke-pop-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.65; margin-bottom: 3px; }
+.ke-pop-desc-field { position: relative; }
+.ke-pop-suggest {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
+  background-color: var(--ke-surface); color: var(--ke-text);
+  border: 1px solid var(--ke-border); border-radius: 6px;
+  margin-top: 2px; overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.ke-pop-suggest-item {
+  display: block; width: 100%; box-sizing: border-box;
+  background: transparent; border: 0; border-bottom: 1px solid var(--ke-border);
+  color: inherit; font: inherit; text-align: left; cursor: pointer; padding: 6px 9px;
+}
+.ke-pop-suggest-item:last-child { border-bottom: 0; }
+.ke-pop-suggest-item:hover, .ke-pop-suggest-item.ke-active { background-color: rgba(127, 127, 127, 0.18); }
+.ke-pop-suggest-item:focus-visible { outline: 2px solid var(--ke-link); outline-offset: -2px; }
+.ke-pop-suggest-title { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ke-pop-suggest-sub { display: block; font-size: 12px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ke-pop-timer, .ke-pop-today-row {
   display: flex; align-items: center; gap: 8px;
   border: 1px solid var(--ke-border); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px;

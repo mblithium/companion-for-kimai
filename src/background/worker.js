@@ -57,7 +57,6 @@ importScripts(
         }),
       });
     } catch (e) {}
-    await updateMenus(true);
   }
 
   async function setIdle() {
@@ -66,35 +65,6 @@ importScripts(
       await ext().action.setBadgeText({ text: '' });
       await ext().action.setTitle({ title: KE.uiText('ui.workerIdleTitle') });
     } catch (e) {}
-    await updateMenus(false);
-  }
-
-  async function updateMenus(running) {
-    try {
-      await ext().contextMenus.update('ke-pause', { title: '⏸ ' + KE.uiText('ui.pauseTimerMenu'), visible: running });
-      await ext().contextMenus.update('ke-continue', { title: '▶ ' + KE.uiText('ui.resumeTimerMenu'), visible: !running });
-    } catch (e) {}
-  }
-
-  function safeCreate(props) {
-    try {
-      const r = ext().contextMenus.create(props);
-      if (r && typeof r.catch === 'function') r.catch(() => {});
-    } catch (e) {}
-  }
-
-  function setupMenus() {
-    const createBoth = () => {
-      safeCreate({ id: 'ke-pause', title: '⏸ ' + KE.uiText('ui.pauseTimerMenu'), contexts: ['action'], visible: false });
-      safeCreate({ id: 'ke-continue', title: '▶ ' + KE.uiText('ui.resumeTimerMenu'), contexts: ['action'], visible: false });
-    };
-    try {
-      const p = ext().contextMenus.removeAll();
-      if (p && typeof p.then === 'function') p.then(createBoth, createBoth);
-      else createBoth();
-    } catch (e) {
-      createBoth();
-    }
   }
 
   async function refreshState() {
@@ -114,27 +84,6 @@ importScripts(
     } catch (e) {}
   }
 
-  async function pauseAll() {
-    try {
-      if (!(await withApi())) return;
-      const active = await KE.fetchActiveTimesheets();
-      for (const t of active) {
-        try {
-          await KE.apiPatch('/api/timesheets/' + encodeURIComponent(t.id) + '/stop');
-        } catch (e) {}
-      }
-    } catch (e) {}
-    await refreshState();
-  }
-
-  async function continueLast() {
-    try {
-      if (!(await withApi())) return;
-      await KE.restartLast();
-    } catch (e) {}
-    await refreshState();
-  }
-
   function scheduleTick() {
     try {
       ext().alarms.create('ke-tick', { periodInMinutes: 1 });
@@ -143,22 +92,15 @@ importScripts(
 
   try {
     ext().runtime.onInstalled.addListener(() => {
-      setupMenus();
       scheduleTick();
       refreshState();
     });
     ext().runtime.onStartup.addListener(() => {
-      setupMenus();
       scheduleTick();
       refreshState();
     });
     ext().alarms.onAlarm.addListener((alarm) => {
       if (alarm && alarm.name === 'ke-tick') refreshState();
-    });
-    ext().contextMenus.onClicked.addListener((info) => {
-      if (!info) return;
-      if (info.menuItemId === 'ke-pause') pauseAll();
-      else if (info.menuItemId === 'ke-continue') continueLast();
     });
     ext().runtime.onMessage.addListener((msg) => {
       if (msg && msg.type === 'ke-refresh') refreshState();

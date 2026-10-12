@@ -70,7 +70,6 @@
   "permissions": [
     "storage",
     "alarms",
-    "contextMenus",
     "cookies"
   ],
   "optional_host_permissions": [
