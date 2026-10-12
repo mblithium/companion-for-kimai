@@ -134,7 +134,6 @@
         removeItem: 'Remover',
         expandOptions: 'Expandir opções',
         newTagOption: '+ {{name}}',
-        workerIdleTitle: 'Companion for Kimai',
         extensionHotkeysHint: 'Abrir o popup por teclado: configure em chrome://extensions → Atalhos de teclado (ação da extensão).',
         cache: 'Cache',
         cacheHint: 'Listas de clientes/projetos/atividades (24h) e diários (1h) ficam salvos neste dispositivo para abrir rápido.',
@@ -195,7 +194,6 @@
         popupConnectionStart: 'Não foi possível conectar a {{origin}}. {{why}}Confira URL, login/chave e acesso, depois abra as configurações e use "Testar conexão".',
         popupOpenTrackerFailed: 'Não foi possível abrir o acompanhamento do timer.',
         popupLoadFailed: 'Não foi possível carregar o popup: {{error}}',
-        workerRunningTitle: 'Companion for Kimai — rodando: {{task}} ({{elapsed}})',
       },
     },
     en: {
@@ -329,7 +327,6 @@
         removeItem: 'Remove',
         expandOptions: 'Expand options',
         newTagOption: '+ {{name}}',
-        workerIdleTitle: 'Companion for Kimai',
         extensionHotkeysHint: 'To open the popup with a shortcut, configure it under chrome://extensions → Keyboard shortcuts (extension action).',
         cache: 'Cache',
         cacheHint: 'Customer/project/activity lists (24h) and daily entries (1h) are saved on this device for faster startup.',
@@ -390,7 +387,6 @@
         popupConnectionStart: 'Could not connect to {{origin}}. {{why}}Check the URL, login/API key, and access, then open settings and select "Test connection".',
         popupOpenTrackerFailed: 'Could not open the timer tracker.',
         popupLoadFailed: 'Could not load the popup: {{error}}',
-        workerRunningTitle: 'Companion for Kimai — running: {{task}} ({{elapsed}})',
       },
     },
   };

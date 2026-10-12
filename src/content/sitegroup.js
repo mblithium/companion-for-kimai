@@ -817,7 +817,6 @@
       }
       closeGroupEditor();
       try { KE.notifyKimaiUpdate(); } catch (e) {}
-      try { KE.notifyBackground(); } catch (e) {}
       await KE.syncSiteGroupUI();
     }
     saveBtn.addEventListener('click', () => { doGroupSave().catch(() => {}); });

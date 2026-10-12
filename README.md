@@ -99,17 +99,16 @@ required file is missing.
 
 ## Compatibility
 
-- Manifest V3: Chrome uses a service worker; Firefox uses an event page via
-  `background.scripts`. Both share the same worker implementation.
+- Manifest V3 with no background worker: everything runs in the popup,
+  options page, tracker window, and content scripts.
 - `browser_specific_settings.gecko.id` is included as required by AMO.
-- Permissions are limited to `storage` and `alarms`, plus an
+- Permissions are limited to `storage`, plus an
   optional host permission requested only for the configured Kimai host.
   Firefox also requests `cookies` to open Kimai in the same container;
   the Chrome build ships without it. The
-  content script uses same-origin `fetch`; the popup and worker use the
+  content script uses same-origin `fetch`; the popup uses the
   configured API URL.
-- The toolbar icon changes while a timer is running, including an elapsed-time
-  badge. Firefox 121 or later is required.
+- Firefox 121 or later is required.
 - Tested against the official demo (`demo.kimai.org`, Kimai 2.68.0) with a
   logged-in session.
 

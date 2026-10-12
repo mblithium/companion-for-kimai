@@ -39,7 +39,7 @@ Qualquer bug ou sugestão de melhoria, nos avise.
 5. Abra `https://kimai.example.com/pt_BR/timesheet/` e use a barra acima dos registros.
 
 ### Firefox
-1. O `manifest.json` da raiz já é a variante Firefox (event page) — sem passo extra.
+1. O `manifest.json` da raiz já é a variante Firefox — sem passo extra.
 2. Acesse `about:debugging#/runtime/this-firefox`.
 3. **Carregar extensão temporária** → selecione o `manifest.json`.
 4. Abra a página do timesheet. (Para distribuição final é preciso assinar na AMO.)
@@ -85,15 +85,15 @@ arquivo necessário.
 
 ## Compatibilidade
 
-- `manifest_version: 3`; o Chrome usa service worker e o Firefox usa event page
-  (`background.scripts`), com o mesmo worker compartilhado.
+- `manifest_version: 3` sem worker de background: tudo roda no popup,
+  na página de opções, na janela do tracker e nos content scripts.
 - `browser_specific_settings.gecko.id` incluído (exigido pela AMO).
-- Permissões enxutas: `storage` + `alarms` (sem alertas) e
+- Permissões enxutas: `storage` (sem alertas) e
   `optional_host_permissions` pedida só para o host do seu Kimai. O Firefox
   pede ainda `cookies` para abrir o Kimai no mesmo contêiner; a variante
   Chrome não inclui essa permissão. O content
-  script usa `fetch` mesma-origem; popup/worker usam a origem configurada.
-- Ícone muda com timer rodando (badge com decorrido). Requer Firefox 121+.
+  script usa `fetch` mesma-origem; o popup usa a origem configurada.
+- Requer Firefox 121+.
 - Testado contra o demo oficial (`demo.kimai.org`, Kimai 2.68.0) com login de sessão.
 
 ## Desenvolvimento

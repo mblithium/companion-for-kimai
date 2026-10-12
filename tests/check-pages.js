@@ -48,31 +48,6 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
   }
 }
 {
-  const wfile = 'src/background/worker.js';
-  const wsrc = fs.readFileSync(path.join(ROOT, wfile), 'utf8');
-  const m = wsrc.match(/importScripts\(([\s\S]*?)\);/);
-  if (!m) {
-    failures++;
-    console.log('FALHOU worker sem importScripts: ' + wfile);
-  } else {
-    const files = [...m[1].matchAll(/'([^']+)'/g)].map((x) => path.posix.normalize(path.posix.join('src/background', x[1])));
-    for (const f of files) {
-      if (!fs.existsSync(path.join(ROOT, f))) {
-        failures++;
-        console.log('FALHOU import inexistente: ' + wfile + ' -> ' + f);
-      }
-    }
-    const defs = definedNames(files);
-    const missing = [...usedNames(wfile)].filter((n) => !defs.has(n));
-    if (missing.length) {
-      failures++;
-      console.log('FALHOU ' + wfile + ' usa KE.* sem definição nos imports: ' + missing.map((n) => 'KE.' + n).join(', '));
-    } else {
-      console.log('ok   ' + wfile + ' (' + files.length + ' imports, ' + usedNames(wfile).size + ' usos cobertos)');
-    }
-  }
-}
-{
   const variants = ['manifest/chrome.json', 'manifest/firefox.json'];
   const loaded = {};
   for (const f of variants) {
@@ -119,13 +94,11 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
       failures++;
       console.log('FALHOU sitegroup.js ausente ou fora de ordem antes de quicktimer.js');
     }
-    if (!c.background || !c.background.service_worker) {
+    if (!c.background && !f.background) {
+      console.log('ok   sem background worker nas variantes');
+    } else {
       failures++;
-      console.log('FALHOU chrome sem background.service_worker');
-    }
-    if (!f.background || !Array.isArray(f.background.scripts) || 'persistent' in f.background) {
-      failures++;
-      console.log('FALHOU firefox sem background.scripts (sem persistent, removido no MV3)');
+      console.log('FALHOU background worker ainda declarado em alguma variante');
     }
     const dcp = f.browser_specific_settings && f.browser_specific_settings.gecko &&
       f.browser_specific_settings.gecko.data_collection_permissions;

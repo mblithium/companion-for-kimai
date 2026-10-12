@@ -69,7 +69,6 @@
   ],
   "permissions": [
     "storage",
-    "alarms",
     "cookies"
   ],
   "optional_host_permissions": [
@@ -85,10 +84,5 @@
         ]
       }
     }
-  },
-  "background": {
-    "scripts": [
-      "src/background/worker.js"
-    ]
   }
 }

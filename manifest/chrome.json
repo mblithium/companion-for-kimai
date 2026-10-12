@@ -68,15 +68,11 @@
     }
   ],
   "permissions": [
-    "storage",
-    "alarms"
+    "storage"
   ],
   "optional_host_permissions": [
     "*://*/*"
   ],
-  "background": {
-    "service_worker": "src/background/worker.js"
-  },
   "browser_specific_settings": {
     "gecko": {
       "id": "companion-for-kimai@mblithium",

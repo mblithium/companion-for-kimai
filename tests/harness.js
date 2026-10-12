@@ -14,16 +14,6 @@ const SRC_TESTHOOK = '\n;globalThis.__keTest = { KE };';
 const POP_SRC = fs.readFileSync(path.join(ROOT, 'src/popup/popup.js'), 'utf8');
 const FOCUS_SRC = fs.readFileSync(path.join(ROOT, 'src/popup/focus.js'), 'utf8');
 const OPT_SRC = fs.readFileSync(path.join(ROOT, 'src/options/options.js'), 'utf8');
-function workerTestSource() {
-  const wsrc = fs.readFileSync(path.join(ROOT, 'src/background/worker.js'), 'utf8');
-  const m = wsrc.match(/importScripts\(([\s\S]*?)\);/);
-  if (!m) throw new Error('worker sem importScripts');
-  const files = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
-  const imports = files
-    .map((f) => fs.readFileSync(path.join(ROOT, 'src/background', f), 'utf8'))
-    .join('\n;\n');
-  return imports + '\n;\n' + wsrc.replace(m[0], '');
-}
 
 
 function detachNode(c) {
@@ -237,7 +227,6 @@ function listenerReg() {
   const r = { fn: null, addListener(f) { r.fn = f; } };
   return r;
 }
-const actionCalls = [];
 const sentMessages = [];
 const chrome = {
   permissions: {
@@ -269,12 +258,6 @@ const chrome = {
   alarms: {
     create() {},
     onAlarm: listenerReg(),
-  },
-  action: {
-    setIcon: async (o) => { actionCalls.push(['setIcon', o]); },
-    setBadgeText: async (o) => { actionCalls.push(['setBadgeText', o]); },
-    setBadgeBackgroundColor: async (o) => { actionCalls.push(['setBadgeBackgroundColor', o]); },
-    setTitle: async (o) => { actionCalls.push(['setTitle', o]); },
   },
   i18n: { getUILanguage: () => 'pt-BR' },
   storage: {
@@ -998,28 +981,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   todayStub = [
     { id: 902, project: 200, activity: 1655, begin: tkey + 'T09:00:00', end: tkey + 'T10:00:00', duration: 3600, description: 'r', tags: [] },
   ];
-  actionCalls.length = 0;
   stoppedIds.length = 0;
   posted.length = 0;
-  eval(workerTestSource());
-  await chrome.runtime.onInstalled.fn();
-  await sleep(300);
-  const iconCall = actionCalls.find((c) => c[0] === 'setIcon');
-  check('ícone rodando', !!iconCall && String(iconCall[1].path[16]).includes('running16.png'), iconCall && iconCall[1]);
-  const badgeCall = actionCalls.find((c) => c[0] === 'setBadgeText');
-  check('badge decorrido', !!badgeCall && badgeCall[1].text === '5m', badgeCall && badgeCall[1]);
-  const titleCall = actionCalls.find((c) => c[0] === 'setTitle');
-  check('título detalhado', !!titleCall && titleCall[1].title.includes('Site São Paulo'), titleCall && titleCall[1]);
-  activeStub = [];
-  await chrome.alarms.onAlarm.fn({ name: 'ke-tick' });
-  await sleep(300);
-  const idleIcon = actionCalls.filter((c) => c[0] === 'setIcon').pop();
-  check('ícone volta ao normal', !!idleIcon && String(idleIcon[1].path[16]).includes('icon16.png'), idleIcon && idleIcon[1]);
-  const clearBadge = actionCalls.filter((c) => c[0] === 'setBadgeText').pop();
-  check('badge limpo', !!clearBadge && clearBadge[1].text === '', clearBadge && clearBadge[1]);
-  await chrome.runtime.onMessage.fn({ type: 'ke-refresh' });
-  await sleep(200);
-  check('mensagem atualiza worker', true);
   const gday = KE.todayKey();
   const gsrc = [
     { id: 1, project: 1, activity: 1, begin: gday + 'T09:00:00', end: gday + 'T10:00:00', duration: 3600, description: 'a' },
@@ -1503,7 +1466,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'workerIdleTitle', 'saveToApply', 'useSuggestion'].every((k) =>
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
@@ -1513,8 +1476,6 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('botões de ícone do popup têm aria-label traduzível',
     ['ke-pop-open', 'ke-pop-settings', 'ke-pop-refresh-catalog', 'ke-pop-refresh-today', 'ke-pop-refresh-recent']
       .every((id) => new RegExp('id="' + id + '"[^>]*data-ke-i18n-aria-label').test(popHtmlForIcons)));
-  const workerSrc = fs.readFileSync(path.join(ROOT, 'src/background/worker.js'), 'utf8');
-  check('título ocioso do worker usa i18n', workerSrc.includes("KE.uiText('ui.workerIdleTitle')"));
   mIn.value = '';
   mIn.fire('keydown', { key: 'Backspace' });
   check('backspace remove último', mc.getValues().length === 0 && mc.root.querySelectorAll('.ke-chip').length === 0);

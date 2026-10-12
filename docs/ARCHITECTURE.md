@@ -86,18 +86,12 @@ content e no popup, sempre com prefixo `ke-`), `src/popup/popup.css`.
   assinatura (sem loop); restaura a ordem ao desligar; totais dos timers
   rodando atualizados a cada 1 min.
 
-## Background worker (`src/background/worker.js`)
+## Sem worker de background
 
-- Importa os módulos puros via `importScripts` (sem DOM: sem combo/popup).
-- `alarms` a cada 1 min + mensagens `ke-refresh` (content avisa após
-  start/stop/edit) → ícone rodando/parado, badge `5m`/`2h`, título detalhado.
-- Usa a mesma config do popup (base + chave); sem config/acesso, some.
-- Duas variantes de manifest (`manifest/chrome.json` com service worker,
-  `manifest/firefox.json` com event page `scripts` sem `persistent`;
-  mesmo worker): a raiz vem com a variante Firefox; troque via
-  `npm run manifest:chrome` ou `npm run manifest:firefox`. O `check-pages`
-  valida que só diferem em background, permissões (`cookies` só no Firefox)
-  e Gecko-mínimo.
+Não há `background.service_worker` nem event page: todo o comportamento mora
+no popup, na página de opções, na janela do tracker e nos content scripts.
+As listas são recarregadas sob demanda (com cache local de 24h/1h); o ícone
+da extensão é estático.
 
 ## Testes
 
@@ -114,7 +108,7 @@ definida nos scripts que a página carrega).
   `manifest.json` da raiz, que é só a variante ativa no dev).
 - Cada zip contém `manifest.json` (da variante) + `icons/`, `src/`, `LICENSE`.
 - Valida antes: versões sincronizadas (manifests + `package.json`), manifest
-  parseável e todos os arquivos referenciados (js/css/html/icons/worker)
+  parseável e todos os arquivos referenciados (js/css/html/icons)
   presentes; recusa vazar `tests/`, `docs/`, `scripts/`, `manifest/`.
 - Não edite versão/descrição/homepage nos manifests à mão: `package.json` é a
   fonte da verdade; `npm run manifest:sync` propaga para as variantes e para o

@@ -38,7 +38,6 @@
       }
       setStatus(KE.T.restartedOk, 'ok');
       KE.notifyKimaiUpdate();
-      KE.notifyBackground();
       await loadActive();
     } catch (e) {
       const msg = apiErrorText(e, KE.T.startFail);
@@ -152,7 +151,6 @@
       await KE.apiPatch('/api/timesheets/' + encodeURIComponent(id) + '/stop');
       setStatus(KE.T.stoppedOk, 'ok');
       KE.notifyKimaiUpdate();
-      KE.notifyBackground();
       await loadActive();
     } catch (e) {
       setStatus(KE.T.stopFail + (e.status ? ' (HTTP ' + e.status + ')' : ''), 'err');
@@ -264,7 +262,6 @@
       await KE.apiPatch('/api/timesheets/' + encodeURIComponent(id), payload);
       setStatus(KE.T.updatedOk, 'ok');
       KE.notifyKimaiUpdate();
-      KE.notifyBackground();
       await loadActive();
     } catch (e) {
       const msg = apiErrorText(e, KE.T.updateFail);
@@ -294,7 +291,6 @@
       setStatus(KE.T.stopFail + (failStatus ? ' (HTTP ' + failStatus + ')' : ''), 'err');
     }
     KE.notifyKimaiUpdate();
-    KE.notifyBackground();
     await loadActive();
   }
 
@@ -345,7 +341,6 @@
       await KE.localSet({ keApiToken: created.token });
       await refreshConnectBanner();
       setStatus(KE.T.connectedOk, 'ok');
-      KE.notifyBackground();
       await loadActive();
     } catch (e) {
       const detail = String((e && e.serverMessage) || '').trim();
@@ -389,7 +384,6 @@
       ui.description.value = '';
       setStatus(KE.T.startedOk, 'ok');
       KE.notifyKimaiUpdate();
-      KE.notifyBackground();
       await loadActive();
     } catch (e) {
       const msg = apiErrorText(e, KE.T.startFail);

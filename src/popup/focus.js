@@ -134,7 +134,6 @@
       if (currentMode === 'running') await pauseTimer(currentTimer);
       else if (currentMode === 'paused') await resumeTimer(currentTimer);
       await KE.reloadKimaiTabs(kimaiBase);
-      KE.notifyBackground();
     } catch (error) {
       const detail = String((error && error.serverMessage) || '').trim();
       setStatus(detail ? detail.slice(0, 160) : (error && error.message) || KE.T.stopFail, 'err');

@@ -97,15 +97,6 @@
     const m = s.match(/(\d+)\s*$/);
     return m ? m[1] : s;
   };
-  KE.notifyBackground = function () {
-    try {
-      const rt = KE.ext().runtime;
-      if (rt && rt.sendMessage) {
-        const p = rt.sendMessage({ type: 'ke-refresh' });
-        if (p && typeof p.catch === 'function') p.catch(() => {});
-      }
-    } catch (e) {}
-  };
   KE.notifyKimaiUpdate = function () {
     ['kimai.timesheetUpdate', 'kimai.timesheetStop', 'kimai.timesheetCreate'].forEach((name) => {
       try { document.dispatchEvent(new CustomEvent(name, { bubbles: true })); } catch (e) {}
