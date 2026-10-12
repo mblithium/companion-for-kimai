@@ -12,6 +12,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - "About" section in both READMEs (features, transparency, bugs and
   improvements).
+- Description suggestions in the popup New timer: typing shows up to 5
+  matching recent timers; clicking (or ↓/Enter) fills Description,
+  Customer, Project, Activity and Tags.
+### Removed
+- Toolbar icon context menus (Pause/Continue) and the `contextMenus`
+  permission: the menus never appeared and all menu errors were silent.
+- Background worker and dynamic toolbar icon (running/idle icons, elapsed
+  badge): the extension now runs entirely in the popup, options page,
+  tracker and content scripts; `alarms` permission removed.
 
 ## [0.22.15] — 2026-10-08
 ### Added

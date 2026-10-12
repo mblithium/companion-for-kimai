@@ -12,6 +12,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Added
 - Seção "Sobre" nos dois READMEs (funcionalidades, transparência, bugs e
   melhorias).
+- Sugestões de descrição no Novo timer do popup: ao digitar, até 5 timers
+  recentes relacionados; clicar (ou ↓/Enter) preenche Descrição, Cliente,
+  Projeto, Atividade e Tags.
+### Removed
+- Menus de contexto do ícone (Pausar/Continuar) e a permissão `contextMenus`:
+  os menus nunca apareciam e todos os erros eram silenciosos.
+- Worker de background e ícone dinâmico (ícones rodando/parado, badge de
+  decorrido): a extensão agora roda só no popup, opções, tracker e content
+  scripts; permissão `alarms` removida.
 
 ## [0.22.15] — 2026-10-08
 ### Added
