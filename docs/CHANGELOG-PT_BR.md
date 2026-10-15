@@ -4,6 +4,11 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.23.1] — 2026-10-16
+### Fixed
+- Ícones da extensão quadrados de novo (48x48, 128x128) como exigem as
+  lojas; arte centralizada com padding mínimo.
+
 ## [0.23.0] — 2026-10-16
 ### Added
 - Sugestões de descrição no Timer rápido do site: ao digitar, até 5 timers

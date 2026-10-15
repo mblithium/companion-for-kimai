@@ -4,6 +4,11 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.23.1] — 2026-10-16
+### Fixed
+- Extension icons are square again (48x48, 128x128) as required by the
+  stores; artwork stays centered with minimal padding.
+
 ## [0.23.0] — 2026-10-16
 ### Added
 - Description suggestions in the site Quick Timer bar: typing shows up to 5
