@@ -858,8 +858,14 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent));
   const popCss = fs.readFileSync(path.join(ROOT, 'src/popup/popup.css'), 'utf8');
   const popHtmlForIcons = fs.readFileSync(path.join(ROOT, 'src/popup/popup.html'), 'utf8');
-  check('logo do popup usa triângulo CSS no círculo', /class="ke-pop-logo"[^>]*><span class="ke-pop-logo-icon"/.test(popHtmlForIcons) &&
-    /\.ke-pop-logo-icon,[\s\S]*?border-left:\s*8px solid currentColor/.test(popCss));
+  check('logo do popup usa o ícone da extensão', /<img[^>]*class="ke-pop-logo"[^>]*src="[^"]*icons\/icon48\.png"/.test(popHtmlForIcons) &&
+    /\.ke-pop-logo\s*\{[^}]*width:\s*24px[^}]*height:\s*24px/s.test(popCss) &&
+    !/ke-pop-logo-icon/.test(popHtmlForIcons + popCss));
+  check('logo das opções usa o ícone da extensão',
+    /<img[^>]*class="ke-opt-logo"[^>]*src="[^"]*icons\/icon48\.png"/.test(
+      fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8')) &&
+    /\.ke-opt-logo\s*\{[^}]*width:\s*30px[^}]*height:\s*30px/s.test(
+      fs.readFileSync(path.join(ROOT, 'src/options/options.css'), 'utf8')));
   check('botão Iniciar do popup separa e centraliza ícone e texto',
     /id="ke-pop-start"[^>]*class="[^"]*ke-pop-start-btn"[^>]*><span class="ke-pop-start-icon"[^>]*><\/span><span[^>]*>Iniciar<\/span>/.test(popHtmlForIcons) &&
     /\.ke-pop-start-btn\s*\{[^}]*display:\s*inline-flex[^}]*justify-content:\s*center[^}]*gap:\s*8px/s.test(popCss));
