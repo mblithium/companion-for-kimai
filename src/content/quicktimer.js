@@ -121,7 +121,10 @@
       else sub.appendChild(KE.el('span', 'ke-active-desc', ' — ' + KE.T.activeNow));
       info.appendChild(title);
       info.appendChild(sub);
-      const btn = KE.el('button', 'ke-btn ke-btn-stop', KE.T.stop);
+      const btn = KE.el('button', 'ke-btn ke-btn-stop', '■');
+      btn.type = 'button';
+      btn.title = KE.T.stop;
+      btn.setAttribute('aria-label', KE.T.stop);
       btn.type = 'button';
       btn.addEventListener('click', (ev) => { ev.stopPropagation(); stopTimer(t.id, btn); });
       const editBtn = KE.el('button', 'ke-btn ke-btn-edit', '✎');
@@ -145,9 +148,8 @@
   }
 
   async function stopTimer(id, btn) {
-    const label = btn ? btn.textContent : '';
     try {
-      if (btn) { btn.disabled = true; btn.textContent = KE.T.stopping; }
+      if (btn) { btn.disabled = true; }
       await KE.apiPatch('/api/timesheets/' + encodeURIComponent(id) + '/stop');
       setStatus(KE.T.stoppedOk, 'ok');
       KE.notifyKimaiUpdate();
@@ -155,7 +157,7 @@
     } catch (e) {
       setStatus(KE.T.stopFail + (e.status ? ' (HTTP ' + e.status + ')' : ''), 'err');
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = label || KE.T.stop; }
+      if (btn) { btn.disabled = false; }
     }
   }
   function apiErrorText(e, fallback) {

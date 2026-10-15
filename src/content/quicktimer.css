@@ -331,13 +331,13 @@ body.ke-hide-header .navbar.navbar-expand-md:not(.navbar-vertical) {
 #ke-quick-timer .ke-btn-start-label { display: inline-block; }
 #ke-quick-timer .ke-btn-start:hover { background: var(--ke-green-dark, #27a03c); }
 .ke-card .ke-btn-stop {
-  background: transparent;
-  border: 1px solid var(--ke-red-text, #d63939);
-  color: var(--ke-red-text, #d63939);
-  padding: 4px 12px;
-  font-size: 13px;
+  background: var(--ke-red-btn, #d63939);
+  border: 1px solid var(--ke-red-btn, #d63939);
+  color: var(--ke-on-red, #fff);
+  width: 28px; height: 28px; padding: 0; font-size: 13px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.ke-card .ke-btn-stop:hover { background: var(--ke-red-btn, #d63939); color: var(--ke-on-red, #fff); }
+.ke-card .ke-btn-stop:hover { filter: brightness(0.9); }
 #ke-quick-timer .ke-link { font-size: 13px; text-decoration: none; }
 #ke-quick-timer .ke-link:hover { text-decoration: underline; }
 

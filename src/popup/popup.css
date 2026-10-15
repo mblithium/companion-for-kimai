@@ -145,10 +145,11 @@ body {
 .ke-pop-start-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center; line-height: 1; }
 .ke-pop-btn-primary:hover { background: var(--ke-green-dark); }
 .ke-pop-btn-stop {
-  background: transparent; border: 1px solid var(--ke-red-text); color: var(--ke-red-text);
-  padding: 4px 10px; font-size: 12px; flex: none;
+  background: var(--ke-red-btn); border: 1px solid var(--ke-red-btn); color: var(--ke-on-red);
+  width: 28px; height: 28px; padding: 0; font-size: 13px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.ke-pop-btn-stop:hover { background: var(--ke-red-btn); color: var(--ke-on-red); }
+.ke-pop-btn-stop:hover { filter: brightness(0.9); }
 .ke-pop-btn-go {
   background: transparent; border: 1px solid var(--ke-green-text); color: var(--ke-green-text);
   padding: 4px 10px; font-size: 12px; flex: none;

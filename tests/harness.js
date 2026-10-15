@@ -513,6 +513,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   stoppedIds.length = 0;
   const agoraStops = findAll(nowSection(), 'ke-btn-stop');
   check('parar por timer no Agora', agoraStops.length === 2, agoraStops.length);
+  check('parar usa ícone quadrado com rótulo acessível', agoraStops.every((b) => b.textContent === '■' &&
+    b.getAttribute('aria-label') === KE.T.stop && b.title === KE.T.stop));
   agoraStops[0].fire('click');
   await sleep(150);
   check('parou o timer', stoppedIds.join(',') === '555', stoppedIds);
@@ -709,13 +711,15 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await sleep(100);
   check('tracker mostra timer ativo e opção pausar', popEls['ke-focus-row'].hidden === false &&
     popEls['ke-focus-task'].textContent.includes('Consequuntur dolor') &&
-    popEls['ke-focus-action'].textContent.includes('Pausar'));
+    popEls['ke-focus-action'].textContent === '⏸' &&
+    popEls['ke-focus-action'].getAttribute('aria-label') === 'Pausar');
   activeStub = [];
   await popEls['ke-focus-action'].onclick();
   await sleep(100);
   check('tracker pausa e guarda dados para retomar', stoppedIds.includes('990') &&
     storedLocal.kePausedTimer.projectId === '200' && storedLocal.kePausedTimer.tags[0] === 'Alexander' &&
-    popEls['ke-focus-action'].textContent.includes('Retomar'));
+    popEls['ke-focus-action'].textContent === '▶' &&
+    popEls['ke-focus-action'].getAttribute('aria-label') === 'Retomar');
   await popEls['ke-focus-action'].onclick();
   await sleep(100);
   const resumedByTracker = posted[posted.length - 1];
@@ -788,7 +792,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     findAll(popEls['ke-pop-active'], 'ke-pop-edit-form').length === 0 &&
     findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop').length === 1);
   activeStub = [];
-  findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop')[0].fire('click');
+  const popStopBtn = findAll(popEls['ke-pop-active'], 'ke-pop-btn-stop')[0];
+  check('popup parar usa ícone quadrado com rótulo acessível', !!popStopBtn && popStopBtn.textContent === '■' &&
+    popStopBtn.getAttribute('aria-label') === KE.T.stop && popStopBtn.title === KE.T.stop);
+  popStopBtn.fire('click');
   await sleep(200);
   check('popup parar ativo', stoppedIds.join(',') === '801', stoppedIds);
   check('Novo timer abre após parar último timer', popEls['ke-pop-new-body'].hidden === false &&

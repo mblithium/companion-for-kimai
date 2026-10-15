@@ -119,7 +119,9 @@
       const stop = document.createElement('button');
       stop.className = 'ke-pop-btn ke-pop-btn-stop';
       stop.type = 'button';
-      stop.textContent = KE.T.stop;
+      stop.textContent = '■';
+      stop.title = KE.T.stop;
+      stop.setAttribute('aria-label', KE.T.stop);
       stop.addEventListener('click', async () => {
         stop.disabled = true;
         try {
@@ -329,6 +331,7 @@
     go.type = 'button';
     go.textContent = '▶';
     go.title = KE.T.start;
+    go.setAttribute('aria-label', KE.T.start);
     go.addEventListener('click', () => continueTimer(t, go));
     row.appendChild(info);
     row.appendChild(go);
@@ -364,6 +367,7 @@
       go.type = 'button';
       go.textContent = '▶';
       go.title = KE.T.start;
+      go.setAttribute('aria-label', KE.T.start);
       go.addEventListener('click', () => continueTimer(g.entries[0], go));
       const kids = document.createElement('div');
       kids.className = 'ke-pop-group-kids';

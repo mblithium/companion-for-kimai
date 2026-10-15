@@ -55,7 +55,9 @@
     ui.duration.textContent = paused
       ? KE.formatDuration(timer.elapsedSeconds)
       : KE.elapsedSince(timer.begin);
-    ui.action.textContent = paused ? '▶ ' + KE.T.trackerResume : '⏸ ' + KE.T.trackerPause;
+    ui.action.textContent = paused ? '▶' : '⏸';
+    ui.action.title = paused ? KE.T.trackerResume : KE.T.trackerPause;
+    ui.action.setAttribute('aria-label', paused ? KE.T.trackerResume : KE.T.trackerPause);
     ui.action.dataset.mode = currentMode;
     ui.action.hidden = false;
     ui.action.disabled = actionPending;
