@@ -6,8 +6,6 @@
   "author": "mblithium",
   "homepage_url": "https://github.com/mblithium/companion-for-kimai",
   "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
@@ -15,8 +13,6 @@
     "default_title": "Companion for Kimai",
     "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
