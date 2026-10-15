@@ -180,23 +180,6 @@
     const created = await KE.autoCreateToken(Object.assign({}, opts, { name: name }));
     return { token: created.token, replaced: replaced, name: name };
   };
-  KE.restartLast = async function () {
-    const list = KE.asArray(await KE.apiGet('/api/timesheets?size=5'))
-      .slice()
-      .sort((a, b) => String(b.begin || '').localeCompare(String(a.begin || '')));
-    const t = list[0];
-    if (!t || !KE.entityId(t.project) || !KE.entityId(t.activity)) return { ok: false, empty: true };
-    const tagNames = await KE.ensureTags(KE.tagNames(t.tags));
-    const payload = {
-      begin: KE.nowLocal(),
-      project: Number(KE.entityId(t.project)),
-      activity: Number(KE.entityId(t.activity)),
-    };
-    if (t.description) payload.description = t.description;
-    if (tagNames.length) payload.tags = tagNames.join(',');
-    await KE.apiPost('/api/timesheets', payload);
-    return { ok: true };
-  };
   KE.describeProjectRef = function (ref) {
     const id = KE.entityId(ref);
     const cached = KE.state.projectById.get(id);

@@ -612,6 +612,16 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await popEls['ke-pop-setup-btn'].onclick();
   await sleep(500);
   check('após autorizar abre o app', popEls['ke-pop-main'].hidden === false && chrome.permissions.granted === true);
+  const footKids = popEls['ke-pop-foot'].children;
+  check('rodapé mostra dica de abrir o Kimai', footKids.length === 3 &&
+    footKids[0].textContent === 'ALT + SHIFT + K para abrir o Kimai (' &&
+    footKids[2].textContent === ')', footKids.map((n) => n.textContent));
+  const footLink = findAll(popEls['ke-pop-foot'], 'ke-pop-link')[0];
+  check('rodapé tem link para atalhos', !!footLink && footLink.textContent === 'ver mais atalhos');
+  chrome.tabs.created.length = 0;
+  await footLink.onclick();
+  check('link abre seção de atalhos', chrome.tabs.created.length === 1 &&
+    chrome.tabs.created[0].url === 'chrome-extension://test/src/options/options.html#ke-opt-shortcuts-card', chrome.tabs.created);
   posted.length = 0;
   stoppedIds.length = 0;
   const popTitles = findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent);
@@ -705,6 +715,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     KE.STRINGS.en.ui.configureTemplate === 'Configure template');
   check('seção rascunho das opções tem âncora',
     fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-draft-card"'));
+  check('seção atalhos das opções tem âncora',
+    fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-shortcuts-card"'));
   chrome.tabs.created.length = 0;
   await popEls['ke-pop-draft-config'].onclick();
   check('link abre configurações do rascunho', chrome.tabs.created.length === 1 &&
@@ -892,6 +904,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('popup header fica fixo durante scroll', !!popupHeadCss &&
     /position:\s*sticky/.test(popupHeadCss[1]) && /top:\s*0/.test(popupHeadCss[1]) &&
     /background:\s*var\(--ke-bg\)/.test(popupHeadCss[1]));
+  const popupFootCss = popCss.match(/\.ke-pop-foot\s*\{([^}]*)\}/);
+  check('popup footer fica fixo durante scroll', !!popupFootCss &&
+    /position:\s*sticky/.test(popupFootCss[1]) && /bottom:\s*0/.test(popupFootCss[1]) &&
+    /background:\s*var\(--ke-bg\)/.test(popupFootCss[1]));
   const optCss = fs.readFileSync(path.join(ROOT, 'src/options/options.css'), 'utf8');
   const themeCss = ['src/common/theme.css', ...fs.readdirSync(path.join(ROOT, 'src/common/themes'))
     .filter((f) => f.endsWith('.css')).map((f) => path.join('src/common/themes', f))]
@@ -935,7 +951,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combina exato', KE.shortcutMatches('Alt+Shift+S', fakeEv({ altKey: true, shiftKey: true, key: 'S' })) === true);
   check('não combina outro', KE.shortcutMatches('Alt+Shift+S', fakeEv({ altKey: true, key: 's' })) === false);
   check('vazio nunca combina', KE.shortcutMatches('', fakeEv({ altKey: true, shiftKey: true, key: 'S' })) === false);
-  check('padrões existem', KE.DEFAULT_SHORTCUTS.start === 'Alt+Shift+S' && !!KE.DEFAULT_SHORTCUTS.stop && !!KE.DEFAULT_SHORTCUTS.restart);
+  check('padrões existem', KE.DEFAULT_SHORTCUTS.startDefault === 'Alt+Shift+P' && KE.DEFAULT_SHORTCUTS.stop === 'Alt+Shift+S' &&
+    !('restart' in KE.DEFAULT_SHORTCUTS));
   check('alvo editável', KE.isEditableTarget({ tagName: 'INPUT' }) === true && KE.isEditableTarget({ tagName: 'DIV' }) === false);
   check('onStorageChanged sem suporte não quebra', KE.onStorageChanged(() => {}) === null);
   todayStub = [
@@ -943,13 +960,12 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     { id: 902, project: 200, activity: 1655, begin: KE.todayKey() + 'T10:00:00', end: KE.todayKey() + 'T11:00:00', duration: 3600, description: 'recente', tags: [] },
   ];
   posted.length = 0;
-  const restarted = await KE.restartLast();
-  check('restart copia recente', restarted.ok === true && posted.length === 1 && posted[0].project === 200 &&
-    posted[0].activity === 1655 && posted[0].description === 'recente' && /^\d{4}-\d{2}-\d{2}T/.test(posted[0].begin), posted[0]);
-  todayStub = [];
-  check('restart vazio', JSON.stringify(await KE.restartLast()) === JSON.stringify({ ok: false, empty: true }));
+  const qtSrc = fs.readFileSync(path.join(ROOT, 'src/content/quicktimer.js'), 'utf8');
+  check('atalho P inicia timer padrão com guarda de template',
+    qtSrc.includes('startDefaultTimer') && qtSrc.includes("KE.uiText('ui.needDefaultTimer')") &&
+    !qtSrc.includes('doRestart') && !qtSrc.includes('restartLast'));
   check('temas disponíveis', KE.THEMES.map((t) => t.id).join(',') === 'system,light,dark,dracula,catppuccin,nord,gruvbox,gnome');
-  check('rótulo tema', KE.themeLabel('dark') === 'Escuro' && KE.themeLabel('x') === 'Sistema');
+  check('rótulo tema', KE.themeLabel('dark') === 'Escuro' && KE.themeLabel('x') === 'GNOME');
   check('rótulo dracula', KE.themeLabel('dracula') === 'Dracula' && KE.themeLabel('catppuccin') === 'Catppuccin');
   check('rótulo gnome', KE.themeLabel('gnome') === 'GNOME');
   const pkgJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
@@ -966,7 +982,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('aplica dark', document.documentElement.dataset.keTheme === 'dark');
   stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo' };
   await KE.applyTheme();
-  check('padrão system', document.documentElement.dataset.keTheme === 'system');
+  check('padrão gnome', document.documentElement.dataset.keTheme === 'gnome');
   let gnomeSchemeListener;
   let gnomeListenerRemoved = false;
   global.matchMedia = (query) => ({
@@ -1465,10 +1481,11 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await KE.openKimai('https://kimai.exemplo', 'pt_BR');
   check('sem aba abre padrão', chrome.tabs.created.length === 1 &&
     !('cookieStoreId' in chrome.tabs.created[0]), chrome.tabs.created);
-  const scMap = { start: 'Alt+Shift+S', stop: 'Alt+Shift+X', restart: 'Alt+Shift+R' };
+  const scMap = { startDefault: 'Alt+Shift+P', stop: 'Alt+Shift+S' };
   const kEv = (o) => Object.assign({ ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, key: '', repeat: false, target: null }, o);
   check('desligado ignora tudo', KE.shortcutAction(scMap, false, kEv({ altKey: true, shiftKey: true, key: 'S' })) === null);
-  check('ligado despacha', KE.shortcutAction(scMap, true, kEv({ altKey: true, shiftKey: true, key: 'X' })) === 'stop');
+  check('ligado despacha parar', KE.shortcutAction(scMap, true, kEv({ altKey: true, shiftKey: true, key: 'S' })) === 'stop');
+  check('ligado despacha padrão', KE.shortcutAction(scMap, true, kEv({ altKey: true, shiftKey: true, key: 'P' })) === 'startDefault');
   check('repetição ignora', KE.shortcutAction(scMap, true, kEv({ altKey: true, shiftKey: true, key: 'S', repeat: true })) === null);
   check('em campo ignora', KE.shortcutAction(scMap, true, kEv({ altKey: true, shiftKey: true, key: 'S', target: { tagName: 'INPUT' } })) === null);
   check('sem match nulo', KE.shortcutAction(scMap, true, kEv({ key: 'a' })) === null);
@@ -1491,7 +1508,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion'].every((k) =>
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion', 'startDefaultTask', 'stopTask', 'popupOpenHint', 'moreShortcuts'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
@@ -1728,6 +1745,13 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     popEls['ke-opt-about-version'].textContent === 'v' + manifest.version &&
     popEls['ke-opt-about-author'].textContent === manifest.author &&
     popEls['ke-opt-about-github'].href === manifest.homepage_url);
+  const optAboutHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
+  check('sobre mostra publicador Devmove',
+    /<dt[^>]*data-ke-i18n="ui\.publisher"[^>]*>/.test(optAboutHtml) &&
+    optAboutHtml.includes('<a id="ke-opt-about-publisher" href="https://github.com/Devmove"') &&
+    optAboutHtml.includes('>Devmove</a>'));
+  check('chave publicador em pt e en',
+    KE.STRINGS.pt.ui.publisher === 'Publicador' && KE.STRINGS.en.ui.publisher === 'Publisher');
   const toast = popEls['ke-opt-toast'];
   const toastShown = () => toast.hidden === false && toast.classList.contains('ke-show');
   check('Interface inicia com opções desmarcadas',
@@ -1735,11 +1759,29 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     popEls['ke-opt-hide-actionbar'].checked === false &&
     popEls['ke-opt-hide-recent'].checked === false &&
     popEls['ke-opt-hide-continue'].checked === false);
-  popEls['ke-opt-sc-start'].value = 'X';
+  popEls['ke-opt-sc-default'].value = 'X';
   popEls['ke-opt-sc-reset'].fire('click');
   await sleep(20);
   check('reset de atalhos usa toast', toastShown() && toast.textContent.includes('Padrões restaurados'), toast.textContent);
-  check('reset preenche padrões', popEls['ke-opt-sc-start'].value === 'Alt+Shift+S', popEls['ke-opt-sc-start'].value);
+  check('reset preenche padrões', popEls['ke-opt-sc-default'].value === 'Alt+Shift+P' &&
+    popEls['ke-opt-sc-stop'].value === 'Alt+Shift+S', popEls['ke-opt-sc-default'].value);
+  const scStopInput = popEls['ke-opt-sc-stop'];
+  scStopInput.fire('focus');
+  scStopInput.fire('keydown', { key: 'Alt', altKey: true });
+  check('modificador sozinho não captura', scStopInput.value === '', scStopInput.value);
+  scStopInput.fire('keyup', { key: 'Alt' });
+  check('soltar modificador não confirma', scStopInput.value === '' && scStopInput.dataset.prev === 'Alt+Shift+S',
+    scStopInput.value);
+  scStopInput.fire('keydown', { key: 'x', altKey: true, shiftKey: true });
+  scStopInput.fire('keydown', { key: 'x', altKey: true, shiftKey: true, repeat: true });
+  scStopInput.fire('keyup', { key: 'x', altKey: true, shiftKey: true });
+  check('captura remapeia parar', scStopInput.value === 'Alt+Shift+X' && scStopInput.dataset.prev === 'Alt+Shift+X',
+    scStopInput.value);
+  popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  popEls['ke-opt-save'].fire('click');
+  await sleep(100);
+  check('remap de parar persiste', stored.keSettings.shortcuts.stop === 'Alt+Shift+X' &&
+    stored.keSettings.shortcuts.startDefault === 'Alt+Shift+P', stored.keSettings.shortcuts);
   popEls['ke-opt-url'].value = 'se-url-valida';
   popEls['ke-opt-save'].fire('click');
   await sleep(50);

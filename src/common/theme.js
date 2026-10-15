@@ -14,7 +14,7 @@
   ];
 
   KE.themeLabel = function (id) {
-    const valid = KE.THEMES.some((t) => t.id === id) ? id : 'system';
+    const valid = KE.THEMES.some((t) => t.id === id) ? id : 'gnome';
     const key = 'theme' + valid.charAt(0).toUpperCase() + valid.slice(1);
     return KE.T[key] || valid;
   };
@@ -23,9 +23,9 @@
     try {
       const s = await KE.storageGet(['keSettings']);
       const t = s && s.keSettings && s.keSettings.theme;
-      return KE.THEMES.some((x) => x.id === t) ? t : 'system';
+      return KE.THEMES.some((x) => x.id === t) ? t : 'gnome';
     } catch (e) {
-      return 'system';
+      return 'gnome';
     }
   };
 

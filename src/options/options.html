@@ -150,7 +150,7 @@
       </div>
     </section>
 
-    <section class="ke-opt-card">
+    <section class="ke-opt-card" id="ke-opt-shortcuts-card">
       <h2 data-ke-i18n="ui.shortcuts">Atalhos de teclado</h2>
       <label class="ke-opt-check">
         <input type="checkbox" id="ke-opt-sc-enabled" checked>
@@ -158,16 +158,12 @@
       </label>
       <p class="ke-opt-hint" data-ke-i18n="ui.shortcutsHint">Funcionam na página do timesheet (fora de campos de texto). Clique no campo e pressione a combinação — use Alt, Ctrl ou Shift. Backspace limpa.</p>
       <div class="ke-opt-shortcut">
-        <span data-ke-i18n="ui.startNewTask">Iniciar nova tarefa</span>
-        <input id="ke-opt-sc-start" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
+        <span data-ke-i18n="ui.startDefaultTask">Iniciar timer padrão</span>
+        <input id="ke-opt-sc-default" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
       </div>
       <div class="ke-opt-shortcut">
-        <span data-ke-i18n="ui.stopTask">Parar tarefa</span>
+        <span data-ke-i18n="ui.stopTask">Parar timer atual</span>
         <input id="ke-opt-sc-stop" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
-      </div>
-      <div class="ke-opt-shortcut">
-        <span data-ke-i18n="ui.restartTask">Recomeçar tarefa</span>
-        <input id="ke-opt-sc-restart" type="text" readonly placeholder="pressione as teclas…" data-ke-i18n-placeholder="ui.shortcutCaptureHint">
       </div>
       <div class="ke-opt-row">
         <button id="ke-opt-sc-reset" class="ke-opt-btn" type="button" data-ke-i18n="ui.restoreDefaults">Restaurar padrões</button>
@@ -192,6 +188,7 @@
         <div><dt data-ke-i18n="ui.name">Nome</dt><dd id="ke-opt-about-name"></dd></div>
         <div><dt data-ke-i18n="ui.version">Versão</dt><dd id="ke-opt-about-version"></dd></div>
         <div><dt data-ke-i18n="ui.author">Autor</dt><dd id="ke-opt-about-author"></dd></div>
+        <div><dt data-ke-i18n="ui.publisher">Publicador</dt><dd><a id="ke-opt-about-publisher" href="https://github.com/Devmove" target="_blank" rel="noopener noreferrer">Devmove</a></dd></div>
         <div><dt data-ke-i18n="ui.github">GitHub</dt><dd><a id="ke-opt-about-github" target="_blank" rel="noopener noreferrer"></a></dd></div>
         <div><dt data-ke-i18n="ui.license">Licença</dt><dd>MIT</dd></div>
       </dl>

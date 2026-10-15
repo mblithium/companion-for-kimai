@@ -28,15 +28,24 @@
     } catch (e) {}
   }
 
-  async function doRestart() {
+  async function startDefaultTimer() {
     setStatus('', '');
+    let def = {};
     try {
-      const r = await KE.restartLast();
-      if (!r.ok && r.empty) {
-        setStatus(KE.T.restartEmpty, 'err');
-        return;
-      }
-      setStatus(KE.T.restartedOk, 'ok');
+      const settings = await KE.getSettings();
+      def = (settings && settings.defaultTimer) || {};
+    } catch (e) {}
+    if (!def.project || !def.activity) {
+      setStatus(KE.uiText('ui.needDefaultTimer'), 'err');
+      return;
+    }
+    try {
+      const tagNames = await KE.ensureTags(def.tags || []);
+      const payload = { begin: KE.nowLocal(), project: Number(def.project), activity: Number(def.activity) };
+      if (tagNames.length) payload.tags = tagNames.join(',');
+      await KE.apiPost('/api/timesheets', payload);
+      await KE.storageSet({ keCustomer: def.customer || '', keProject: String(def.project), keActivity: String(def.activity) });
+      setStatus(KE.T.startedOk, 'ok');
       KE.notifyKimaiUpdate();
       await loadActive();
     } catch (e) {
@@ -50,9 +59,8 @@
     const action = KE.shortcutAction(shortcuts, shortcutsEnabled, ev);
     if (!action) return;
     ev.preventDefault();
-    if (action === 'start') startTimer();
+    if (action === 'startDefault') startDefaultTimer();
     else if (action === 'stop') stopAllTimers();
-    else if (action === 'restart') doRestart();
   }
   let toastEl = null;
   let toastTimer = null;

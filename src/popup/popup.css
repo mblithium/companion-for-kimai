@@ -169,6 +169,14 @@ body {
 .ke-pop-status { font-size: 12px; min-height: 1.2em; margin-top: 4px; }
 .ke-pop-status[data-kind="ok"] { color: var(--ke-green-text); font-weight: 600; }
 .ke-pop-status[data-kind="err"] { color: var(--ke-red-text); font-weight: 600; }
+.ke-pop-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  font-size: 11px; opacity: 0.65; margin: 8px -14px -12px; padding: 6px 14px 12px;
+  background: var(--ke-bg);
+  border-top: 1px solid var(--ke-border);
+}
 .ke-pop-setup p { font-size: 13px; }
 .ke-pop-error { text-align: center; padding: 8px 4px; }
 .ke-pop-error-icon { font-size: 32px; }

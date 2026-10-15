@@ -54,6 +54,31 @@
     KE.openOptions();
   }
 
+  async function openShortcutsSettings() {
+    const extension = KE.ext();
+    try {
+      const url = extension.runtime.getURL('src/options/options.html') + '#ke-opt-shortcuts-card';
+      if (extension.tabs && typeof extension.tabs.create === 'function') {
+        await extension.tabs.create({ url });
+        return;
+      }
+    } catch (e) {}
+    KE.openOptions();
+  }
+
+  function renderFootTips() {
+    if (!ui.foot) return;
+    ui.foot.replaceChildren();
+    ui.foot.appendChild(document.createTextNode(KE.uiText('ui.popupOpenHint')));
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'ke-pop-link';
+    more.textContent = KE.uiText('ui.moreShortcuts');
+    more.onclick = () => { openShortcutsSettings().catch(() => {}); };
+    ui.foot.appendChild(more);
+    ui.foot.appendChild(document.createTextNode(')'));
+  }
+
   function connectionMessage(base, e) {
     if (isAuthError(e)) return KE.T.authDenied + ' ' + KE.uiText('ui.popupConnectionAuth');
     const detail = String((e && e.serverMessage) || '').trim();
@@ -775,6 +800,7 @@
       todayToggle: $('ke-pop-today-toggle'), recentToggle: $('ke-pop-recent-toggle'),
       todaySec: $('ke-pop-today-sec'), recentSec: $('ke-pop-recent-sec'),
       desc: $('ke-pop-new-desc'), start: $('ke-pop-start'), status: $('ke-pop-status'),
+      foot: $('ke-pop-foot'),
       suggest: $('ke-pop-desc-suggest'),
       groupToggle: $('ke-pop-group-toggle'),
       draftRow: $('ke-pop-draft-row'), draftCheck: $('ke-pop-draft'),
@@ -926,6 +952,7 @@
       };
 
       show('main');
+      renderFootTips();
       ui.draftRow.hidden = settings.draftEnabled !== true;
       setSectionCollapsed(ui.todayToggle, ui.today, true);
       setSectionCollapsed(ui.recentToggle, ui.recent, true);

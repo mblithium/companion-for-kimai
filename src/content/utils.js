@@ -57,7 +57,7 @@
   };
 
   KE.sleep = function (ms) { return new Promise((r) => setTimeout(r, ms)); };
-  KE.DEFAULT_SHORTCUTS = { start: 'Alt+Shift+S', stop: 'Alt+Shift+X', restart: 'Alt+Shift+R' };
+  KE.DEFAULT_SHORTCUTS = { startDefault: 'Alt+Shift+P', stop: 'Alt+Shift+S' };
 
   KE.describeKeyEvent = function (ev) {
     const mods = [];
@@ -79,9 +79,8 @@
     if (!enabled || !ev || ev.repeat || ev.defaultPrevented) return null;
     if (KE.isEditableTarget(ev.target)) return null;
     map = map || {};
-    if (KE.shortcutMatches(map.start, ev)) return 'start';
+    if (KE.shortcutMatches(map.startDefault, ev)) return 'startDefault';
     if (KE.shortcutMatches(map.stop, ev)) return 'stop';
-    if (KE.shortcutMatches(map.restart, ev)) return 'restart';
     return null;
   };
 

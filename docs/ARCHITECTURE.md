@@ -57,8 +57,8 @@ content e no popup, sempre com prefixo `ke-`), `src/popup/popup.css`.
   GNOME acompanha a preferência de modo claro/escuro do sistema.
 - **Atalhos**: `utils` normaliza/compara (`describeKeyEvent`,
   `shortcutMatches`); `quicktimer` ouve `keydown` (ignora campos e repetição),
-  lê `keSettings.shortcuts` e reage a mudanças via `onStorageChanged`;
-  `kimai.restartLast()` copia o timer mais recente.
+  lê `keSettings.shortcuts` (P inicia o timer padrão via `startDefaultTimer`,
+  S para via `stopAllTimers`) e reage a mudanças via `onStorageChanged`.
 
 ## Fluxos principais
 

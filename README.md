@@ -21,7 +21,7 @@ with any Kimai installation.
 - ▶ "Now" widget showing your running timer at a glance;
 - ➕ Popup to start timers, continue today's work, and reuse recent entries;
 - 🗂 Entry grouping, with inline editing;
-- ⌨ Keyboard shortcuts to start, stop, restart, and open the popup;
+- ⌨ Keyboard shortcuts to start the default timer, stop, and open the popup (Alt+Shift+P/S/K);
 - 🎨 7 themes including GNOME/Adwaita, with light/dark following the system;
 - 🔑 Secure API-key login, stored only on your device — no tracking or data collection.
 

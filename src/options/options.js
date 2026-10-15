@@ -43,44 +43,56 @@
 
   function readShortcuts() {
     return {
-      start: $('ke-opt-sc-start').value.trim(),
+      startDefault: $('ke-opt-sc-default').value.trim(),
       stop: $('ke-opt-sc-stop').value.trim(),
-      restart: $('ke-opt-sc-restart').value.trim(),
     };
   }
 
   function fillShortcuts(map) {
     const eff = Object.assign({}, KE.DEFAULT_SHORTCUTS, map || {});
-    $('ke-opt-sc-start').value = eff.start || '';
+    $('ke-opt-sc-default').value = eff.startDefault || '';
     $('ke-opt-sc-stop').value = eff.stop || '';
-    $('ke-opt-sc-restart').value = eff.restart || '';
+    ['ke-opt-sc-default', 'ke-opt-sc-stop'].forEach((id) => { $(id).dataset.prev = $(id).value; });
   }
 
   function armShortcutCapture(input) {
+    let pending = '';
     input.addEventListener('focus', () => {
       input.value = '';
       input.placeholder = '…';
+      pending = '';
     });
     input.addEventListener('blur', () => {
       input.placeholder = KE.uiText('ui.shortcutCaptureHint');
       if (!input.value && input.dataset.prev !== undefined) input.value = input.dataset.prev;
+      pending = '';
     });
     input.addEventListener('keydown', (ev) => {
       ev.preventDefault();
+      if (ev.repeat) return;
       if (ev.key === 'Escape') {
         input.value = input.dataset.prev || '';
+        pending = '';
         input.blur();
         return;
       }
       if (ev.key === 'Backspace' || ev.key === 'Delete') {
         input.dataset.prev = '';
         input.value = '';
+        pending = '';
         input.blur();
         return;
       }
       if (!(ev.ctrlKey || ev.altKey || ev.shiftKey || ev.metaKey)) return;
-      input.dataset.prev = KE.describeKeyEvent(ev);
-      input.value = input.dataset.prev;
+      if (['Alt', 'Control', 'Shift', 'Meta'].indexOf(ev.key) >= 0) return;
+      pending = KE.describeKeyEvent(ev);
+      input.value = pending;
+    });
+    input.addEventListener('keyup', () => {
+      if (!pending) return;
+      input.dataset.prev = pending;
+      input.value = pending;
+      pending = '';
       input.blur();
     });
   }
@@ -351,14 +363,11 @@
     $('ke-opt-hide-continue').checked = !!settings.hideContinueToday;
     fillShortcuts(settings.shortcuts);
     $('ke-opt-sc-enabled').checked = !settings || settings.shortcutsEnabled !== false;
-    ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => {
-      const inp = $(id);
-      inp.dataset.prev = inp.value;
-      armShortcutCapture(inp);
+    ['ke-opt-sc-default', 'ke-opt-sc-stop'].forEach((id) => {
+      armShortcutCapture($(id));
     });
     $('ke-opt-sc-reset').addEventListener('click', () => {
       fillShortcuts(KE.DEFAULT_SHORTCUTS);
-      ['ke-opt-sc-start', 'ke-opt-sc-stop', 'ke-opt-sc-restart'].forEach((id) => { $(id).dataset.prev = $(id).value; });
       setStatus(KE.uiText('ui.restoreShortcutsMessage'), '');
     });
     const open = $('ke-opt-open');
