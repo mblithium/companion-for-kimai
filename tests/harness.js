@@ -214,6 +214,7 @@ let rangeStub = [];
 let autoConnectPosts = [];
 let autoConnectDeleted = [];
 let autoConnectPage = '';
+let autoConnectPostPage = '<html>ok</html>';
 let failMode = null;
 const fetchCounts = {};
 const bump = (k) => { fetchCounts[k] = (fetchCounts[k] || 0) + 1; };
@@ -350,13 +351,18 @@ const fetch = async (url, opts) => {
   }
   if (u.match(/\/profile\/[^/]+\/create-access-token/) && method === 'POST') {
     autoConnectPosts.push(String((opts && opts.body) || ''));
-    return { ok: true, status: 200, headers: { get: () => 'text/html' }, text: async () => '<html>ok</html>' };
+    return { ok: true, status: 200, headers: { get: () => 'text/html' }, text: async () => autoConnectPostPage };
   }
   if (u.match(/\/profile\/[^/]+\/api-token/) && method === 'GET') {
     return { ok: true, status: 200, headers: { get: () => 'text/html' }, text: async () => autoConnectPage };
   }
   if (u.match(/\/api\/users\/api-token\/\d+/) && method === 'DELETE') {
     const id = u.match(/\/api\/users\/api-token\/(\d+)/)[1];
+    autoConnectDeleted.push(id);
+    return { ok: true, status: 200, headers: { get: () => 'application/json' }, json: async () => ({}), text: async () => '{}' };
+  }
+  if (u.match(/\/profile\/[^/]+\/api-token\/\d+/) && method === 'DELETE') {
+    const id = u.match(/\/api-token\/(\d+)/)[1];
     autoConnectDeleted.push(id);
     return { ok: true, status: 200, headers: { get: () => 'application/json' }, json: async () => ({}), text: async () => '{}' };
   }
@@ -495,6 +501,66 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     bannerLink.href.indexOf('/api-token') >= 0, bannerLink.href);
   check('toast de falha orienta', pageToast().textContent === 'Não foi possível conectar.', pageToast().textContent);
   if (savedBannerToken !== undefined) storedLocal.keApiToken = savedBannerToken;
+  const t0desc = KE.todayKey();
+  todayStub = [
+    { id: 701, project: 200, activity: 1655, begin: t0desc + 'T09:00:00', end: t0desc + 'T10:00:00', duration: 3600, description: 'manhã' },
+  ];
+  recentStub = [
+    { id: 801, project: 144, activity: 1661, begin: '2000-01-02T09:00:00', end: '2000-01-02T10:00:00', duration: 1800, description: 'revisão do layout', tags: [{ name: 'Alexander' }] },
+    { id: 802, project: 144, activity: 1661, begin: '2000-01-01T09:00:00', end: '2000-01-01T10:00:00', duration: 1800, description: 'revisão do layout' },
+  ];
+  Object.keys(storedLocal).forEach((k) => { if (k === 'keCacheToday' || k === 'keCacheRecent') delete storedLocal[k]; });
+  const descArea = findAll(card, 'ke-input').filter((n) => n.tagName === 'TEXTAREA')[0];
+  check('descrição da barra é textarea', !!descArea);
+  fireInput(descArea, 'revi');
+  await sleep(300);
+  const siteSuggest = findAll(card, 'ke-suggest')[0];
+  const siteItems = findAll(siteSuggest, 'ke-suggest-item');
+  check('barra sugere recentes relacionados', siteSuggest.hidden === false && siteItems.length === 1 &&
+    findAll(siteItems[0], 'ke-suggest-title')[0].textContent === 'revisão do layout' &&
+    siteItems[0].getAttribute('role') === 'option', siteItems.length);
+  siteItems[0].onclick();
+  await sleep(400);
+  const siteCombos = findAll(card, 'ke-combo-input');
+  check('sugestão preenche tudo na barra', descArea.value === 'revisão do layout' &&
+    siteCombos[0].value === 'Altenwerth-Donnelly' &&
+    siteCombos[1].value === 'Altenwerth-Donnelly / Tempore commodi' &&
+    siteCombos[2].value === 'Corrupti aut' &&
+    findAll(card, 'ke-chip').length === 1 && siteSuggest.hidden === true,
+    siteCombos.map((i) => i.value));
+  fireInput(descArea, 'zzz-nada');
+  await sleep(300);
+  check('sem relação oculta na barra', siteSuggest.hidden === true);
+  fireInput(descArea, 'r');
+  await sleep(300);
+  check('texto curto oculta na barra', siteSuggest.hidden === true);
+  const postedBeforeSiteKeys = posted.length;
+  fireInput(descArea, 'revi');
+  await sleep(300);
+  descArea.fire('keydown', { key: 'ArrowDown' });
+  descArea.fire('keydown', { key: 'Enter' });
+  await sleep(400);
+  check('teclado aplica sem iniciar na barra', descArea.value === 'revisão do layout' &&
+    posted.length === postedBeforeSiteKeys, posted.length);
+  Object.keys(storedLocal).forEach((k) => { if (k === 'keCacheToday' || k === 'keCacheRecent') delete storedLocal[k]; });
+  const savedApiToken = storedLocal.keApiToken;
+  storedLocal.keApiToken = 'tok-api-down';
+  failMode = null;
+  await KE.refreshCatalogHandler();
+  await sleep(300);
+  const siteBanner = findAll(card, 'ke-connect')[0];
+  check('banner oculto com API ok', siteBanner.hidden === true);
+  failMode = 'network';
+  await KE.refreshCatalogHandler();
+  await sleep(300);
+  check('banner reaparece com API fora', siteBanner.hidden === false);
+  failMode = null;
+  await KE.refreshCatalogHandler();
+  await sleep(300);
+  check('banner oculta ao recuperar', siteBanner.hidden === true);
+  if (savedApiToken === undefined) delete storedLocal.keApiToken;
+  else storedLocal.keApiToken = savedApiToken;
+  failMode = null;
   moInstances.forEach((m) => m.cb());
   await sleep(700);
   check('sem duplicar com card presente', mountedCards.length === 2, mountedCards.length);
@@ -1299,6 +1365,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('totais vêm da API e não do DOM', apiResult && apiResult.from === '20261013' && apiResult.to === '20261013' &&
     apiResult.days === 1 && apiResult.week === 5400, apiResult);
   check('busca da API usa intervalo begin/end', lastReq.url.includes('/api/timesheets?') && lastReq.url.includes('begin=2026-10-13'), lastReq.url);
+  check('intervalo usa formato ISO com T', lastReq.url.includes('begin=2026-10-13T00%3A00%3A00') &&
+    lastReq.url.includes('end=2026-10-13T23%3A59%3A59') && !/%20/.test(lastReq.url.split('begin=')[1] || ''), lastReq.url);
   check('célula diária usa duração da API', findAll(apiTbody, 'ke-day-total')[0].textContent === '01:30:00');
   function bareRow(id, date) {
     const tr = document.createElement('tr');
@@ -1347,6 +1415,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('células diárias via API em semanas distintas',
     findAll(twoWeekApi, 'ke-day-total')[0].textContent === '01:00:00' &&
     findAll(twoWeekApi, 'ke-day-total')[1].textContent === '02:00:00');
+  const rangeFetches = fetchCounts.range || 0;
+  await KE.refreshSiteTotals(twoWeekApi);
+  check('totais respeitam cooldown', (fetchCounts.range || 0) === rangeFetches, fetchCounts.range);
   rangeStub = [];
   failMode = 'network';
   const fallbackTbody = document.createElement('tbody');
@@ -1354,6 +1425,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   fallbackTbody.appendChild(realSumRow('13/10/2026', '0:00'));
   check('falha da API usa DOM como fallback', (await KE.refreshSiteTotals(fallbackTbody)) === null &&
     findAll(fallbackTbody, 'ke-day-total')[0].textContent === '01:00:00');
+  const rangeAfterFail = fetchCounts.range || 0;
+  await KE.refreshSiteTotals(fallbackTbody);
+  check('falha respeita cooldown', (fetchCounts.range || 0) === rangeAfterFail, fetchCounts.range);
   failMode = null;
   rangeStub = [];
 
@@ -1551,6 +1625,22 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   autoConnectDeleted.length = 0;
   const auto2 = await KE.autoConnectKimai({ locale: 'en', username: 'john_user', name: 'Companion for Kimai' });
   check('autoConnect sem antigos', auto2.token === 'sozinho456' && auto2.replaced.length === 0, auto2);
+  check('parseAccessToken com atributos', KE.parseAccessToken('<pre style="padding-left: 65px"><code>tok123</code></pre>') === 'tok123');
+  check('parseCsrfToken ordem invertida', KE.parseCsrfToken('<input value="ABC" name="access_token_form[_token]" />', 'access_token_form[_token]') === 'ABC');
+  check('parseCsrfToken aspas simples', KE.parseCsrfToken("<input name='access_token_form[_token]' value='XYZ' />", 'access_token_form[_token]') === 'XYZ');
+  const listAttr = '<table><thead><tr><th>Nome</th></tr></thead><tbody>' +
+    '<tr class="odd"><td class="x">Companion for Kimai abc123</td><td></td><td><a href="/en/profile/john_user/api-token/77/delete">x</a></td></tr>' +
+    '</tbody></table>';
+  const parsedAttr = KE.parseTokenList(listAttr);
+  check('parseTokenList com atributos', parsedAttr.length === 1 && parsedAttr[0].id === '77' &&
+    parsedAttr[0].name === 'Companion for Kimai abc123', parsedAttr);
+  autoConnectPostPage = '<div><pre><code>direto789</code></pre></div>';
+  autoConnectPage = '<table><tr><td>Companion for Kimai oldrow</td><td></td><td><a href="/en/profile/john_user/api-token/78/delete">x</a></td></tr></table>';
+  autoConnectDeleted.length = 0;
+  const auto3 = await KE.autoConnectKimai({ locale: 'en', username: 'john_user', name: 'Companion for Kimai' });
+  check('token vem da resposta do POST', auto3.token === 'direto789', auto3);
+  check('limpeza usa URL da linha', autoConnectDeleted.join(',') === '78', autoConnectDeleted);
+  autoConnectPostPage = '<html>ok</html>';
   stored.keSettings = { kimaiBaseUrl: 'https://kimai.exemplo', keLocale: 'pt_BR' };
   stored.keCustomer = '20';
   stored.keProject = '200';
@@ -1797,6 +1887,34 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   popEls['ke-opt-save'].fire('click');
   await sleep(100);
   check('salvar válido usa toast', toastShown() && toast.textContent === 'Configurações salvas.', toast.textContent);
+  popEls['ke-opt-url'].value = 'https://kimai.exemplo';
+  chrome.permissions.granted = true;
+  delete storedLocal.keApiToken;
+  autoConnectPage = '<table></table><pre><code>tokenpelasconfig</code></pre>';
+  popEls['ke-opt-autoconnect'].fire('click');
+  await sleep(400);
+  check('autoconnect nas opções salva chave', storedLocal.keApiToken === 'tokenpelasconfig', storedLocal.keApiToken);
+  check('autoconnect usa toast', toastShown() && toast.textContent === 'Plugin conectado!', toast.textContent);
+  check('autoconnect salva usuário', stored.keSettings.keUsername === 'john_user' &&
+    stored.keSettings.kimaiBaseUrl === 'https://kimai.exemplo', stored.keSettings);
+  check('autoconnect some após conectar', popEls['ke-opt-autoconnect'].hidden === true);
+  delete storedLocal.keApiToken;
+  eval(OPT_SRC);
+  await sleep(300);
+  check('autoconnect aparece sem chave', popEls['ke-opt-autoconnect'].hidden === false);
+  storedLocal.keApiToken = 'chave-invalida';
+  eval(OPT_SRC);
+  await sleep(300);
+  failMode = 'auth';
+  popEls['ke-opt-test'].fire('click');
+  await sleep(300);
+  check('autoconnect aparece com falha', popEls['ke-opt-autoconnect'].hidden === false &&
+    toast.textContent.includes('Falhou'), toast.textContent);
+  failMode = null;
+  popEls['ke-opt-test'].fire('click');
+  await sleep(300);
+  check('autoconnect some com sucesso', popEls['ke-opt-autoconnect'].hidden === true &&
+    toast.textContent.includes('Conexão ok'), toast.textContent);
   check('salvar persiste opções de Interface', stored.keSettings.hideNavigation === true &&
     stored.keSettings.hideActionBar === true && stored.keSettings.hideSidebar === false &&
     stored.keSettings.hideHeader === false && stored.keSettings.hideRecents === true &&

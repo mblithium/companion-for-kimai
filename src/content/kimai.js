@@ -96,23 +96,49 @@
       language: (me && (me.language || me.locale)) || '',
     };
   };
+  function loginRedirected(res) {
+    try {
+      return String((res && res.url) || '').indexOf('/login') >= 0;
+    } catch (e) {
+      return false;
+    }
+  }
+  function authRequiredError() {
+    const err = new Error('login');
+    err.status = 401;
+    return err;
+  }
   KE.parseCsrfToken = function (html, fieldName) {
-    const m = String(html || '').match(
-      new RegExp('name="' + fieldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '" value="([^"]+)"')
-    );
-    return m ? m[1] : '';
+    const src = String(html || '');
+    const esc = fieldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const patterns = [
+      new RegExp('name="' + esc + '"[^>]*value="([^"]+)"'),
+      new RegExp("name='" + esc + "'[^>]*value='([^']+)'"),
+      new RegExp('value="([^"]+)"[^>]*name="' + esc + '"'),
+      new RegExp("value='([^']+)'[^>]*name='" + esc + "'"),
+    ];
+    for (const re of patterns) {
+      const m = src.match(re);
+      if (m) return m[1];
+    }
+    return '';
   };
   KE.parseAccessToken = function (html) {
-    const m = String(html || '').match(/<pre[^>]*><code>([^<]+)<\/code><\/pre>/);
+    const m = String(html || '').match(/<pre[^>]*>\s*<code[^>]*>([^<]+)<\/code>\s*<\/pre>/);
     return m ? m[1].trim() : '';
   };
   KE.parseTokenList = function (html) {
     const out = [];
-    const rows = String(html || '').match(/<tr>([\s\S]*?)<\/tr>/g) || [];
+    const rows = String(html || '').match(/<tr[^>]*>([\s\S]*?)<\/tr>/g) || [];
     rows.forEach((row) => {
-      const name = (row.match(/<td>([^<]*)<\/td>/) || [])[1];
-      const id = (row.match(/\/api\/users\/api-token\/(\d+)/) || [])[1];
-      if (name && String(name).trim() && id) out.push({ id: id, name: String(name).trim() });
+      const name = (row.match(/<td[^>]*>([^<]*)<\/td>/) || [])[1];
+      const hrefs = [...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+      const deleteHref = hrefs.filter((h) => /api-token/i.test(h)).pop() || hrefs[hrefs.length - 1] || '';
+      const id = (deleteHref.match(/(\d+)/) || [])[1] ||
+        (row.match(/\/api\/users\/api-token\/(\d+)/) || [])[1];
+      if (name && String(name).trim() && id) {
+        out.push({ id: id, name: String(name).trim(), deleteUrl: deleteHref });
+      }
     });
     return out;
   };
@@ -120,8 +146,12 @@
     const locale = (opts && opts.locale) || 'en';
     const username = opts && opts.username;
     const name = (opts && opts.name) || 'Companion for Kimai';
-    const base = '/' + locale + '/profile/' + encodeURIComponent(username);
-    const formHtml = await (await fetch(base + '/create-access-token', { credentials: 'same-origin' })).text();
+    const root = (opts && opts.baseUrl) ? String(opts.baseUrl).replace(/\/+$/, '') : '';
+    const cred = (opts && opts.credentials) || 'same-origin';
+    const base = root + '/' + locale + '/profile/' + encodeURIComponent(username);
+    const formRes = await fetch(base + '/create-access-token', { credentials: cred });
+    if (loginRedirected(formRes)) throw authRequiredError();
+    const formHtml = await formRes.text();
     const csrf = KE.parseCsrfToken(formHtml, 'access_token_form[_token]');
     if (!csrf) {
       const err = new Error('form');
@@ -131,15 +161,22 @@
     const body = new URLSearchParams();
     body.set('access_token_form[name]', name);
     body.set('access_token_form[_token]', csrf);
-    await fetch(base + '/create-access-token', {
+    const postRes = await fetch(base + '/create-access-token', {
       method: 'POST',
-      redirect: 'manual',
-      credentials: 'same-origin',
+      credentials: cred,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body.toString(),
     });
-    const page = await (await fetch(base + '/api-token', { credentials: 'same-origin' })).text();
-    const token = KE.parseAccessToken(page);
+    if (loginRedirected(postRes)) throw authRequiredError();
+    let token = '';
+    try {
+      token = KE.parseAccessToken(await postRes.text());
+    } catch (e) {}
+    if (!token) {
+      const overRes = await fetch(base + '/api-token', { credentials: cred });
+      if (loginRedirected(overRes)) throw authRequiredError();
+      token = KE.parseAccessToken(await overRes.text());
+    }
     if (!token) {
       const err = new Error('token');
       err.status = 0;
@@ -148,10 +185,16 @@
     return { token: token };
   };
 
-  KE.deleteAccessToken = async function (id) {
-    const res = await fetch('/api/users/api-token/' + encodeURIComponent(id), {
+  KE.deleteAccessToken = async function (id, opts) {
+    const root = (opts && opts.baseUrl) ? String(opts.baseUrl).replace(/\/+$/, '') : '';
+    let url = root + '/api/users/api-token/' + encodeURIComponent(id);
+    if (opts && opts.url) {
+      const u = String(opts.url);
+      url = /^[a-z]+:\/\//i.test(u) ? u : root + (u.charAt(0) === '/' ? u : '/' + u);
+    }
+    const res = await fetch(url, {
       method: 'DELETE',
-      credentials: 'same-origin',
+      credentials: (opts && opts.credentials) || 'same-origin',
       headers: { Accept: 'application/json' },
     });
     if (!res.ok) {
@@ -162,17 +205,21 @@
     return true;
   };
   KE.autoConnectKimai = async function (opts) {
-    const base = (opts && opts.name) || 'Companion for Kimai';
-    const name = base + ' ' + KE.shortHash();
-    const page = await (await fetch(
-      '/' + ((opts && opts.locale) || 'en') + '/profile/' + encodeURIComponent(opts.username) + '/api-token',
-      { credentials: 'same-origin' }
-    )).text();
+    const baseName = (opts && opts.name) || 'Companion for Kimai';
+    const name = baseName + ' ' + KE.shortHash();
+    const root = (opts && opts.baseUrl) ? String(opts.baseUrl).replace(/\/+$/, '') : '';
+    const cred = (opts && opts.credentials) || 'same-origin';
+    const listRes = await fetch(
+      root + '/' + ((opts && opts.locale) || 'en') + '/profile/' + encodeURIComponent(opts.username) + '/api-token',
+      { credentials: cred }
+    );
+    if (loginRedirected(listRes)) throw authRequiredError();
+    const page = await listRes.text();
     const replaced = [];
     for (const t of KE.parseTokenList(page)) {
-      if (t.name === base || t.name.indexOf(base + ' ') === 0) {
+      if (t.name === baseName || t.name.indexOf(baseName + ' ') === 0) {
         try {
-          await KE.deleteAccessToken(t.id);
+          await KE.deleteAccessToken(t.id, { baseUrl: root, credentials: cred, url: t.deleteUrl });
           replaced.push(t.id);
         } catch (e) {}
       }

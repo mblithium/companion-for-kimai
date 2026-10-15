@@ -40,6 +40,7 @@
         "src/content/utils.js",
         "src/content/api.js",
         "src/content/storage.js",
+        "src/common/permissions.js",
         "src/common/theme.js",
         "src/content/combo.js",
         "src/content/kimai.js",

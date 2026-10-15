@@ -105,6 +105,7 @@
     $('ke-opt-token').placeholder = has ? '••••••••••' : KE.uiText('ui.apiKeyPlaceholder');
     $('ke-opt-test').textContent = KE.uiText(has ? 'ui.testConnection' : 'ui.connect');
     $('ke-opt-disconnect').hidden = !has;
+    $('ke-opt-autoconnect').hidden = has;
     await refreshTokenLink();
   }
 
@@ -378,6 +379,7 @@
     };
     syncOpen();
     await refreshAccess($('ke-opt-url').value);
+    await refreshTokenState();
 
     $('ke-opt-url').addEventListener('input', () => {
       syncOpen();
@@ -411,10 +413,12 @@
       try {
         const active = KE.asArray(await KE.apiGet('/api/timesheets/active'));
         setStatus(KE.uiText('ui.connectionOk', { count: active.length }), 'ok');
+        $('ke-opt-autoconnect').hidden = true;
       } catch (e) {
         const detail = String((e && e.serverMessage) || '').trim();
         setStatus(KE.uiText('ui.connectionFailed') + (e && e.status ? ' (HTTP ' + e.status + ')' : '') +
           (detail ? ': ' + detail.slice(0, 160) : KE.uiText('ui.connectionFallback')), 'err');
+        $('ke-opt-autoconnect').hidden = false;
       } finally {
         KE.apiBaseUrl = '';
         KE.authToken = '';
@@ -424,6 +428,53 @@
     themeSel.addEventListener('change', () => {
     document.documentElement.dataset.keTheme = themeSel.value;
   });
+
+    $('ke-opt-autoconnect').addEventListener('click', async () => {
+      const btn = $('ke-opt-autoconnect');
+      const base = KE.normalizeBaseUrl($('ke-opt-url').value);
+      if (!base) {
+        setStatus(KE.uiText('ui.invalidUrl'), 'err');
+        return;
+      }
+      if (!(await KE.hasOriginAccess(base))) {
+        setStatus(KE.uiText('ui.accessMissing', { origin: KE.originOf(base) }), 'err');
+        return;
+      }
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = KE.T.connecting;
+      try {
+        KE.apiBaseUrl = base;
+        KE.authToken = '';
+        KE.apiCredentials = 'include';
+        let me = null;
+        try {
+          me = await KE.fetchCurrentUser();
+        } finally {
+          KE.apiBaseUrl = '';
+          KE.authToken = '';
+          KE.apiCredentials = 'same-origin';
+        }
+        if (!me || !me.username) {
+          setStatus(KE.T.needLogin, 'err');
+          return;
+        }
+        const locale = $('ke-opt-locale').value || me.language || 'en';
+        const created = await KE.autoConnectKimai({
+          locale: locale, username: me.username, name: 'Companion for Kimai', baseUrl: base, credentials: 'include',
+        });
+        await KE.localSet({ keApiToken: created.token });
+        await KE.saveSettings({ kimaiBaseUrl: base, keUsername: me.username, keLocale: locale });
+        await refreshTokenState();
+        setStatus(KE.T.connectedOk, 'ok');
+      } catch (e) {
+        if (e && (e.status === 401 || e.status === 403)) setStatus(KE.T.needLogin, 'err');
+        else setStatus(KE.T.connectFail + (e && e.status ? ' (HTTP ' + e.status + ')' : ''), 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
 
   $('ke-opt-save').onclick = async () => {
     const base = KE.normalizeBaseUrl($('ke-opt-url').value);

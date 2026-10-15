@@ -5,6 +5,7 @@
   let ui = null;
   let shortcuts = Object.assign({}, KE.DEFAULT_SHORTCUTS);
   let shortcutsEnabled = true;
+  let apiDown = false;
 
   async function reloadShortcuts() {
     try {
@@ -99,6 +100,13 @@
 
   async function loadActive() {
     KE.state.active = await KE.fetchActiveTimesheets();
+    try {
+      await KE.fetchCurrentUser();
+      apiDown = false;
+    } catch (e) {
+      apiDown = true;
+    }
+    await refreshConnectBanner();
     renderActive();
   }
 
@@ -316,7 +324,7 @@
       const s = await KE.localGet(['keApiToken']);
       has = !!(s && s.keApiToken);
     } catch (e) {}
-    ui.connect.hidden = has;
+    ui.connect.hidden = has && !apiDown;
   }
 
   async function doAutoConnect(btn) {
@@ -369,6 +377,7 @@
   }
 
   async function startTimer() {
+    hideDescSuggest();
     ui.customerCombo.flush(true);
     ui.projectCombo.flush(true);
     ui.activityCombo.flush(true);
@@ -500,6 +509,10 @@
     description.placeholder = KE.T.descriptionPh;
     description.setAttribute('maxlength', '255');
     fDesc.appendChild(description);
+    const suggest = KE.el('div', 'ke-suggest');
+    suggest.hidden = true;
+    suggest.setAttribute('role', 'listbox');
+    fDesc.appendChild(suggest);
 
     const tagsCombo = KE.createMultiCombo({
       searchPlaceholder: KE.T.tagsPh,
@@ -543,13 +556,34 @@
     ui = {
       card: card, connect: connect, connectBtn: connectBtn, connectManual: connectManual,
       customerCombo: customerCombo, projectCombo: projectCombo, activityCombo: activityCombo,
-      description: description, tagsCombo: tagsCombo, start: start,
+      description: description, suggest: suggest, tagsCombo: tagsCombo, start: start,
       nowSection: nowSection, activeList: activeList
     };
 
     start.addEventListener('click', startTimer);
+    description.addEventListener('input', () => { updateDescSuggest().catch(() => {}); });
+    description.addEventListener('blur', () => { setTimeout(hideDescSuggest, 150); });
     description.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); startTimer(); }
+      if (ev.key === 'Escape' && ui.suggest && !ui.suggest.hidden) {
+        ev.preventDefault();
+        hideDescSuggest();
+        return;
+      }
+      if ((ev.key === 'ArrowDown' || ev.key === 'ArrowUp') && ui.suggest && !ui.suggest.hidden && siteSuggestItems.length) {
+        ev.preventDefault();
+        const n = siteSuggestItems.length;
+        siteSuggestActive = ev.key === 'ArrowDown' ? (siteSuggestActive + 1) % n : (siteSuggestActive - 1 + n) % n;
+        paintDescSuggest();
+        return;
+      }
+      if (ev.key === 'Enter' && !ev.shiftKey) {
+        ev.preventDefault();
+        if (ui.suggest && !ui.suggest.hidden && siteSuggestActive >= 0 && siteSuggestItems[siteSuggestActive]) {
+          applyDescSuggestion(siteSuggestItems[siteSuggestActive]).catch(() => {});
+        } else {
+          startTimer();
+        }
+      }
     });
 
     return card;
@@ -605,6 +639,118 @@
     setStatus(KE.T.listsUpdated, 'ok');
   }
   KE.refreshCatalogHandler = refreshCatalog;
+  let siteSuggestItems = [];
+  let siteSuggestActive = -1;
+  let siteSuggestSeq = 0;
+
+  function hideDescSuggest() {
+    siteSuggestSeq++;
+    siteSuggestItems = [];
+    siteSuggestActive = -1;
+    if (ui && ui.suggest) ui.suggest.hidden = true;
+  }
+
+  function paintDescSuggest() {
+    if (!ui || !ui.suggest) return;
+    ui.suggest.replaceChildren();
+    siteSuggestItems.forEach((t, idx) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'ke-suggest-item' + (idx === siteSuggestActive ? ' ke-active' : '');
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', idx === siteSuggestActive ? 'true' : 'false');
+      const useLabel = KE.uiText('ui.useSuggestion');
+      item.title = useLabel;
+      item.setAttribute('aria-label', String(t.description || '') + ' — ' + useLabel);
+      const name = document.createElement('span');
+      name.className = 'ke-suggest-title';
+      name.textContent = t.description || '';
+      const sub = document.createElement('span');
+      sub.className = 'ke-suggest-sub';
+      const proj = KE.describeProjectRef(t.project);
+      const act = KE.describeActivityRef(t.activity);
+      sub.textContent = act ? proj + ' · ' + act : proj;
+      item.appendChild(name);
+      item.appendChild(sub);
+      item.onclick = () => { applyDescSuggestion(t).catch(() => {}); };
+      ui.suggest.appendChild(item);
+    });
+    ui.suggest.hidden = siteSuggestItems.length === 0;
+  }
+
+  async function updateDescSuggest() {
+    const my = ++siteSuggestSeq;
+    siteSuggestItems = [];
+    siteSuggestActive = -1;
+    if (!ui || !ui.suggest || !ui.description) {
+      hideDescSuggest();
+      return;
+    }
+    const query = KE.norm(ui.description.value.trim());
+    if (query.length < 2) {
+      hideDescSuggest();
+      return;
+    }
+    let pool = [];
+    try {
+      const results = await Promise.all([KE.getTodayCached(false), KE.getRecentCached(false)]);
+      results.forEach((r) => { pool = pool.concat((r && r.entries) || []); });
+    } catch (e) {
+      hideDescSuggest();
+      return;
+    }
+    if (my !== siteSuggestSeq) return;
+    const seen = new Set();
+    siteSuggestItems = [];
+    for (const t of pool) {
+      const desc = String((t && t.description) || '').trim();
+      if (!desc || seen.has(desc)) continue;
+      if (KE.norm(desc).indexOf(query) < 0) continue;
+      seen.add(desc);
+      siteSuggestItems.push(t);
+      if (siteSuggestItems.length >= 5) break;
+    }
+    paintDescSuggest();
+  }
+
+  async function applyDescSuggestion(t) {
+    if (!t || !ui) return;
+    hideDescSuggest();
+    const projId = KE.entityId(t.project);
+    const actId = KE.entityId(t.activity);
+    await KE.loadProjects('');
+    const found = (KE.state.projects || []).find((p) => String(p.id) === String(projId));
+    let customerId = '';
+    if (found) {
+      customerId = KE.entityId(found.customer);
+      if (!customerId && found.parentTitle) {
+        const cust = (KE.state.customers || []).find((c) => String(c.name) === String(found.parentTitle));
+        if (cust) customerId = String(cust.id);
+      }
+    }
+    ui.customerCombo.setItems(
+      (KE.state.customers || []).map((c) => ({ value: String(c.id), label: c.name || ('#' + c.id) })),
+      customerId
+    );
+    await KE.loadProjects(customerId || '');
+    ui.projectCombo.setLoading(false);
+    ui.projectCombo.setItems(
+      (KE.state.projects || []).map((p) => ({ value: String(p.id), label: KE.projectLabel(p) })),
+      projId
+    );
+    await KE.loadActivities(projId);
+    ui.activityCombo.setLoading(false);
+    ui.activityCombo.setItems(
+      (KE.state.activities || []).map((a) => ({ value: String(a.id), label: a.name || ('#' + a.id) })),
+      actId
+    );
+    await KE.loadTags();
+    ui.tagsCombo.setItems(KE.state.tags);
+    ui.tagsCombo.setValues(KE.tagNames(t.tags));
+    ui.description.value = t.description || '';
+    try { ui.description.focus(); } catch (e) {}
+  }
+
   async function loadAll(force) {
     if (!ui) return;
     try {

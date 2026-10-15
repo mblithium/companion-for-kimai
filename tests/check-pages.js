@@ -48,6 +48,25 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
   }
 }
 {
+  const contentFiles = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest/chrome.json'), 'utf8')).content_scripts[0].js;
+  for (const f of contentFiles) {
+    if (!fs.existsSync(path.join(ROOT, f))) {
+      failures++;
+      console.log('FALHOU script inexistente no content bundle: ' + f);
+    }
+  }
+  const defs = definedNames(contentFiles);
+  for (const entry of ['src/content/quicktimer.js', 'src/content/sitegroup.js']) {
+    const missing = [...usedNames(entry)].filter((n) => !defs.has(n));
+    if (missing.length) {
+      failures++;
+      console.log('FALHOU ' + entry + ' usa KE.* sem definição no bundle da página: ' + missing.map((n) => 'KE.' + n).join(', '));
+    } else {
+      console.log('ok   ' + entry + ' (' + usedNames(entry).size + ' usos cobertos pelo bundle)');
+    }
+  }
+}
+{
   const variants = ['manifest/chrome.json', 'manifest/firefox.json'];
   const loaded = {};
   for (const f of variants) {

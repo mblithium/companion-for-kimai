@@ -6,6 +6,8 @@
   let siteObs = null;
   let lastSig = '';
   let totalsTimer = null;
+  let totalsCache = { key: '', at: 0, list: [] };
+  const TOTALS_COOLDOWN_MS = 60000;
   let weekTotalEl = null;
   let bulkSyncing = false;
   const expandedKeys = new Set();
@@ -432,7 +434,7 @@
   }
 
   KE.fetchTimesheetsBetween = async function (fromKey, toKey) {
-    const stamp = (key, time) => key.slice(0, 4) + '-' + key.slice(4, 6) + '-' + key.slice(6, 8) + ' ' + time;
+    const stamp = (key, time) => key.slice(0, 4) + '-' + key.slice(4, 6) + '-' + key.slice(6, 8) + 'T' + time;
     const url = '/api/timesheets?size=1000' +
       '&begin=' + encodeURIComponent(stamp(fromKey, '00:00:00')) +
       '&end=' + encodeURIComponent(stamp(toKey, '23:59:59'));
@@ -468,7 +470,22 @@
       } else {
         [from, to] = currentWeekRange(nowMs);
       }
-      const list = await KE.fetchTimesheetsBetween(from, to);
+      const rangeKey = from + '|' + to;
+      const rangeNow = Date.now();
+      let list = (totalsCache.key === rangeKey && (rangeNow - totalsCache.at) < TOTALS_COOLDOWN_MS)
+        ? totalsCache.list
+        : null;
+      if (!list) {
+        try {
+          list = await KE.fetchTimesheetsBetween(from, to);
+        } catch (e) {
+          totalsCache = { key: rangeKey, at: rangeNow, list: totalsCache.key === rangeKey ? totalsCache.list : [] };
+          refreshDailyTotals(tb);
+          refreshWeekTotal(tb);
+          return null;
+        }
+        totalsCache = { key: rangeKey, at: rangeNow, list: list };
+      }
       const perDay = new Map();
       list.forEach((t) => {
         const day = entryDayKey(t);
