@@ -4,6 +4,33 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.23.0] — 2026-10-16
+### Added
+- Description suggestions in the site Quick Timer bar: typing shows up to 5
+  matching recent timers; clicking (or ↓/Enter) fills Description, Customer,
+  Project, Activity and Tags.
+- "Connect automatically" on the options API-key card, with hashed token
+  names (`Companion for Kimai <hash>`) and a manual-creation link on failure;
+  the button hides once connected and reappears without a key or on failure.
+- Page banner reappears when the API goes down and hides on recovery.
+- Popup footer with shortcut tips and a link to the settings section.
+- Keyboard shortcuts reworked around `Alt+Shift+P` (default timer) and
+  `Alt+Shift+S` (stop), with keyup-confirmed remapping in settings.
+- "About" section in both READMEs; Devmove publisher in options About.
+### Changed
+- Chrome build drops the `cookies` permission (kept on Firefox).
+- Stop buttons are icon-only (red ■) with accessible labels; extension icon
+  in popup and options headers; GNOME is the default theme.
+- Site totals use ISO datetimes and a 60s per-range cooldown.
+### Removed
+- Toolbar icon menus, background worker with dynamic icon, `alarms` and
+  `contextMenus` permissions; restart shortcut; 16px and 32px icons.
+### Fixed
+- Content bundle now ships `permissions.js` (page auto-connect and default
+  shortcuts were calling missing functions); new check-pages coverage guard.
+- Token flow reads the creation response first, tolerates markup variants,
+  reuses each row's delete URL, and detects login redirects.
+
 ## [0.22.16] — 2026-10-12
 ### Changed
 - Chrome build drops the `cookies` permission (kept on Firefox for

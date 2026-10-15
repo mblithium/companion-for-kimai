@@ -4,6 +4,33 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.23.0] — 2026-10-16
+### Added
+- Sugestões de descrição no Timer rápido do site: ao digitar, até 5 timers
+  recentes relacionados; clicar (ou ↓/Enter) preenche Descrição, Cliente,
+  Projeto, Atividade e Tags.
+- "Conectar automaticamente" no cartão de chave das opções, com nomes de token
+  com hash (`Companion for Kimai <hash>`) e link de criação manual na falha;
+  o botão some após conectar e reaparece sem chave ou em caso de falha.
+- Banner da página reaparece com a API fora e oculta ao recuperar.
+- Rodapé do popup com dicas de atalho e link para as configurações.
+- Atalhos retrabalhados em `Alt+Shift+P` (timer padrão) e `Alt+Shift+S`
+  (parar), com remapeamento confirmado no keyup.
+- Seção "Sobre" nos dois READMEs; publicador Devmove no Sobre das opções.
+### Changed
+- Variante Chrome dispensa `cookies` (mantida no Firefox).
+- Botões de parar só-ícone (■ vermelho) com rótulos acessíveis; ícone da
+  extensão nos cabeçalhos; GNOME como tema padrão.
+- Totais do site usam datetimes ISO e cooldown de 60s por intervalo.
+### Removed
+- Menus do ícone, worker de background com ícone dinâmico, permissões `alarms`
+  e `contextMenus`; atalho de recomeçar; ícones 16px e 32px.
+### Fixed
+- Bundle da página agora inclui `permissions.js` (auto-connect e atalhos
+  chamavam funções inexistentes); nova trava no check-pages.
+- Fluxo do token lê a resposta da criação, tolera variações de markup,
+  reaproveita a URL de exclusão da linha e detecta redirect de login.
+
 ## [0.22.16] — 2026-10-12
 ### Changed
 - Variante Chrome dispensa a permissão `cookies` (mantida no Firefox para
