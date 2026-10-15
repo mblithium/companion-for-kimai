@@ -483,6 +483,18 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const bodyTags = posted[1] || {};
   check('tags como string', bodyTags.tags === 'Alexander,NovaTag', bodyTags.tags);
   check('start com tags ok', status.textContent === 'Timer iniciado!', status.textContent);
+  const bannerLink = findAll(card, 'ke-connect-manual')[0];
+  check('banner tem link manual oculto', !!bannerLink && bannerLink.hidden === true &&
+    bannerLink.textContent === 'Criar chave manualmente');
+  const savedBannerToken = storedLocal.keApiToken;
+  delete storedLocal.keApiToken;
+  autoConnectPage = '<table></table>';
+  findAll(card, 'ke-btn-connect')[0].fire('click');
+  await sleep(300);
+  check('falha mostra link manual com URL da chave', bannerLink.hidden === false &&
+    bannerLink.href.indexOf('/api-token') >= 0, bannerLink.href);
+  check('toast de falha orienta', pageToast().textContent === 'Não foi possível conectar.', pageToast().textContent);
+  if (savedBannerToken !== undefined) storedLocal.keApiToken = savedBannerToken;
   moInstances.forEach((m) => m.cb());
   await sleep(700);
   check('sem duplicar com card presente', mountedCards.length === 2, mountedCards.length);
@@ -1507,15 +1519,17 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const parsed = KE.parseTokenList(listHtml);
   check('parseTokenList', parsed.length === 2 && parsed[0].id === '11' && parsed[0].name === 'Companion for Kimai' && parsed[1].id === '22', parsed);
   autoConnectPage = '<table><tr><td>Companion for Kimai</td><td></td><td><a href="/api/users/api-token/11">x</a></td></tr>' +
-    '<tr><td>Companion for Kimai</td><td></td><td><a href="/api/users/api-token/12">x</a></td></tr>' +
+    '<tr><td>Companion for Kimai a1b2c3</td><td></td><td><a href="/api/users/api-token/12">x</a></td></tr>' +
     '<tr><td>Outro token</td><td></td><td><a href="/api/users/api-token/99">x</a></td></tr></table><pre><code>novotoken123</code></pre>';
   autoConnectPosts.length = 0;
   autoConnectDeleted.length = 0;
+  check('shortHash tem 6 hex', /^[0-9a-f]{6}$/.test(KE.shortHash()), KE.shortHash());
   const auto = await KE.autoConnectKimai({ locale: 'pt_BR', username: 'john_user', name: 'Companion for Kimai' });
   check('autoConnect cria e substitui', auto.token === 'novotoken123' && auto.replaced.join(',') === '11,12', auto);
+  check('autoConnect nomeia com hash', /^Companion for Kimai [0-9a-f]{6}$/.test(auto.name), auto.name);
   check('autoConnect preserva outros', autoConnectDeleted.indexOf('99') < 0, autoConnectDeleted);
   check('autoConnect posta form', autoConnectPosts.length === 1 &&
-    autoConnectPosts[0].indexOf('access_token_form%5Bname%5D=Companion+for+Kimai') >= 0, autoConnectPosts);
+    /access_token_form%5Bname%5D=Companion\+for\+Kimai\+[0-9a-f]{6}/.test(autoConnectPosts[0]), autoConnectPosts);
   autoConnectPage = '<table><tr><td>Outro token</td><td></td><td><a href="/api/users/api-token/99">x</a></td></tr></table><pre><code>sozinho456</code></pre>';
   autoConnectDeleted.length = 0;
   const auto2 = await KE.autoConnectKimai({ locale: 'en', username: 'john_user', name: 'Companion for Kimai' });

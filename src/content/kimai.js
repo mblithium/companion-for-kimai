@@ -162,22 +162,23 @@
     return true;
   };
   KE.autoConnectKimai = async function (opts) {
-    const name = (opts && opts.name) || 'Companion for Kimai';
+    const base = (opts && opts.name) || 'Companion for Kimai';
+    const name = base + ' ' + KE.shortHash();
     const page = await (await fetch(
       '/' + ((opts && opts.locale) || 'en') + '/profile/' + encodeURIComponent(opts.username) + '/api-token',
       { credentials: 'same-origin' }
     )).text();
     const replaced = [];
     for (const t of KE.parseTokenList(page)) {
-      if (t.name === name) {
+      if (t.name === base || t.name.indexOf(base + ' ') === 0) {
         try {
           await KE.deleteAccessToken(t.id);
           replaced.push(t.id);
         } catch (e) {}
       }
     }
-    const created = await KE.autoCreateToken(opts);
-    return { token: created.token, replaced: replaced };
+    const created = await KE.autoCreateToken(Object.assign({}, opts, { name: name }));
+    return { token: created.token, replaced: replaced, name: name };
   };
   KE.restartLast = async function () {
     const list = KE.asArray(await KE.apiGet('/api/timesheets?size=5'))

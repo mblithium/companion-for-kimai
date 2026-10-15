@@ -36,6 +36,18 @@
   KE.norm = function (s) {
     return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
+  KE.shortHash = function () {
+    try {
+      const cryptoObj = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto :
+        ((typeof msCrypto !== 'undefined' && msCrypto.getRandomValues) ? msCrypto : null);
+      if (cryptoObj) {
+        const buf = new Uint8Array(3);
+        cryptoObj.getRandomValues(buf);
+        return Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) {}
+    return Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+  };
 
   KE.el = function (tag, cls, text) {
     const n = document.createElement(tag);

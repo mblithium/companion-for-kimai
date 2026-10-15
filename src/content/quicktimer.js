@@ -315,6 +315,8 @@
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = KE.T.connecting;
+    ui.connectManual.hidden = true;
+    ui.connectManual.href = '';
     try {
       let me = null;
       try {
@@ -331,6 +333,7 @@
         return;
       }
       const locale = detectLocale() || me.language || 'en';
+      ui.connectManual.href = KE.apiTokenUrl(location.origin, locale, me.username);
       const created = await KE.autoConnectKimai({ locale: locale, username: me.username, name: 'Companion for Kimai' });
       const cur = await KE.storageGet(['keSettings']);
       await KE.storageSet({
@@ -345,10 +348,12 @@
       setStatus(KE.T.connectedOk, 'ok');
       await loadActive();
     } catch (e) {
+      if (ui.connectManual.href) ui.connectManual.hidden = false;
+      const manual = ui.connectManual.href || '';
       const detail = String((e && e.serverMessage) || '').trim();
-      if (e && (e.status === 401 || e.status === 403)) setStatus(KE.T.needLogin, 'err');
-      else if (detail) setStatus(KE.T.connectFail + ' ' + detail.slice(0, 160), 'err');
-      else setStatus(KE.T.connectFail + (e && e.status ? ' (HTTP ' + e.status + ')' : ''), 'err');
+      if (e && (e.status === 401 || e.status === 403)) setStatus(KE.T.needLogin, 'err', manual);
+      else if (detail) setStatus(KE.T.connectFail + ' ' + detail.slice(0, 160), 'err', manual);
+      else setStatus(KE.T.connectFail + (e && e.status ? ' (HTTP ' + e.status + ')' : ''), 'err', manual);
     } finally {
       btn.disabled = false;
       btn.textContent = original;
@@ -444,8 +449,13 @@
     const connectBtn = KE.el('button', 'ke-btn ke-btn-connect', '🔌 ' + KE.T.connectBtn);
     connectBtn.type = 'button';
     connectBtn.addEventListener('click', () => doAutoConnect(connectBtn));
+    const connectManual = KE.el('a', 'ke-link ke-connect-manual', KE.T.connectManual);
+    connectManual.hidden = true;
+    connectManual.target = '_blank';
+    connectManual.rel = 'noopener';
     connect.appendChild(connectText);
     connect.appendChild(connectBtn);
+    connect.appendChild(connectManual);
     card.appendChild(connect);
 
     const head = KE.el('div', 'ke-head');
@@ -523,7 +533,7 @@
     nowSection.appendChild(activeList);
 
     ui = {
-      card: card, connect: connect, connectBtn: connectBtn,
+      card: card, connect: connect, connectBtn: connectBtn, connectManual: connectManual,
       customerCombo: customerCombo, projectCombo: projectCombo, activityCombo: activityCombo,
       description: description, tagsCombo: tagsCombo, start: start,
       nowSection: nowSection, activeList: activeList

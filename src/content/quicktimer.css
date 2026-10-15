@@ -218,6 +218,12 @@ body.ke-hide-header .navbar.navbar-expand-md:not(.navbar-vertical) {
 }
 #ke-quick-timer .ke-connect[hidden] { display: none; }
 #ke-quick-timer .ke-connect-text { flex: 1; min-width: 200px; }
+#ke-quick-timer .ke-connect-manual {
+  flex: none;
+  font-weight: 700;
+  color: var(--ke-link, #206bc4);
+}
+#ke-quick-timer .ke-connect-manual[hidden] { display: none; }
 #ke-quick-timer .ke-btn-connect {
   background: var(--ke-green, #2fb344);
   color: var(--ke-on-green, #1c1c1e);
