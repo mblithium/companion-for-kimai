@@ -688,6 +688,35 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await footLink.onclick();
   check('link abre seção de atalhos', chrome.tabs.created.length === 1 &&
     chrome.tabs.created[0].url === 'chrome-extension://test/src/options/options.html#ke-opt-shortcuts-card', chrome.tabs.created);
+  const savedActiveStats = activeStub;
+  const savedTodayStats = todayStub;
+  const savedRecentStats = recentStub;
+  activeStub = [];
+  const statsDay = KE.todayKey();
+  const daysSinceMonday = (new Date().getDay() + 6) % 7;
+  const recentDate = new Date();
+  recentDate.setDate(recentDate.getDate() - (daysSinceMonday > 0 ? 1 : 0));
+  const padStats = (n) => String(n).padStart(2, '0');
+  const recentKey = recentDate.getFullYear() + '-' + padStats(recentDate.getMonth() + 1) + '-' + padStats(recentDate.getDate());
+  todayStub = [
+    { id: 711, project: 200, activity: 1655, begin: statsDay + 'T09:00:00', end: statsDay + 'T10:00:00', duration: 3600, description: 'a' },
+    { id: 712, project: 200, activity: 1655, begin: statsDay + 'T11:00:00', end: statsDay + 'T11:30:00', duration: 1800, description: 'b' },
+  ];
+  recentStub = [
+    { id: 713, project: 144, activity: 1661, begin: recentKey + 'T09:00:00', end: recentKey + 'T10:00:00', duration: 600, description: 'c' },
+  ];
+  Object.keys(storedLocal).forEach((k) => { if (k === 'keCacheToday' || k === 'keCacheRecent') delete storedLocal[k]; });
+  eval(POP_SRC);
+  await sleep(500);
+  check('stats somam hoje e semana', popEls['ke-pop-stats-today'].textContent === (daysSinceMonday > 0 ? '01:30:00' : '01:40:00') &&
+    popEls['ke-pop-stats-week'].textContent === '01:40:00',
+    [popEls['ke-pop-stats-today'].textContent, popEls['ke-pop-stats-week'].textContent]);
+  activeStub = savedActiveStats;
+  todayStub = savedTodayStats;
+  recentStub = savedRecentStats;
+  Object.keys(storedLocal).forEach((k) => { if (k === 'keCacheToday' || k === 'keCacheRecent') delete storedLocal[k]; });
+  eval(POP_SRC);
+  await sleep(500);
   posted.length = 0;
   stoppedIds.length = 0;
   const popTitles = findAll(popEls['ke-pop-active'], 'ke-pop-timer-title').map((n) => n.textContent);
@@ -1099,6 +1128,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     { id: 5, project: 1, activity: 1, begin: '2000-01-01T08:00:00', end: '2000-01-01T09:00:00', duration: 60, description: 'ontem' },
   ];
   check('filterToday exclui rodando/ontem', KE.filterToday(gsrc).map((t) => t.id).join(',') === '3,2,1');
+  check('isoWeekKey cruza com siteWeekKey', KE.isoWeekKey('2026-10-13') === KE.siteWeekKey('20261013') &&
+    KE.isoWeekKey('2026-01-01') === KE.siteWeekKey('20260101') && KE.isoWeekKey('xx') === '');
+  check('formatHms zera e preenche', KE.formatHms(0) === '00:00:00' && KE.formatHms(600) === '00:10:00' &&
+    KE.formatHms(3661) === '01:01:01');
   const gs = KE.groupByTask(gsrc, 8);
   check('agrupa por tarefa', gs.length === 2 && gs[0].entries.length === 1 && gs[1].entries.length === 2,
     gs.map((g) => g.entries.length));
@@ -1582,7 +1615,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo usa chaves i18n', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion', 'startDefaultTask', 'stopTask', 'popupOpenHint', 'moreShortcuts'].every((k) =>
+  check('novas chaves i18n em pt e en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion', 'startDefaultTask', 'stopTask', 'popupOpenHint', 'moreShortcuts', 'statsToday', 'statsWeek'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
   check('chaves das seções do plugin em pt e en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
     i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));

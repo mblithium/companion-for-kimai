@@ -16,6 +16,7 @@ O Companion for Kimai adiciona uma barra de Timer rápido à página do timeshee
 - ⚡ Barra de Timer rápido acima dos registros — chega de procurar o botão de play;
 - ▶ Widget "Agora" mostrando seu timer em execução de relance;
 - ➕ Popup para iniciar timers, continuar o trabalho de hoje e reaproveitar entradas recentes;
+- 📊 Estatísticas no popup com totais de hoje e da semana;
 - 🗂 Agrupamento de lançamentos, com edição inline;
 - ⌨ Atalhos de teclado para iniciar o timer padrão, parar e abrir o popup (Alt+Shift+P/S/K);
 - 🎨 7 temas incluindo GNOME/Adwaita, com claro/escuro seguindo o sistema;

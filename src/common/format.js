@@ -17,6 +17,23 @@
   KE.beginDayKey = function (beginStr) {
     return String(beginStr || '').slice(0, 10);
   };
+  KE.isoWeekKey = function (dayStr) {
+    const m = String(dayStr || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!m) return '';
+    const thursday = new Date(+m[1], +m[2] - 1, +m[3]);
+    thursday.setDate(thursday.getDate() - ((thursday.getDay() + 6) % 7) + 3);
+    const firstThursday = new Date(thursday.getFullYear(), 0, 4);
+    firstThursday.setDate(firstThursday.getDate() - ((firstThursday.getDay() + 6) % 7) + 3);
+    const week = 1 + Math.round((thursday - firstThursday) / 604800000);
+    return thursday.getFullYear() + '-W' + String(week).padStart(2, '0');
+  };
+  KE.formatHms = function (totalSeconds) {
+    const s = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s - h * 3600) / 60);
+    const sec = s % 60;
+    return [h, m, sec].map((part) => String(part).padStart(2, '0')).join(':');
+  };
   KE.shortElapsed = function (beginStr, nowMs) {
     const t = new Date(beginStr).getTime();
     if (Number.isNaN(t)) return '•';

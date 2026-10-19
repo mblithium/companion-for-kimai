@@ -20,6 +20,7 @@ with any Kimai installation.
 - ⚡ Quick Timer bar above the records — no more hunting for the play button;
 - ▶ "Now" widget showing your running timer at a glance;
 - ➕ Popup to start timers, continue today's work, and reuse recent entries;
+- 📊 Popup stats with today and week totals;
 - 🗂 Entry grouping, with inline editing;
 - ⌨ Keyboard shortcuts to start the default timer, stop, and open the popup (Alt+Shift+P/S/K);
 - 🎨 7 themes including GNOME/Adwaita, with light/dark following the system;

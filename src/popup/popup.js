@@ -6,6 +6,7 @@
   let ui = {};
   let tick = null;
   let tickToday = null;
+  let statsTick = null;
 
   function setStatus(msg, kind) {
     ui.status.textContent = msg || '';
@@ -788,6 +789,46 @@
     await refreshActive();
     await refreshToday();
     await refreshRecent();
+    await refreshStats();
+  }
+
+  async function refreshStats() {
+    if (!ui.statsToday || !ui.statsWeek) return;
+    let pool = [];
+    try {
+      const results = await Promise.all([KE.getTodayCached(false), KE.getRecentCached(false)]);
+      results.forEach((r) => { pool = pool.concat((r && r.entries) || []); });
+      pool = pool.concat(KE.state.active || []);
+    } catch (e) {
+      return;
+    }
+    const seen = new Set();
+    const nowMs = Date.now();
+    const day = KE.todayKey();
+    const week = KE.isoWeekKey(day);
+    let todaySec = 0;
+    let weekSec = 0;
+    for (const t of pool) {
+      if (!t) continue;
+      const id = t.id != null ? String(t.id) : '';
+      if (id) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+      }
+      let secs = 0;
+      if (t.end) {
+        secs = Math.max(0, Math.floor(Number(t.duration) || 0));
+      } else {
+        const beginMs = new Date(t.begin).getTime();
+        if (Number.isNaN(beginMs)) continue;
+        secs = Math.max(0, Math.floor((nowMs - beginMs) / 1000));
+      }
+      const d = KE.beginDayKey(t.begin);
+      if (d === day) todaySec += secs;
+      if (d && KE.isoWeekKey(d) === week) weekSec += secs;
+    }
+    ui.statsToday.textContent = KE.formatHms(todaySec);
+    ui.statsWeek.textContent = KE.formatHms(weekSec);
   }
 
   async function boot() {
@@ -795,6 +836,7 @@
       setup: $('ke-pop-setup'), setupMsg: $('ke-pop-setup-msg'), setupBtn: $('ke-pop-setup-btn'),
       error: $('ke-pop-error'), errorMsg: $('ke-pop-error-msg'),
       main: $('ke-pop-main'), active: $('ke-pop-active'), today: $('ke-pop-today'),
+      statsToday: $('ke-pop-stats-today'), statsWeek: $('ke-pop-stats-week'),
       newTimerToggle: $('ke-pop-new-toggle'), newTimerBody: $('ke-pop-new-body'),
       recent: $('ke-pop-recent'),
       todayToggle: $('ke-pop-today-toggle'), recentToggle: $('ke-pop-recent-toggle'),
@@ -968,6 +1010,8 @@
       tick = setInterval(tickDurations, 1000);
       if (tickToday) clearInterval(tickToday);
       tickToday = setInterval(() => { refreshToday(false, true); refreshRecent(false, true); }, KE.CACHE_TTL.today);
+      if (statsTick) clearInterval(statsTick);
+      statsTick = setInterval(() => { refreshStats().catch(() => {}); }, 15000);
     } catch (e) {
       try { console.error('[Companion] popup falhou', e); } catch (ce) {}
       ui.setupMsg.textContent = KE.uiText('ui.popupLoadFailed', { error: (e && e.message) || e });

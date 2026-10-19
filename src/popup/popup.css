@@ -42,6 +42,14 @@ body {
   color: inherit; font-size: 15px; cursor: pointer; padding: 2px 8px;
 }
 .ke-pop-sec { margin-bottom: 12px; }
+.ke-pop-stats-row { display: flex; gap: 8px; }
+.ke-pop-stat {
+  flex: 1; min-width: 0;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  border: 1px solid var(--ke-border); border-radius: 6px; padding: 6px 8px;
+}
+.ke-pop-stats-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.65; }
+.ke-pop-stat strong { font-size: 13px; font-variant-numeric: tabular-nums; }
 .ke-pop-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .ke-pop-sec-head h2 { margin: 0; }
 .ke-pop-section-toggle {
