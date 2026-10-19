@@ -414,6 +414,12 @@
         const active = KE.asArray(await KE.apiGet('/api/timesheets/active'));
         setStatus(KE.uiText('ui.connectionOk', { count: active.length }), 'ok');
         $('ke-opt-autoconnect').hidden = true;
+        const typed = $('ke-opt-token').value.trim();
+        if (typed) {
+          await KE.localSet({ keApiToken: typed });
+          $('ke-opt-token').value = '';
+          await refreshTokenState();
+        }
       } catch (e) {
         const detail = String((e && e.serverMessage) || '').trim();
         setStatus(KE.uiText('ui.connectionFailed') + (e && e.status ? ' (HTTP ' + e.status + ')' : '') +
