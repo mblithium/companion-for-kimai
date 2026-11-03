@@ -154,6 +154,7 @@
           await KE.apiPatch('/api/timesheets/' + encodeURIComponent(t.id) + '/stop');
           setStatus(KE.T.stoppedOk, 'ok');
           await refresh();
+          await KE.reloadKimaiTabs(kimaiBase);
         } catch (e) {
           setStatus(popError(e, KE.T.stopFail), 'err');
         }
@@ -251,6 +252,7 @@
         await KE.apiPatch('/api/timesheets/' + encodeURIComponent(t.id), payload);
         setStatus(KE.T.updatedOk, 'ok');
         await refresh();
+        await KE.reloadKimaiTabs(kimaiBase);
       } catch (e) {
         saveBtn.disabled = false;
         showError(popError(e, KE.T.updateFail));

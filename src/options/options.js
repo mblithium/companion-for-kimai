@@ -184,7 +184,7 @@
     renderExtensionInfo();
     $('ke-opt-toast').addEventListener('click', () => setStatus('', ''));
     const settings = await KE.getSettings();
-    let persistedUiLocale = settings.uiLocale || KE.uiLocale;
+    let persistedBase = KE.normalizeBaseUrl(settings.kimaiBaseUrl || '');
     $('ke-opt-url').value = settings.kimaiBaseUrl || '';
     const themeSel = $('ke-opt-theme');
     themeSel.replaceChildren();
@@ -488,7 +488,7 @@
       setStatus(KE.uiText('ui.invalidUrl'), 'err');
       return;
     }
-    const localeChanged = persistedUiLocale !== uiLocaleSel.value;
+    const previousBase = persistedBase;
     const typed = $('ke-opt-token').value.trim();
     if (typed) {
       await KE.localSet({ keApiToken: typed });
@@ -518,7 +518,6 @@
     });
     KE.setLocale(uiLocaleSel.value);
     KE.translatePage(document);
-    persistedUiLocale = uiLocaleSel.value;
     document.documentElement.dataset.keTheme = themeSel.value;
     $('ke-opt-url').value = base;
     syncOpen();
@@ -526,7 +525,9 @@
     await refreshTokenState();
     await refreshCacheState();
     setStatus(KE.uiText('ui.settingsSaved'), 'ok');
-    if (localeChanged) await KE.reloadKimaiTabs(base);
+    if (previousBase && previousBase !== base) await KE.reloadKimaiTabs(previousBase);
+    await KE.reloadKimaiTabs(base);
+    persistedBase = base;
   };
 
     open.addEventListener('click', (ev) => {
