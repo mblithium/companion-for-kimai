@@ -190,6 +190,11 @@
     descInput.placeholder = KE.T.descriptionPh;
     descInput.setAttribute('maxlength', '255');
     descInput.value = t.description || '';
+    const beginInput = document.createElement('input');
+    beginInput.className = 'ke-pop-input';
+    beginInput.type = 'time';
+    beginInput.setAttribute('aria-label', KE.T.begin);
+    beginInput.value = KE.timeValue(t.begin);
     const tagsCombo = KE.createMultiCombo({ searchPlaceholder: KE.T.tagsPh });
     const errBox = document.createElement('div');
     errBox.className = 'ke-pop-edit-error';
@@ -222,6 +227,7 @@
     form.appendChild(labeled(KE.T.project, projectCombo.root));
     form.appendChild(labeled(KE.T.activity, actCombo.root));
     form.appendChild(labeled(KE.T.description, descInput));
+    form.appendChild(labeled(KE.T.begin, beginInput));
     form.appendChild(labeled(KE.T.tags, tagsCombo.root));
     form.appendChild(errBox);
     form.appendChild(actions);
@@ -239,6 +245,11 @@
         showError(KE.T.needProject);
         return;
       }
+      const beginApi = KE.timeToApi(t.begin, beginInput.value);
+      if (!beginApi || Number.isNaN(new Date(beginApi).getTime()) || new Date(beginApi).getTime() > Date.now()) {
+        showError(KE.T.invalidBegin);
+        return;
+      }
       tagsCombo.flush();
       const tagNames = await KE.ensureTags(tagsCombo.getValues());
       const payload = {
@@ -247,6 +258,7 @@
         description: descInput.value.trim(),
         tags: tagNames.join(','),
       };
+      if (KE.timeValue(t.begin) !== beginInput.value) payload.begin = beginApi;
       saveBtn.disabled = true;
       try {
         await KE.apiPatch('/api/timesheets/' + encodeURIComponent(t.id), payload);
@@ -261,6 +273,10 @@
     saveBtn.addEventListener('click', () => { doSave().catch(() => {}); });
     cancelBtn.addEventListener('click', () => { refreshActive().catch(() => {}); });
     descInput.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); doSave().catch(() => {}); }
+      else if (ev.key === 'Escape') refreshActive().catch(() => {});
+    });
+    beginInput.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); doSave().catch(() => {}); }
       else if (ev.key === 'Escape') refreshActive().catch(() => {});
     });

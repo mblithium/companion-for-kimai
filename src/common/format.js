@@ -17,6 +17,20 @@
   KE.beginDayKey = function (beginStr) {
     return String(beginStr || '').slice(0, 10);
   };
+  KE.timeValue = function (beginStr) {
+    const t = new Date(beginStr);
+    if (Number.isNaN(t.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return pad(t.getHours()) + ':' + pad(t.getMinutes());
+  };
+  KE.timeToApi = function (beginStr, timeValue) {
+    const t = new Date(beginStr);
+    const m = String(timeValue || '').match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+    if (Number.isNaN(t.getTime()) || !m) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate()) +
+      'T' + m[1] + ':' + m[2] + ':' + (m[3] || '00');
+  };
   KE.isoWeekKey = function (dayStr) {
     const m = String(dayStr || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (!m) return '';

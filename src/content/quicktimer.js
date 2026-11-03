@@ -205,6 +205,12 @@
     tagsInput.type = 'text';
     tagsInput.placeholder = KE.T.tagsPh;
     tagsInput.value = KE.tagNames(t.tags).join(', ');
+    const beginInput = document.createElement('input');
+    beginInput.className = 'ke-input';
+    beginInput.type = 'time';
+    beginInput.value = KE.timeValue(t.begin);
+    beginInput.title = KE.T.begin;
+    beginInput.setAttribute('aria-label', KE.T.begin);
     const actions = KE.el('div', 'ke-edit-actions');
     const saveBtn = KE.el('button', 'ke-btn ke-btn-save', KE.T.save);
     saveBtn.type = 'button';
@@ -215,14 +221,15 @@
     form.appendChild(projCombo.root);
     form.appendChild(actCombo.root);
     form.appendChild(descInput);
+    form.appendChild(beginInput);
     form.appendChild(tagsInput);
     form.appendChild(actions);
     row.appendChild(form);
 
-    const doSave = () => saveEdit(t.id, projCombo, actCombo, descInput, tagsInput, saveBtn);
+    const doSave = () => saveEdit(t.id, projCombo, actCombo, descInput, tagsInput, beginInput, saveBtn);
     saveBtn.addEventListener('click', doSave);
     cancelBtn.addEventListener('click', () => renderActive());
-    [descInput, tagsInput].forEach((inp) => inp.addEventListener('keydown', (ev) => {
+    [descInput, beginInput, tagsInput].forEach((inp) => inp.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); doSave(); }
       else if (ev.key === 'Escape') renderActive();
     }));
@@ -260,7 +267,7 @@
     };
   }
 
-  async function saveEdit(id, projCombo, actCombo, descInput, tagsInput, saveBtn) {
+  async function saveEdit(id, projCombo, actCombo, descInput, tagsInput, beginInput, saveBtn) {
     projCombo.flush(true);
     actCombo.flush(true);
     const projectId = projCombo.getValue();
@@ -270,6 +277,13 @@
       (!projectId ? projCombo : actCombo).focus();
       return;
     }
+    const origBegin = (KE.state.active.find((x) => String(x.id) === String(id)) || {}).begin;
+    const beginApi = KE.timeToApi(origBegin, beginInput.value);
+    if (!beginApi || Number.isNaN(new Date(beginApi).getTime()) || new Date(beginApi).getTime() > Date.now()) {
+      setStatus(KE.T.invalidBegin, 'err');
+      beginInput.focus();
+      return;
+    }
     const description = descInput.value.trim();
     const tagNames = await KE.ensureTags(tagsInput.value.split(',').map((s) => s.trim()).filter(Boolean));
     saveBtn.disabled = true;
@@ -277,6 +291,8 @@
     saveBtn.textContent = KE.T.saving;
     try {
       const payload = { project: Number(projectId), activity: Number(activityId), description: description, tags: tagNames.join(',') };
+      const orig = KE.state.active.find((x) => String(x.id) === String(id));
+      if (!orig || KE.timeValue(orig.begin) !== beginInput.value) payload.begin = beginApi;
       await KE.apiPatch('/api/timesheets/' + encodeURIComponent(id), payload);
       setStatus(KE.T.updatedOk, 'ok');
       KE.notifyKimaiUpdate();

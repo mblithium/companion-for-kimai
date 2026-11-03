@@ -627,13 +627,17 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('edição preenche atividade', editCombos[1].value === 'Consequuntur dolor', editCombos.map((i) => i.value));
   const editTexts = findAll(editForm, 'ke-input').filter((n) => n.tagName === 'INPUT' && !n.classList.contains('ke-combo-input'));
   check('edição preenche descrição', editTexts[0].value === 'antes', editTexts.map((i) => i.value));
-  check('edição preenche tags', editTexts[1].value === 'Alexander, NovaTag', editTexts.map((i) => i.value));
+  check('edição preenche início', editTexts[1].value === KE.timeValue(activeStub[0].begin), editTexts.map((i) => i.value));
+  check('edição preenche tags', editTexts[2].value === 'Alexander, NovaTag', editTexts.map((i) => i.value));
   editTexts[0].value = 'depois';
+  const pastTime = KE.timeValue(new Date(new Date(activeStub[0].begin).getTime() - 120000).toISOString());
+  editTexts[1].value = pastTime;
   findAll(editForm, 'ke-btn-save')[0].fire('click');
   await sleep(250);
   check('PATCH edição', patchedTimers.length === 1 && patchedTimers[0].id === '558' &&
     patchedTimers[0].body.project === 200 && patchedTimers[0].body.activity === 1655 &&
-    patchedTimers[0].body.description === 'depois' && patchedTimers[0].body.tags === 'Alexander,NovaTag',
+    patchedTimers[0].body.description === 'depois' && patchedTimers[0].body.tags === 'Alexander,NovaTag' &&
+    patchedTimers[0].body.begin === KE.timeToApi(activeStub[0].begin, pastTime),
     patchedTimers);
   check('status atualizado', pageToast().textContent === 'Timer atualizado!');
   findAll(nowSection(), 'ke-btn-edit')[0].fire('click');
@@ -880,16 +884,21 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   const activeEditForm = findAll(popEls['ke-pop-active'], 'ke-pop-edit-form')[0];
   check('edição do ativo abre formulário', !!activeEditForm);
   const activeEditInputs = activeEditForm.querySelectorAll('input');
-  check('edição do ativo sem datas nem duração', activeEditInputs.length === 4 &&
-    activeEditInputs.every((n) => n.type === 'text'), activeEditInputs.map((n) => n.type));
+  check('edição do ativo tem campo de início', activeEditInputs.length === 5 &&
+    activeEditInputs.filter((n) => n.type === 'time').length === 1 &&
+    activeEditInputs.filter((n) => n.type === 'text').length === 4, activeEditInputs.map((n) => n.type));
   check('edição do ativo tem rótulos nos campos',
     findAll(activeEditForm, 'ke-pop-label').map((n) => n.textContent).join('|') ===
-    [KE.T.project, KE.T.activity, KE.T.description, KE.T.tags].join('|'),
+    [KE.T.project, KE.T.activity, KE.T.description, KE.T.begin, KE.T.tags].join('|'),
     findAll(activeEditForm, 'ke-pop-label').map((n) => n.textContent));
   check('edição do ativo usa multi-combo de tags', findAll(activeEditForm, 'ke-multi').length === 1 &&
     activeEditInputs.filter((n) => n.classList.contains('ke-pop-input') && n.placeholder === KE.T.tagsPh).length === 0);
   const activeDescIn = activeEditInputs.find((n) => n.getAttribute('maxlength') === '255');
   check('edição do ativo preenche descrição', activeDescIn && activeDescIn.value === 'rodando', activeDescIn && activeDescIn.value);
+  const activeBeginIn = activeEditInputs.find((n) => n.type === 'time');
+  check('edição do ativo preenche início', activeBeginIn && activeBeginIn.value === KE.timeValue(activeStub[0].begin), activeBeginIn && activeBeginIn.value);
+  const activePastTime = KE.timeValue(new Date(new Date(activeStub[0].begin).getTime() - 120000).toISOString());
+  activeBeginIn.value = activePastTime;
   patchedTimers.length = 0;
   activeDescIn.value = 'revisado no popup';
   const activeTagsIn = findAll(activeEditForm, 'ke-multi-input')[0];
@@ -899,10 +908,11 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   findAll(activeEditForm, 'ke-pop-edit-save')[0].fire('click');
   await sleep(300);
   check('edição do ativo salva via PATCH', patchedTimers.length === 1 && patchedTimers[0].id === '801', patchedTimers);
-  check('PATCH do ativo sem datas nem duração', patchedTimers.length === 1 &&
+  check('PATCH do ativo com início alterado', patchedTimers.length === 1 &&
     patchedTimers[0].body.project === 200 && patchedTimers[0].body.activity === 1655 &&
     patchedTimers[0].body.description === 'revisado no popup' && patchedTimers[0].body.tags === 'Alexander' &&
-    Object.keys(patchedTimers[0].body).sort().join(',') === 'activity,description,project,tags', patchedTimers[0] && patchedTimers[0].body);
+    patchedTimers[0].body.begin === KE.timeToApi(activeStub[0].begin, activePastTime) &&
+    Object.keys(patchedTimers[0].body).sort().join(',') === 'activity,begin,description,project,tags', patchedTimers[0] && patchedTimers[0].body);
   findAll(popEls['ke-pop-active'], 'ke-pop-btn-edit')[0].fire('click');
   await sleep(400);
   findAll(popEls['ke-pop-active'], 'ke-pop-edit-cancel')[0].fire('click');
@@ -952,6 +962,11 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('dur 0', KE.formatDuration(0) === '0:00');
   check('dur 90', KE.formatDuration(90) === '1:30');
   check('dur 3661', KE.formatDuration(3661) === '1:01:01');
+  check('hora cheia', KE.timeValue('2026-10-26T08:12:22') === '08:12');
+  check('hora sem segundos', KE.timeValue('2026-10-26T08:12') === '08:12');
+  check('hora inválida', KE.timeValue('') === '' && KE.timeValue('ontem') === '');
+  check('hora p/ API mantém a data', KE.timeToApi('2026-10-26T09:00:00', '08:12') === '2026-10-26T08:12:00');
+  check('hora p/ API inválida', KE.timeToApi('', '08:12') === '' && KE.timeToApi('2026-10-26T09:00:00', 'abc') === '');
   const todayStr = KE.todayKey();
   const recents = KE.todayRecents([
     { id: 1, project: 1, activity: 1, description: 'a', begin: todayStr + 'T09:00:00', end: todayStr + 'T10:00:00', duration: 3600 },

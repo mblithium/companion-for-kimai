@@ -38,6 +38,7 @@
         "src/content/namespace.js",
         "src/content/i18n.js",
         "src/content/utils.js",
+        "src/common/format.js",
         "src/content/api.js",
         "src/content/storage.js",
         "src/common/permissions.js",
