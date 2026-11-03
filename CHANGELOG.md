@@ -4,6 +4,12 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.24.1] — 2026-11-03
+### Changed
+- Codebase in English: test names, check tooling messages and code
+  fallbacks translated; extension shortcut description in English.
+  No functional change.
+
 ## [0.24.0] — 2026-11-03
 ### Added
 - Editable start time in the active timer edit form (popup) and in the

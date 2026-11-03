@@ -4,6 +4,12 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.24.1] — 2026-11-03
+### Changed
+- Código em inglês: nomes de testes, mensagens das ferramentas de
+  verificação e fallbacks traduzidos; descrição do atalho da extensão
+  em inglês. Sem mudança funcional.
+
 ## [0.24.0] — 2026-11-03
 ### Added
 - Horário de início editável na edição do timer ativo (popup) e na seção
