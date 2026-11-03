@@ -396,12 +396,12 @@
 
   function weekTotalLabel() {
     const label = KE.uiText('weekTotal');
-    return label === 'weekTotal' ? 'TOTAL DA SEMANA' : label;
+    return label === 'weekTotal' ? 'WEEK TOTAL' : label;
   }
 
   function dayTotalLabel() {
     const label = KE.uiText('dayTotal');
-    return label === 'dayTotal' ? 'HOJE' : label;
+    return label === 'dayTotal' ? 'TODAY' : label;
   }
 
   function dateKeyFromDate(d) {

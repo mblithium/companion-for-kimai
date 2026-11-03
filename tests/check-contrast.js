@@ -126,7 +126,7 @@ const themes = parseThemes(themeCss);
 for (const t of ['light', 'dark', 'dracula', 'catppuccin', 'nord', 'gruvbox', 'gnome', 'gnome-light', 'system']) {
   if (!themes[t]) {
     failures++;
-    console.log('FALHOU tema ausente: ' + t);
+    console.log('FAILED missing theme: ' + t);
   }
 }
 
@@ -155,11 +155,11 @@ for (const f of files) {
       const q = ratio(fgC, bgC);
       if (q < MIN_RATIO) {
         failures++;
-        console.log(`FALHOU ${theme} ${f} ${r.sel}: "${fgRaw}" sobre "${bgRaw}" = ${q.toFixed(2)} (fg=${fg} bg=${bgC.slice(0, 3).join(',')})`);
+        console.log(`FAILED ${theme} ${f} ${r.sel}: "${fgRaw}" on "${bgRaw}" = ${q.toFixed(2)} (fg=${fg} bg=${bgC.slice(0, 3).join(',')})`);
       }
     }
   }
 }
 
-console.log(failures === 0 ? 'CHECK-CONTRAST OK (>= ' + MIN_RATIO + ')' : failures + ' FALHA(S)');
+console.log(failures === 0 ? 'CHECK-CONTRAST OK (>= ' + MIN_RATIO + ')' : failures + ' FAILURE(S)');
 process.exit(failures === 0 ? 0 : 1);

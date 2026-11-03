@@ -26,7 +26,7 @@
       "suggested_key": {
         "default": "Alt+Shift+K"
       },
-      "description": "Abrir o popup do Companion for Kimai"
+      "description": "Open the Companion for Kimai popup"
     }
   },
   "content_scripts": [

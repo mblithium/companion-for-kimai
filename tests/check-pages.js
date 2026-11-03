@@ -33,7 +33,7 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
   for (const f of files) {
     if (!fs.existsSync(path.join(ROOT, f))) {
       failures++;
-      console.log('FALHOU script inexistente: ' + html + ' -> ' + f);
+      console.log('FAILED missing script: ' + html + ' -> ' + f);
     }
   }
   const pageScript = files[files.length - 1];
@@ -42,7 +42,7 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
   const missing = [...usedNames(pageScript)].filter((n) => !defs.has(n));
   if (missing.length) {
     failures++;
-    console.log('FALHOU ' + html + ' usa KE.* sem definição nas libs: ' + missing.map((n) => 'KE.' + n).join(', '));
+    console.log('FAILED ' + html + ' uses KE.* without definition in libs: ' + missing.map((n) => 'KE.' + n).join(', '));
   } else {
     console.log('ok   ' + html + ' (' + files.length + ' scripts, ' + usedNames(pageScript).size + ' usos cobertos)');
   }
@@ -60,7 +60,7 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
     const missing = [...usedNames(entry)].filter((n) => !defs.has(n));
     if (missing.length) {
       failures++;
-      console.log('FALHOU ' + entry + ' usa KE.* sem definição no bundle da página: ' + missing.map((n) => 'KE.' + n).join(', '));
+      console.log('FAILED ' + entry + ' uses KE.* without definition in page bundle: ' + missing.map((n) => 'KE.' + n).join(', '));
     } else {
       console.log('ok   ' + entry + ' (' + usedNames(entry).size + ' usos cobertos pelo bundle)');
     }
@@ -93,19 +93,19 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
     };
     if (c.version !== f.version) {
       failures++;
-      console.log('FALHOU versões divergentes: chrome=' + c.version + ' firefox=' + f.version);
+      console.log('FAILED divergent versions: chrome=' + c.version + ' firefox=' + f.version);
     }
     if (JSON.stringify(strip(c)) !== JSON.stringify(strip(f))) {
       failures++;
-      console.log('FALHOU variantes divergem além de background/gecko-min/cookies-firefox');
+      console.log('FAILED variants diverge beyond background/gecko-min/cookies-firefox');
     }
     if (!Array.isArray(f.permissions) || f.permissions.indexOf('cookies') < 0) {
       failures++;
-      console.log('FALHOU firefox sem permissão cookies (suporte a contêineres)');
+      console.log('FAILED firefox missing cookies permission (container support)');
     }
     if (Array.isArray(c.permissions) && c.permissions.indexOf('cookies') >= 0) {
       failures++;
-      console.log('FALHOU chrome com permissão cookies (só Firefox usa contêineres)');
+      console.log('FAILED chrome has cookies permission (only Firefox uses containers)');
     }
     const contentScripts = (c.content_scripts && c.content_scripts[0] && c.content_scripts[0].js) || [];
     if (contentScripts.indexOf('src/content/sitegroup.js') < 0 ||
