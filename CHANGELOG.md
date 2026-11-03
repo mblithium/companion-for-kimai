@@ -4,6 +4,19 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.24.0] — 2026-11-03
+### Added
+- Editable start time in the active timer edit form (popup) and in the
+  site "Now" section: time-only input, prefilled with the current start,
+  validated (required, valid, never in the future); sent in the PATCH
+  only when changed.
+- Today and week time totals in the popup.
+### Fixed
+- Kimai tabs now reload after stopping a timer (popup), after inline
+  edits, and after any settings save (previously only on start and on
+  locale change); changing the base URL reloads the old and new origins.
+- API token is auto-saved after a successful connection test.
+
 ## [0.23.1] — 2026-10-16
 ### Fixed
 - Extension icons are square again (48x48, 128x128) as required by the

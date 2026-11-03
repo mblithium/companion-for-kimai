@@ -4,6 +4,19 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.24.0] — 2026-11-03
+### Added
+- Horário de início editável na edição do timer ativo (popup) e na seção
+  "Agora" do site: campo só de hora, pré-preenchido com o início atual,
+  validado (obrigatório, válido, nunca no futuro); enviado no PATCH só
+  quando alterado.
+- Totais de hoje e da semana no popup.
+### Fixed
+- Abas do Kimai agora recarregam ao parar um timer (popup), ao editar e
+  ao salvar qualquer configuração (antes: só ao iniciar e ao trocar o
+  idioma); trocar a URL base recarrega as origens antiga e nova.
+- Token da API salvo automaticamente após teste de conexão bem-sucedido.
+
 ## [0.23.1] — 2026-10-16
 ### Fixed
 - Ícones da extensão quadrados de novo (48x48, 128x128) como exigem as
