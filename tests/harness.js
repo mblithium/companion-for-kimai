@@ -810,13 +810,21 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     /\.ke-pop-check\s*\{[^}]*margin:\s*0 0 6px/s.test(popDraftCss) &&
     /\.ke-pop-draft-row\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between/s.test(popDraftCss) &&
     /\.ke-pop-draft-row \.ke-pop-check\s*\{[^}]*margin:\s*0/s.test(popDraftCss));
-  check('configure-template key in pt/en', KE.STRINGS.pt.ui.configureTemplate === 'Configurar template' &&
-    KE.STRINGS.en.ui.configureTemplate === 'Configure template');
+  check('configure-template key in all languages', KE.STRINGS.pt.ui.configureTemplate === 'Configurar template' &&
+    KE.STRINGS.en.ui.configureTemplate === 'Configure template' &&
+    KE.STRINGS.fr.ui.configureTemplate === 'Configurer le modèle' &&
+    KE.STRINGS.ro.ui.configureTemplate === 'Configurează șablonul');
   const savedGetAttr = document.documentElement.getAttribute;
   const savedNavLang = navigator.language;
   document.documentElement.getAttribute = () => 'es';
   check('detectLang falls back to en', KE.detectLang() === 'en');
   check('setLocale falls back to en', KE.setLocale('es') === 'en' && KE.T === KE.STRINGS.en);
+  document.documentElement.getAttribute = () => 'fr';
+  check('detectLang detects French', KE.detectLang() === 'fr');
+  check('setLocale selects French', KE.setLocale('fr') === 'fr' && KE.T === KE.STRINGS.fr);
+  document.documentElement.getAttribute = () => 'ro-RO';
+  check('detectLang detects Romanian', KE.detectLang() === 'ro');
+  check('setLocale selects Romanian', KE.setLocale('ro') === 'ro' && KE.T === KE.STRINGS.ro);
   document.documentElement.getAttribute = () => '';
   navigator.language = 'es';
   check('detectLang without lang falls back to en', KE.detectLang() === 'en');
@@ -824,6 +832,25 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   navigator.language = savedNavLang;
   KE.setLocale('pt');
   check('pt still detected', KE.detectLang() === 'pt' && KE.T === KE.STRINGS.pt);
+  const savedTable = KE.T;
+  KE.T = {};
+  check('uiText falls back to English for missing keys', KE.uiText('ui.saveSettings') === 'Save settings' && KE.uiText('save') === 'Save');
+  KE.T = { ui: {} };
+  check('uiText falls back to English for missing nested tables', KE.uiText('ui.saveSettings') === 'Save settings');
+  KE.T = savedTable;
+  check('locale restored after fallback probe', KE.T === KE.STRINGS.pt);
+  const enPaths = [];
+  const collectPaths = (table, prefix) => {
+    Object.keys(table).forEach((k) => {
+      const p = prefix ? prefix + '.' + k : k;
+      if (table[k] && typeof table[k] === 'object') collectPaths(table[k], p);
+      else enPaths.push(p);
+    });
+  };
+  collectPaths(KE.STRINGS.en, '');
+  const lookupPath = (table, p) => p.split('.').reduce((v, part) => v && v[part], table);
+  check('all languages share the English key set', ['pt', 'fr', 'ro'].every((lang) =>
+    enPaths.every((p) => lookupPath(KE.STRINGS[lang], p) != null)), enPaths.length);
   check('draft options section has anchor',
     fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-draft-card"'));
   check('shortcuts options section has anchor',
@@ -1357,8 +1384,10 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   twoWeekTbody.appendChild(siteRow({ id: 'n1', date: '19/10/2026', dur: '1:00', cust: 'C2', proj: 'P2', act: 'A2' }));
   check('week total ignores previous listing weeks', KE.siteWeekTotalSeconds(twoWeekTbody) === 3600,
     KE.siteWeekTotalSeconds(twoWeekTbody));
-  check('week total uses pt/en labels', KE.STRINGS.pt.weekTotal === 'TOTAL DA SEMANA' && KE.STRINGS.en.weekTotal === 'WEEK TOTAL');
-  check('today total uses pt/en labels', KE.STRINGS.pt.dayTotal === 'HOJE' && KE.STRINGS.en.dayTotal === 'TODAY');
+  check('week total uses labels in all languages', KE.STRINGS.pt.weekTotal === 'TOTAL DA SEMANA' && KE.STRINGS.en.weekTotal === 'WEEK TOTAL' &&
+    KE.STRINGS.fr.weekTotal === 'TOTAL DE LA SEMAINE' && KE.STRINGS.ro.weekTotal === 'TOTAL SĂPTĂMÂNĂ');
+  check('today total uses labels in all languages', KE.STRINGS.pt.dayTotal === 'HOJE' && KE.STRINGS.en.dayTotal === 'TODAY' &&
+    KE.STRINGS.fr.dayTotal === 'AUJOURD’HUI' && KE.STRINGS.ro.dayTotal === 'AZI');
   const nowDate = new Date();
   const pad2 = (n) => String(n).padStart(2, '0');
   const todayLabel = pad2(nowDate.getDate()) + '/' + pad2(nowDate.getMonth() + 1) + '/' + nowDate.getFullYear();
@@ -1642,13 +1671,15 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('combo uses i18n keys', comboSrc.includes("KE.uiText('ui.removeItem')") && comboSrc.includes("KE.uiText('ui.newTagOption'") &&
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
-  check('new i18n keys in pt and en', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion', 'startDefaultTask', 'stopTask', 'popupOpenHint', 'moreShortcuts', 'statsToday', 'statsWeek'].every((k) =>
-    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
-  check('plugin section keys in pt and en', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
-    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 2));
+  check('new i18n keys in all languages', ['removeItem', 'expandOptions', 'newTagOption', 'saveToApply', 'useSuggestion', 'startDefaultTask', 'stopTask', 'popupOpenHint', 'moreShortcuts', 'statsToday', 'statsWeek'].every((k) =>
+    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 4));
+  check('plugin section keys in all languages', ['kimaiPage', 'plugin', 'pluginHint', 'hideRecents', 'hideContinueToday'].every((k) =>
+    i18nSrc.includes(k + ':') && (i18nSrc.match(new RegExp(k + ':', 'g')) || []).length >= 4));
   const optHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
   check('translatable options title and languages', optHtml.includes('<title data-ke-i18n="ui.optionsTitle">') &&
-    optHtml.includes('data-ke-i18n="ui.languagePortuguese"') && optHtml.includes('data-ke-i18n="ui.languageEnglish"'));
+    optHtml.includes('data-ke-i18n="ui.languagePortuguese"') && optHtml.includes('data-ke-i18n="ui.languageEnglish"') &&
+    optHtml.includes('data-ke-i18n="ui.languageFrench"') && optHtml.includes('data-ke-i18n="ui.languageRomanian"') &&
+    optHtml.includes('<option value="fr"') && optHtml.includes('<option value="ro"'));
   check('popup icon buttons have translatable aria-label',
     ['ke-pop-open', 'ke-pop-settings', 'ke-pop-refresh-catalog', 'ke-pop-refresh-today', 'ke-pop-refresh-recent']
       .every((id) => new RegExp('id="' + id + '"[^>]*data-ke-i18n-aria-label').test(popHtmlForIcons)));
@@ -1900,8 +1931,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     /<dt[^>]*data-ke-i18n="ui\.publisher"[^>]*>/.test(optAboutHtml) &&
     optAboutHtml.includes('<a id="ke-opt-about-publisher" href="https://github.com/Devmove"') &&
     optAboutHtml.includes('>Devmove</a>'));
-  check('publisher key in pt and en',
-    KE.STRINGS.pt.ui.publisher === 'Publicador' && KE.STRINGS.en.ui.publisher === 'Publisher');
+  check('publisher key in all languages',
+    KE.STRINGS.pt.ui.publisher === 'Publicador' && KE.STRINGS.en.ui.publisher === 'Publisher' &&
+    KE.STRINGS.fr.ui.publisher === 'Éditeur' && KE.STRINGS.ro.ui.publisher === 'Publicant');
   const toast = popEls['ke-opt-toast'];
   const toastShown = () => toast.hidden === false && toast.classList.contains('ke-show');
   check('Interface starts with options unchecked',
