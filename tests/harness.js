@@ -812,6 +812,18 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     /\.ke-pop-draft-row \.ke-pop-check\s*\{[^}]*margin:\s*0/s.test(popDraftCss));
   check('configure-template key in pt/en', KE.STRINGS.pt.ui.configureTemplate === 'Configurar template' &&
     KE.STRINGS.en.ui.configureTemplate === 'Configure template');
+  const savedGetAttr = document.documentElement.getAttribute;
+  const savedNavLang = navigator.language;
+  document.documentElement.getAttribute = () => 'es';
+  check('detectLang falls back to en', KE.detectLang() === 'en');
+  check('setLocale falls back to en', KE.setLocale('es') === 'en' && KE.T === KE.STRINGS.en);
+  document.documentElement.getAttribute = () => '';
+  navigator.language = 'es';
+  check('detectLang without lang falls back to en', KE.detectLang() === 'en');
+  document.documentElement.getAttribute = savedGetAttr;
+  navigator.language = savedNavLang;
+  KE.setLocale('pt');
+  check('pt still detected', KE.detectLang() === 'pt' && KE.T === KE.STRINGS.pt);
   check('draft options section has anchor',
     fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-draft-card"'));
   check('shortcuts options section has anchor',

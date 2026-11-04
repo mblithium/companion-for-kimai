@@ -411,17 +411,16 @@
         h = (typeof navigator !== 'undefined' && navigator.language) || '';
       } catch (e) { h = ''; }
     }
-    h = String(h || 'pt').toLowerCase();
+    h = String(h || 'en').toLowerCase();
     if (h.startsWith('pt')) return 'pt';
-    if (h.startsWith('en')) return 'en';
-    return 'pt';
+    return 'en';
   };
 
-  KE.T = KE.STRINGS[KE.detectLang()] || KE.STRINGS.pt;
+  KE.T = KE.STRINGS[KE.detectLang()] || KE.STRINGS.en;
 
   KE.setLocale = function (locale) {
-    const language = String(locale || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
-    KE.uiLocale = language === 'en' ? 'en' : 'pt-BR';
+    const language = String(locale || '').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+    KE.uiLocale = language === 'pt' ? 'pt-BR' : 'en';
     KE.T = KE.STRINGS[language];
     try {
       if (document.documentElement && /^(?:chrome-extension|moz-extension):$/.test(location.protocol)) {
