@@ -4,6 +4,14 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.25.0] — 2026-11-04
+### Added
+- Traduções da interface para francês e romeno, com detecção automática
+  e seletor de idioma nas configurações.
+### Fixed
+- Traduções ausentes agora usam o inglês como fallback em vez de exibir
+  a chave técnica do texto.
+
 ## [0.24.1] — 2026-11-03
 ### Changed
 - Código em inglês: nomes de testes, mensagens das ferramentas de

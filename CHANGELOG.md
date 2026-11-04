@@ -4,6 +4,14 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.25.0] — 2026-11-04
+### Added
+- French and Romanian interface translations, with automatic detection
+  and a language selector in settings.
+### Fixed
+- Missing translations now fall back to English instead of showing the
+  raw string key.
+
 ## [0.24.1] — 2026-11-03
 ### Changed
 - Codebase in English: test names, check tooling messages and code
