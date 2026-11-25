@@ -4,6 +4,12 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.26.0] — 2026-11-25
+### Changed
+- Traduções da interface agora ficam em arquivos de idioma do navegador e são
+  carregadas com fallback para inglês; nome, descrição e atalho da extensão
+  também são localizados pelo manifesto.
+
 ## [0.25.0] — 2026-11-04
 ### Added
 - Traduções da interface para francês e romeno, com detecção automática

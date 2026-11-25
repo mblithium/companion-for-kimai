@@ -4,6 +4,12 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.26.0] — 2026-11-25
+### Changed
+- Interface translations now live in browser locale files and are loaded
+  with English fallback; extension name, description and shortcut are localized
+  through the browser manifest.
+
 ## [0.25.0] — 2026-11-04
 ### Added
 - French and Romanian interface translations, with automatic detection

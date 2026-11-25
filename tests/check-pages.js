@@ -125,6 +125,23 @@ for (const html of ['src/popup/popup.html', 'src/popup/focus.html', 'src/options
       failures++;
       console.log('FALHOU firefox sem data_collection_permissions.required=["none"] (exigido pelo validador AMO)');
     }
+    for (const [label, manifest] of [['chrome', c], ['firefox', f]]) {
+      for (const group of manifest.web_accessible_resources || []) {
+        for (const pattern of group.matches || []) {
+          // Chrome emits "Invalid match pattern" unless WAR matches are origin-only (path exactly /*).
+          if (!/^[a-z*]+:\/\/[^/]+\/\*$/.test(pattern)) {
+            failures++;
+            console.log('FAILED ' + label + ' web_accessible_resources match is not origin-only: ' + pattern);
+          }
+        }
+        for (const resource of group.resources || []) {
+          if (resource.includes('*') || !fs.existsSync(path.join(ROOT, resource))) {
+            failures++;
+            console.log('FAILED ' + label + ' web_accessible resource missing (build-zip only packs explicit files): ' + resource);
+          }
+        }
+      }
+    }
     if (!failures) console.log('ok   variantes chrome/firefox consistentes (v' + c.version + ')');
   }
 }

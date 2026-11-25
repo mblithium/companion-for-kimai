@@ -329,7 +329,7 @@
     const uiLocaleSel = $('ke-opt-ui-locale');
     uiLocaleSel.value = KE.uiLocale;
     uiLocaleSel.addEventListener('change', async () => {
-      KE.setLocale(uiLocaleSel.value);
+      await KE.setLocale(uiLocaleSel.value);
       KE.translatePage(document);
       refreshThemeLabels();
       await refreshAccess($('ke-opt-url').value);
@@ -516,7 +516,7 @@
       hideContinueToday: $('ke-opt-hide-continue').checked,
       keLocale: localeSel.value,
     });
-    KE.setLocale(uiLocaleSel.value);
+    await KE.setLocale(uiLocaleSel.value);
     KE.translatePage(document);
     document.documentElement.dataset.keTheme = themeSel.value;
     $('ke-opt-url').value = base;

@@ -18,7 +18,7 @@
 | Arquivo | Responsabilidade | Publica |
 |---|---|---|
 | `namespace.js` | Raiz do namespace | `KE` |
-| `i18n.js` | Textos pt/en/fr/ro, idioma da página | `KE.STRINGS`, `KE.T` |
+| `i18n.js` | UI language: detection + `_locales/*/messages.json` loader with English fallback | `KE.T`, `KE.uiText` |
 | `utils.js` | Funções puras (datas, DOM, eventos Kimai) | `KE.el`, `KE.norm`, `KE.nowLocal`, `KE.elapsedSince`, `KE.asArray`, `KE.isTimesheetListPage`, `KE.notifyKimaiUpdate`, `KE.sleep` |
 | `api.js` | `fetch` mesma-origem + extração de erro do servidor | `KE.api`, `KE.apiGet/Post/Patch` |
 | `storage.js` | `browser`/`chrome`.storage com fallback | `KE.storageGet/Set` |

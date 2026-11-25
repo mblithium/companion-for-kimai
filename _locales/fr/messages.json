@@ -1,0 +1,858 @@
+{
+  "appName": {
+    "message": "Companion for Kimai",
+    "description": "Extension name shown in the browser and stores."
+  },
+  "appDescription": {
+    "message": "Une extension de navigateur qui améliore votre suivi du temps dans Kimai.",
+    "description": "Extension description shown in the browser and stores."
+  },
+  "commandOpenPopup": {
+    "message": "Ouvrir le popup de Companion for Kimai",
+    "description": "Keyboard shortcut description for opening the popup."
+  },
+  "title": {
+    "message": "Démarrage rapide du minuteur",
+    "description": "Main heading of the quick timer bar."
+  },
+  "subtitle": {
+    "message": "Sans cliquer sur le bouton lecture en haut",
+    "description": "Subheading of the quick timer bar."
+  },
+  "customer": {
+    "message": "Client",
+    "description": "Label for the customer field."
+  },
+  "allCustomers": {
+    "message": "Tous les clients",
+    "description": "Dropdown option showing all customers."
+  },
+  "loading": {
+    "message": "Chargement…",
+    "description": "Placeholder shown while a list loads."
+  },
+  "project": {
+    "message": "Projet",
+    "description": "Label for the project field."
+  },
+  "selectProject": {
+    "message": "Sélectionner le projet",
+    "description": "Placeholder prompting project selection."
+  },
+  "activity": {
+    "message": "Activité",
+    "description": "Label for the activity field."
+  },
+  "selectActivity": {
+    "message": "Sélectionner l’activité",
+    "description": "Placeholder prompting activity selection."
+  },
+  "description": {
+    "message": "Description",
+    "description": "Label for the description field."
+  },
+  "descriptionPh": {
+    "message": "Sur quoi travaillez-vous ? (Entrée = démarrer, Maj+Entrée nouvelle ligne)",
+    "description": "Placeholder with starting hints for the description field."
+  },
+  "tags": {
+    "message": "Étiquettes",
+    "description": "Label for the tags field."
+  },
+  "tagsPh": {
+    "message": "Rechercher ou saisir + Entrée (facultatif)",
+    "description": "Placeholder with hints for the tags field."
+  },
+  "begin": {
+    "message": "Heure de début",
+    "description": "Label for the start-time field."
+  },
+  "invalidBegin": {
+    "message": "Heure de début invalide.",
+    "description": "Error shown for an invalid or future start time."
+  },
+  "start": {
+    "message": "Démarrer",
+    "description": "Label of the start button."
+  },
+  "starting": {
+    "message": "Démarrage…",
+    "description": "Status while a timer is starting."
+  },
+  "needProject": {
+    "message": "Sélectionnez un projet et une activité pour démarrer.",
+    "description": "Error when project or activity is missing."
+  },
+  "startedOk": {
+    "message": "Minuteur démarré !",
+    "description": "Toast after a timer starts."
+  },
+  "startFail": {
+    "message": "Impossible de démarrer le minuteur.",
+    "description": "Error when a timer fails to start."
+  },
+  "activeNow": {
+    "message": "en cours",
+    "description": "Suffix marking a currently running timer."
+  },
+  "weekTotal": {
+    "message": "TOTAL DE LA SEMAINE",
+    "description": "Label of the weekly total."
+  },
+  "dayTotal": {
+    "message": "AUJOURD’HUI",
+    "description": "Label of the daily total."
+  },
+  "trackerTitle": {
+    "message": "Suivi du minuteur",
+    "description": "Timer tracker widget text."
+  },
+  "trackerPaused": {
+    "message": "En pause",
+    "description": "Timer tracker widget text."
+  },
+  "trackerPause": {
+    "message": "Mettre en pause",
+    "description": "Timer tracker widget text."
+  },
+  "trackerResume": {
+    "message": "Reprendre",
+    "description": "Timer tracker widget text."
+  },
+  "trackerSetup": {
+    "message": "Configurez Kimai et une clé d’API dans les paramètres pour suivre un minuteur.",
+    "description": "Timer tracker widget text."
+  },
+  "trackerLoadFail": {
+    "message": "Impossible de charger le minuteur.",
+    "description": "Timer tracker widget text."
+  },
+  "openSettings": {
+    "message": "Ouvrir les paramètres",
+    "description": "Interface string (page widget)."
+  },
+  "nowTitle": {
+    "message": "Maintenant",
+    "description": "Interface string (page widget)."
+  },
+  "stop": {
+    "message": "Arrêter",
+    "description": "Label of the stop button."
+  },
+  "stoppedOk": {
+    "message": "Minuteur arrêté !",
+    "description": "Toast after a timer stops."
+  },
+  "stoppedMany": {
+    "message": "Tous les minuteurs ont été arrêtés !",
+    "description": "Toast after all timers stop."
+  },
+  "stopFail": {
+    "message": "Impossible d’arrêter le minuteur.",
+    "description": "Error when a timer fails to stop."
+  },
+  "noActive": {
+    "message": "Aucun minuteur en cours.",
+    "description": "Empty state when no timer runs."
+  },
+  "openCreate": {
+    "message": "Ouvrir le formulaire complet",
+    "description": "Interface string (page widget)."
+  },
+  "refreshFail": {
+    "message": "Échec du chargement des listes Kimai.",
+    "description": "Label of a refresh control."
+  },
+  "refreshLists": {
+    "message": "Actualiser les listes",
+    "description": "Label of a refresh control."
+  },
+  "listsUpdated": {
+    "message": "Listes mises à jour !",
+    "description": "Interface string (page widget)."
+  },
+  "searchCustomer": {
+    "message": "Rechercher un client…",
+    "description": "Interface string (page widget)."
+  },
+  "searchProject": {
+    "message": "Rechercher un projet…",
+    "description": "Interface string (page widget)."
+  },
+  "searchActivity": {
+    "message": "Rechercher une activité…",
+    "description": "Interface string (page widget)."
+  },
+  "noResults": {
+    "message": "Aucun résultat.",
+    "description": "Interface string (page widget)."
+  },
+  "clearSel": {
+    "message": "Effacer la sélection",
+    "description": "Interface string (page widget)."
+  },
+  "authDenied": {
+    "message": "Accès refusé (vérifiez la clé d’API).",
+    "description": "Interface string (page widget)."
+  },
+  "noToday": {
+    "message": "Aucun minuteur enregistré aujourd’hui.",
+    "description": "Interface string (page widget)."
+  },
+  "noRecent": {
+    "message": "Aucun minuteur récent.",
+    "description": "Interface string (page widget)."
+  },
+  "groupTasks": {
+    "message": "Grouper",
+    "description": "Interface string (page widget)."
+  },
+  "recordOne": {
+    "message": "entrée",
+    "description": "Interface string (page widget)."
+  },
+  "recordMany": {
+    "message": "entrées",
+    "description": "Interface string (page widget)."
+  },
+  "themeSystem": {
+    "message": "Système",
+    "description": "Name of a color theme."
+  },
+  "themeLight": {
+    "message": "Clair",
+    "description": "Name of a color theme."
+  },
+  "themeDark": {
+    "message": "Sombre",
+    "description": "Name of a color theme."
+  },
+  "themeDracula": {
+    "message": "Dracula",
+    "description": "Name of a color theme."
+  },
+  "themeCatppuccin": {
+    "message": "Catppuccin",
+    "description": "Name of a color theme."
+  },
+  "themeNord": {
+    "message": "Nord",
+    "description": "Name of a color theme."
+  },
+  "themeGruvbox": {
+    "message": "Gruvbox",
+    "description": "Name of a color theme."
+  },
+  "themeGnome": {
+    "message": "GNOME",
+    "description": "Name of a color theme."
+  },
+  "connectText": {
+    "message": "Plugin déconnecté de Kimai.",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectBtn": {
+    "message": "Connexion automatique",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectManual": {
+    "message": "Créer la clé manuellement",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connecting": {
+    "message": "Connexion…",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectedOk": {
+    "message": "Plugin connecté !",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "needLogin": {
+    "message": "Connectez-vous à Kimai et réessayez.",
+    "description": "Interface string (page widget)."
+  },
+  "connectFail": {
+    "message": "Impossible de se connecter.",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "edit": {
+    "message": "Modifier le minuteur",
+    "description": "Accessible label of the edit button."
+  },
+  "save": {
+    "message": "Enregistrer",
+    "description": "Label of the save button."
+  },
+  "cancel": {
+    "message": "Annuler",
+    "description": "Label of the cancel button."
+  },
+  "saving": {
+    "message": "Enregistrement…",
+    "description": "Interface string (page widget)."
+  },
+  "updatedOk": {
+    "message": "Minuteur mis à jour !",
+    "description": "Interface string (page widget)."
+  },
+  "updateFail": {
+    "message": "Impossible de mettre à jour le minuteur.",
+    "description": "Interface string (page widget)."
+  },
+  "ui_optionsTitle": {
+    "message": "Companion for Kimai — Paramètres",
+    "description": "Browser tab title of the settings page."
+  },
+  "ui_saveSettings": {
+    "message": "Enregistrer les paramètres",
+    "description": "Label of the main save button on the settings page."
+  },
+  "ui_kimai": {
+    "message": "Kimai",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_baseUrl": {
+    "message": "URL de base de votre Kimai",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_detectedUrlHint": {
+    "message": "Détectée automatiquement à l’ouverture de la feuille de temps. Modifiez-la ici si vous utilisez plusieurs installations.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_openKimai": {
+    "message": "Ouvrir mon Kimai",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupAccess": {
+    "message": "Accès du popup",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupAccessHint": {
+    "message": "Autorise le navigateur à appeler l’API à l’URL ci-dessus (requis même avec une clé).",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_grantAccess": {
+    "message": "Autoriser l’accès",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_removeAccess": {
+    "message": "Retirer l’accès",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKey": {
+    "message": "Clé d’API",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKeyHint": {
+    "message": "Créez-en une dans Mon profil → Accès API dans Kimai. Fonctionne même sans être connecté à la page.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKeyPlaceholder": {
+    "message": "collez ici pour remplacer",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_savedApiKey": {
+    "message": "Clé enregistrée sur cet appareil.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_noApiKey": {
+    "message": "Aucune clé enregistrée.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_manageApiKeys": {
+    "message": "Créez et gérez vos clés sur",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_testConnection": {
+    "message": "Tester la connexion",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_connect": {
+    "message": "Connecter",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_disconnect": {
+    "message": "Déconnecter",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_language": {
+    "message": "Langue",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_uiLanguage": {
+    "message": "Langue de l’interface",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languagePortuguese": {
+    "message": "Portugais (Brésil)",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageEnglish": {
+    "message": "Anglais",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageFrench": {
+    "message": "Français",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageRomanian": {
+    "message": "Roumain",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_kimaiLanguage": {
+    "message": "Langue de Kimai (p. ex. fr)",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_detectedLanguageHint": {
+    "message": "Détectée depuis votre compte Kimai connecté quand c’est possible ; modifiable manuellement.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_appearance": {
+    "message": "Apparence",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_theme": {
+    "message": "Thème",
+    "description": "Name of a color theme."
+  },
+  "ui_themeHint": {
+    "message": "S’applique au popup, à cette page et à la page Kimai.",
+    "description": "Name of a color theme."
+  },
+  "ui_interface": {
+    "message": "Interface",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_interfaceHint": {
+    "message": "Choisissez les éléments affichés sur la page Kimai.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_hideNavigation": {
+    "message": "Masquer l’interface de navigation (en-tête et pages)",
+    "description": "Label of a visibility setting."
+  },
+  "ui_hideActionBar": {
+    "message": "Masquer la barre d’actions (recherche, export, etc.)",
+    "description": "Label of a visibility setting."
+  },
+  "ui_kimaiPage": {
+    "message": "Page Kimai",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_plugin": {
+    "message": "Plugin",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_pluginHint": {
+    "message": "Choisissez les sections affichées dans le popup de l’extension.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_hideRecents": {
+    "message": "Masquer la section Récents",
+    "description": "Label of a visibility setting."
+  },
+  "ui_hideContinueToday": {
+    "message": "Masquer la section Continuer d’aujourd’hui",
+    "description": "Label of a visibility setting."
+  },
+  "ui_draft": {
+    "message": "Brouillon",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_draftPh": {
+    "message": "Décrivez et démarrez…",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_defaultTimer": {
+    "message": "Minuteur par défaut",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_defaultTimerHint": {
+    "message": "Utilisé au démarrage depuis Brouillon. Exige Projet et Activité.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_catalogUnavailable": {
+    "message": "Renseignez l’URL, la clé et l’accès ci-dessus pour charger les listes.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_enableDraft": {
+    "message": "Activer le brouillon",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_needDefaultTimer": {
+    "message": "Définissez un minuteur par défaut (projet et activité) pour utiliser Brouillon.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_configureTemplate": {
+    "message": "Configurer le modèle",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_useSuggestion": {
+    "message": "Utiliser la suggestion",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_shortcuts": {
+    "message": "Raccourcis clavier",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_enableShortcuts": {
+    "message": "Activer les raccourcis clavier sur la page de feuille de temps",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_shortcutsHint": {
+    "message": "Sur la page de feuille de temps (hors champs de texte). P démarre le minuteur par défaut (exige un minuteur par défaut dans Brouillon) ; S arrête le minuteur actuel. Placez le focus dans un champ et appuyez sur la combinaison — utilisez Alt, Ctrl ou Maj. Retour arrière efface.",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_startDefaultTask": {
+    "message": "Démarrer le minuteur par défaut",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_stopTask": {
+    "message": "Arrêter le minuteur actuel",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupOpenHint": {
+    "message": "ALT + MAJ + K pour ouvrir Kimai (",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_moreShortcuts": {
+    "message": "plus de raccourcis",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_statsToday": {
+    "message": "Aujourd’hui",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_statsWeek": {
+    "message": "Semaine",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_restoreDefaults": {
+    "message": "Restaurer les valeurs par défaut",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_shortcutCaptureHint": {
+    "message": "appuyez sur les touches…",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_removeItem": {
+    "message": "Supprimer",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_expandOptions": {
+    "message": "Développer les options",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_newTagOption": {
+    "message": "+ $NAME$",
+    "description": "Dropdown entry creating a tag; {{name}} is the typed tag name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "billable"
+      }
+    }
+  },
+  "ui_extensionHotkeysHint": {
+    "message": "Pour ouvrir le popup au clavier : configurez dans chrome://extensions → Raccourcis clavier (action de l’extension).",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_cache": {
+    "message": "Cache",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheHint": {
+    "message": "Les listes clients/projets/activités (24 h) et les journaux (1 h) sont enregistrés sur cet appareil pour un démarrage rapide.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_refreshCache": {
+    "message": "Actualiser le cache",
+    "description": "Label of a refresh control."
+  },
+  "ui_clearCache": {
+    "message": "Vider le cache",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheEmpty": {
+    "message": "Cache vide.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheCount": {
+    "message": "$COUNT$ élément(s) en cache sur cet appareil.",
+    "description": "Status message; {{count}} is the cached item count.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_about": {
+    "message": "À propos de l’extension",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_aboutDescription": {
+    "message": "Une extension de navigateur qui améliore votre suivi du temps dans Kimai.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_name": {
+    "message": "Nom",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_version": {
+    "message": "Version",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_author": {
+    "message": "Auteur",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_publisher": {
+    "message": "Éditeur",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_github": {
+    "message": "GitHub",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_license": {
+    "message": "Licence",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_invalidUrl": {
+    "message": "URL invalide. Utilisez un format comme https://votre-kimai.exemple",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_validUrlRequired": {
+    "message": "Enregistrez d’abord une URL valide.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_removeAccessUrlRequired": {
+    "message": "Saisissez une URL valide pour retirer l’accès.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_accessAuthorized": {
+    "message": "Accès autorisé pour $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_accessMissing": {
+    "message": "Aucun accès à $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_accessDenied": {
+    "message": "Accès refusé.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_tokenLinkHint": {
+    "message": "renseignez l’URL et autorisez l’accès pour construire ce lien",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_restoreShortcutsMessage": {
+    "message": "Valeurs par défaut restaurées dans les champs. Enregistrez pour appliquer.",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_saveToApply": {
+    "message": "Modification en attente. Enregistrez pour appliquer.",
+    "description": "Warning that a change needs saving to take effect."
+  },
+  "ui_fillUrlGrantSave": {
+    "message": "Renseignez l’URL, autorisez l’accès et enregistrez pour générer le lien de clé d’API.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_connecting": {
+    "message": "Test en cours…",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_connectionOk": {
+    "message": "Connexion OK ($COUNT$ minuteur(s) en cours).",
+    "description": "Auto-connect flow text (options/popup).",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_connectionFailed": {
+    "message": "Échec",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_connectionFallback": {
+    "message": ". Vérifiez l’URL, la clé et l’accès ci-dessous.",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_settingsSaved": {
+    "message": "Paramètres enregistrés.",
+    "description": "Toast confirming the settings were saved."
+  },
+  "ui_accessGranted": {
+    "message": "Accès autorisé.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_accessRemoved": {
+    "message": "Accès retiré pour $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_removeAccessFailed": {
+    "message": "Impossible de retirer l’accès (résultat : $RESULT$). Retirez-le dans chrome://extensions, dans les détails de l’extension.",
+    "description": "Error removing access; {{result}} holds the browser response.",
+    "placeholders": {
+      "result": {
+        "content": "$1",
+        "example": "false"
+      }
+    }
+  },
+  "ui_updatingCache": {
+    "message": "Actualisation du cache…",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_tokenRequired": {
+    "message": "Saisissez la clé d’API pour actualiser.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_cacheUpdated": {
+    "message": "Cache mis à jour.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheUpdateFailed": {
+    "message": "Échec d’actualisation du cache. Vérifiez l’URL et l’authentification.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheCleared": {
+    "message": "Cache vidé ($COUNT$ élément(s)).",
+    "description": "Status message; {{count}} is the cached item count.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_cacheAlreadyEmpty": {
+    "message": "Le cache était déjà vide.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_nothingToDisconnect": {
+    "message": "Rien à déconnecter.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_confirmDisconnect": {
+    "message": "Se déconnecter ?\n\nCela supprime la clé d’API enregistrée sur cet appareil.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_disconnected": {
+    "message": "Déconnecté.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupOpenKimai": {
+    "message": "Ouvrir Kimai",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSettings": {
+    "message": "Paramètres",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupTracker": {
+    "message": "Suivre le minuteur",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSetupNoBase": {
+    "message": "Renseignez l’URL de votre Kimai dans les paramètres pour utiliser le popup.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSetupNoToken": {
+    "message": "Renseignez votre clé d’API dans les paramètres pour utiliser le popup.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupAuthorize": {
+    "message": "Autoriser l’accès",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupErrorSettings": {
+    "message": "Ouvrir les paramètres",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupRetry": {
+    "message": "Réessayer",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_activeSection": {
+    "message": "En cours",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_newTimer": {
+    "message": "Nouveau minuteur",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshCatalog": {
+    "message": "Actualiser les listes",
+    "description": "Label of a refresh control."
+  },
+  "ui_continueToday": {
+    "message": "Continuer d’aujourd’hui",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshToday": {
+    "message": "Actualiser les entrées",
+    "description": "Label of a refresh control."
+  },
+  "ui_recent": {
+    "message": "Récents",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshRecent": {
+    "message": "Actualiser les entrées récentes",
+    "description": "Label of a refresh control."
+  },
+  "ui_popupConnectionAuth": {
+    "message": "Ouvrez les paramètres et choisissez « Tester la connexion ».",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupConnectionStart": {
+    "message": "Impossible de se connecter à $ORIGIN$. $WHY$Vérifiez l’URL, la connexion/clé et l’accès, puis ouvrez les paramètres et choisissez « Tester la connexion ».",
+    "description": "Popup text (options/popup).",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      },
+      "why": {
+        "content": "$2",
+        "example": "HTTP 401. "
+      }
+    }
+  },
+  "ui_popupOpenTrackerFailed": {
+    "message": "Impossible d’ouvrir le suivi du minuteur.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupLoadFailed": {
+    "message": "Impossible de charger le popup : $ERROR$",
+    "description": "Popup text (options/popup).",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Failed to fetch"
+      }
+    }
+  }
+}

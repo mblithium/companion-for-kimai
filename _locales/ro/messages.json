@@ -1,0 +1,858 @@
+{
+  "appName": {
+    "message": "Companion for Kimai",
+    "description": "Extension name shown in the browser and stores."
+  },
+  "appDescription": {
+    "message": "O extensie de browser care îți îmbunătățește fluxul de pontaj în Kimai.",
+    "description": "Extension description shown in the browser and stores."
+  },
+  "commandOpenPopup": {
+    "message": "Deschide popup-ul Companion for Kimai",
+    "description": "Keyboard shortcut description for opening the popup."
+  },
+  "title": {
+    "message": "Pornire rapidă cronometru",
+    "description": "Main heading of the quick timer bar."
+  },
+  "subtitle": {
+    "message": "Fără să apeși butonul de redare de sus",
+    "description": "Subheading of the quick timer bar."
+  },
+  "customer": {
+    "message": "Client",
+    "description": "Label for the customer field."
+  },
+  "allCustomers": {
+    "message": "Toți clienții",
+    "description": "Dropdown option showing all customers."
+  },
+  "loading": {
+    "message": "Se încarcă…",
+    "description": "Placeholder shown while a list loads."
+  },
+  "project": {
+    "message": "Proiect",
+    "description": "Label for the project field."
+  },
+  "selectProject": {
+    "message": "Selectează proiectul",
+    "description": "Placeholder prompting project selection."
+  },
+  "activity": {
+    "message": "Activitate",
+    "description": "Label for the activity field."
+  },
+  "selectActivity": {
+    "message": "Selectează activitatea",
+    "description": "Placeholder prompting activity selection."
+  },
+  "description": {
+    "message": "Descriere",
+    "description": "Label for the description field."
+  },
+  "descriptionPh": {
+    "message": "La ce lucrezi? (Enter = pornește, Shift+Enter linie nouă)",
+    "description": "Placeholder with starting hints for the description field."
+  },
+  "tags": {
+    "message": "Etichete",
+    "description": "Label for the tags field."
+  },
+  "tagsPh": {
+    "message": "Caută sau tastează + Enter (opțional)",
+    "description": "Placeholder with hints for the tags field."
+  },
+  "begin": {
+    "message": "Ora de început",
+    "description": "Label for the start-time field."
+  },
+  "invalidBegin": {
+    "message": "Oră de început nevalidă.",
+    "description": "Error shown for an invalid or future start time."
+  },
+  "start": {
+    "message": "Pornește",
+    "description": "Label of the start button."
+  },
+  "starting": {
+    "message": "Se pornește…",
+    "description": "Status while a timer is starting."
+  },
+  "needProject": {
+    "message": "Selectează un proiect și o activitate pentru a porni.",
+    "description": "Error when project or activity is missing."
+  },
+  "startedOk": {
+    "message": "Cronometru pornit!",
+    "description": "Toast after a timer starts."
+  },
+  "startFail": {
+    "message": "Nu s-a putut porni cronometrul.",
+    "description": "Error when a timer fails to start."
+  },
+  "activeNow": {
+    "message": "în desfășurare",
+    "description": "Suffix marking a currently running timer."
+  },
+  "weekTotal": {
+    "message": "TOTAL SĂPTĂMÂNĂ",
+    "description": "Label of the weekly total."
+  },
+  "dayTotal": {
+    "message": "AZI",
+    "description": "Label of the daily total."
+  },
+  "trackerTitle": {
+    "message": "Urmărire cronometru",
+    "description": "Timer tracker widget text."
+  },
+  "trackerPaused": {
+    "message": "Întrerupt",
+    "description": "Timer tracker widget text."
+  },
+  "trackerPause": {
+    "message": "Întrerupe",
+    "description": "Timer tracker widget text."
+  },
+  "trackerResume": {
+    "message": "Reia",
+    "description": "Timer tracker widget text."
+  },
+  "trackerSetup": {
+    "message": "Configurează Kimai și o cheie API în setări pentru a urmări un cronometru.",
+    "description": "Timer tracker widget text."
+  },
+  "trackerLoadFail": {
+    "message": "Nu s-a putut încărca cronometrul.",
+    "description": "Timer tracker widget text."
+  },
+  "openSettings": {
+    "message": "Deschide setările",
+    "description": "Interface string (page widget)."
+  },
+  "nowTitle": {
+    "message": "Acum",
+    "description": "Interface string (page widget)."
+  },
+  "stop": {
+    "message": "Oprește",
+    "description": "Label of the stop button."
+  },
+  "stoppedOk": {
+    "message": "Cronometru oprit!",
+    "description": "Toast after a timer stops."
+  },
+  "stoppedMany": {
+    "message": "Toate cronometrele au fost oprite!",
+    "description": "Toast after all timers stop."
+  },
+  "stopFail": {
+    "message": "Nu s-a putut opri cronometrul.",
+    "description": "Error when a timer fails to stop."
+  },
+  "noActive": {
+    "message": "Niciun cronometru activ.",
+    "description": "Empty state when no timer runs."
+  },
+  "openCreate": {
+    "message": "Deschide formularul complet",
+    "description": "Interface string (page widget)."
+  },
+  "refreshFail": {
+    "message": "Nu s-au putut încărca listele Kimai.",
+    "description": "Label of a refresh control."
+  },
+  "refreshLists": {
+    "message": "Reîmprospătează listele",
+    "description": "Label of a refresh control."
+  },
+  "listsUpdated": {
+    "message": "Liste actualizate!",
+    "description": "Interface string (page widget)."
+  },
+  "searchCustomer": {
+    "message": "Caută client…",
+    "description": "Interface string (page widget)."
+  },
+  "searchProject": {
+    "message": "Caută proiect…",
+    "description": "Interface string (page widget)."
+  },
+  "searchActivity": {
+    "message": "Caută activitate…",
+    "description": "Interface string (page widget)."
+  },
+  "noResults": {
+    "message": "Niciun rezultat.",
+    "description": "Interface string (page widget)."
+  },
+  "clearSel": {
+    "message": "Șterge selecția",
+    "description": "Interface string (page widget)."
+  },
+  "authDenied": {
+    "message": "Acces refuzat (verifică cheia API).",
+    "description": "Interface string (page widget)."
+  },
+  "noToday": {
+    "message": "Niciun cronometru înregistrat azi.",
+    "description": "Interface string (page widget)."
+  },
+  "noRecent": {
+    "message": "Niciun cronometru recent.",
+    "description": "Interface string (page widget)."
+  },
+  "groupTasks": {
+    "message": "Grupează",
+    "description": "Interface string (page widget)."
+  },
+  "recordOne": {
+    "message": "înregistrare",
+    "description": "Interface string (page widget)."
+  },
+  "recordMany": {
+    "message": "înregistrări",
+    "description": "Interface string (page widget)."
+  },
+  "themeSystem": {
+    "message": "Sistem",
+    "description": "Name of a color theme."
+  },
+  "themeLight": {
+    "message": "Deschis",
+    "description": "Name of a color theme."
+  },
+  "themeDark": {
+    "message": "Închis",
+    "description": "Name of a color theme."
+  },
+  "themeDracula": {
+    "message": "Dracula",
+    "description": "Name of a color theme."
+  },
+  "themeCatppuccin": {
+    "message": "Catppuccin",
+    "description": "Name of a color theme."
+  },
+  "themeNord": {
+    "message": "Nord",
+    "description": "Name of a color theme."
+  },
+  "themeGruvbox": {
+    "message": "Gruvbox",
+    "description": "Name of a color theme."
+  },
+  "themeGnome": {
+    "message": "GNOME",
+    "description": "Name of a color theme."
+  },
+  "connectText": {
+    "message": "Plugin deconectat de la Kimai.",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectBtn": {
+    "message": "Conectare automată",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectManual": {
+    "message": "Creează cheia manual",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connecting": {
+    "message": "Se conectează…",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "connectedOk": {
+    "message": "Plugin conectat!",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "needLogin": {
+    "message": "Autentifică-te în Kimai și încearcă din nou.",
+    "description": "Interface string (page widget)."
+  },
+  "connectFail": {
+    "message": "Nu s-a putut conecta.",
+    "description": "Auto-connect flow text (page widget)."
+  },
+  "edit": {
+    "message": "Editează cronometrul",
+    "description": "Accessible label of the edit button."
+  },
+  "save": {
+    "message": "Salvează",
+    "description": "Label of the save button."
+  },
+  "cancel": {
+    "message": "Anulează",
+    "description": "Label of the cancel button."
+  },
+  "saving": {
+    "message": "Se salvează…",
+    "description": "Interface string (page widget)."
+  },
+  "updatedOk": {
+    "message": "Cronometru actualizat!",
+    "description": "Interface string (page widget)."
+  },
+  "updateFail": {
+    "message": "Nu s-a putut actualiza cronometrul.",
+    "description": "Interface string (page widget)."
+  },
+  "ui_optionsTitle": {
+    "message": "Companion for Kimai — Setări",
+    "description": "Browser tab title of the settings page."
+  },
+  "ui_saveSettings": {
+    "message": "Salvează setările",
+    "description": "Label of the main save button on the settings page."
+  },
+  "ui_kimai": {
+    "message": "Kimai",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_baseUrl": {
+    "message": "URL-ul de bază al Kimai",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_detectedUrlHint": {
+    "message": "Detectat automat la deschiderea foii de pontaj. Schimbă-l aici dacă folosești mai multe instalări.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_openKimai": {
+    "message": "Deschide Kimai-ul meu",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupAccess": {
+    "message": "Acces popup",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupAccessHint": {
+    "message": "Permite browserului să apeleze API-ul la URL-ul de mai sus (necesar chiar și cu cheie).",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_grantAccess": {
+    "message": "Acordă accesul",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_removeAccess": {
+    "message": "Elimină accesul",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKey": {
+    "message": "Cheie API",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKeyHint": {
+    "message": "Creează una în Profilul meu → Acces API în Kimai. Funcționează chiar dacă nu ești autentificat în pagină.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_apiKeyPlaceholder": {
+    "message": "lipește aici pentru a înlocui",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_savedApiKey": {
+    "message": "Cheie salvată pe acest dispozitiv.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_noApiKey": {
+    "message": "Nicio cheie salvată.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_manageApiKeys": {
+    "message": "Creează și gestionează cheile la",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_testConnection": {
+    "message": "Testează conexiunea",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_connect": {
+    "message": "Conectează",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_disconnect": {
+    "message": "Deconectează",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_language": {
+    "message": "Limbă",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_uiLanguage": {
+    "message": "Limba interfeței",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languagePortuguese": {
+    "message": "Portugheză (Brazilia)",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageEnglish": {
+    "message": "Engleză",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageFrench": {
+    "message": "Franceză",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_languageRomanian": {
+    "message": "Română",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_kimaiLanguage": {
+    "message": "Limba Kimai (ex.: ro)",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_detectedLanguageHint": {
+    "message": "Detectată din contul tău Kimai autentificat când e posibil; o poți schimba manual.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_appearance": {
+    "message": "Aspect",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_theme": {
+    "message": "Temă",
+    "description": "Name of a color theme."
+  },
+  "ui_themeHint": {
+    "message": "Se aplică popup-ului, acestei pagini și paginii Kimai.",
+    "description": "Name of a color theme."
+  },
+  "ui_interface": {
+    "message": "Interfață",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_interfaceHint": {
+    "message": "Alege ce elemente se afișează pe pagina Kimai.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_hideNavigation": {
+    "message": "Ascunde interfața de navigare (antet și pagini)",
+    "description": "Label of a visibility setting."
+  },
+  "ui_hideActionBar": {
+    "message": "Ascunde bara de acțiuni (căutare, export etc.)",
+    "description": "Label of a visibility setting."
+  },
+  "ui_kimaiPage": {
+    "message": "Pagina Kimai",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_plugin": {
+    "message": "Plugin",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_pluginHint": {
+    "message": "Alege ce secțiuni se afișează în popup-ul extensiei.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_hideRecents": {
+    "message": "Ascunde secțiunea Recente",
+    "description": "Label of a visibility setting."
+  },
+  "ui_hideContinueToday": {
+    "message": "Ascunde secțiunea Continuă de azi",
+    "description": "Label of a visibility setting."
+  },
+  "ui_draft": {
+    "message": "Ciornă",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_draftPh": {
+    "message": "Descrie și pornește…",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_defaultTimer": {
+    "message": "Cronometru implicit",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_defaultTimerHint": {
+    "message": "Folosit la pornirea din Ciornă. Necesită Proiect și Activitate.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_catalogUnavailable": {
+    "message": "Setează URL-ul, cheia și accesul de mai sus pentru a încărca listele.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_enableDraft": {
+    "message": "Activează ciorna",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_needDefaultTimer": {
+    "message": "Setează un cronometru implicit (proiect și activitate) pentru a folosi Ciorna.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_configureTemplate": {
+    "message": "Configurează șablonul",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_useSuggestion": {
+    "message": "Folosește sugestia",
+    "description": "Draft/template feature text (options/popup)."
+  },
+  "ui_shortcuts": {
+    "message": "Scurtături de tastatură",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_enableShortcuts": {
+    "message": "Activează scurtăturile de tastatură pe pagina foii de pontaj",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_shortcutsHint": {
+    "message": "Pe pagina foii de pontaj (în afara câmpurilor de text). P pornește cronometrul implicit (necesită un cronometru implicit în Ciornă); S oprește cronometrul curent. Pune focusul într-un câmp și apasă combinația — folosește Alt, Ctrl sau Shift. Backspace șterge.",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_startDefaultTask": {
+    "message": "Pornește cronometrul implicit",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_stopTask": {
+    "message": "Oprește cronometrul curent",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupOpenHint": {
+    "message": "ALT + SHIFT + K pentru a deschide Kimai (",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_moreShortcuts": {
+    "message": "mai multe scurtături",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_statsToday": {
+    "message": "Azi",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_statsWeek": {
+    "message": "Săptămână",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_restoreDefaults": {
+    "message": "Restaurează valorile implicite",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_shortcutCaptureHint": {
+    "message": "apasă tastele…",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_removeItem": {
+    "message": "Elimină",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_expandOptions": {
+    "message": "Extinde opțiunile",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_newTagOption": {
+    "message": "+ $NAME$",
+    "description": "Dropdown entry creating a tag; {{name}} is the typed tag name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "billable"
+      }
+    }
+  },
+  "ui_extensionHotkeysHint": {
+    "message": "Pentru a deschide popup-ul din tastatură, configurează în chrome://extensions → Scurtături de tastatură (acțiunea extensiei).",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_cache": {
+    "message": "Cache",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheHint": {
+    "message": "Listele de clienți/proiecte/activități (24h) și pontajele zilnice (1h) sunt salvate pe acest dispozitiv pentru pornire rapidă.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_refreshCache": {
+    "message": "Reîmprospătează cache-ul",
+    "description": "Label of a refresh control."
+  },
+  "ui_clearCache": {
+    "message": "Golește cache-ul",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheEmpty": {
+    "message": "Cache-ul e gol.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheCount": {
+    "message": "$COUNT$ element(e) în cache pe acest dispozitiv.",
+    "description": "Status message; {{count}} is the cached item count.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_about": {
+    "message": "Despre extensie",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_aboutDescription": {
+    "message": "O extensie de browser care îți îmbunătățește fluxul de pontaj în Kimai.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_name": {
+    "message": "Nume",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_version": {
+    "message": "Versiune",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_author": {
+    "message": "Autor",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_publisher": {
+    "message": "Publicant",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_github": {
+    "message": "GitHub",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_license": {
+    "message": "Licență",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_invalidUrl": {
+    "message": "URL nevalid. Folosește un format ca https://kimai-tau.exemplu",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_validUrlRequired": {
+    "message": "Salvează mai întâi un URL valid.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_removeAccessUrlRequired": {
+    "message": "Introdu un URL valid pentru a elimina accesul.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_accessAuthorized": {
+    "message": "Acces acordat pentru $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_accessMissing": {
+    "message": "Fără acces la $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_accessDenied": {
+    "message": "Acces refuzat.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_tokenLinkHint": {
+    "message": "completează URL-ul și acordă accesul pentru a construi acest link",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_restoreShortcutsMessage": {
+    "message": "Valorile implicite au fost restaurate în câmpuri. Salvează pentru a aplica.",
+    "description": "Keyboard shortcut text (options/popup)."
+  },
+  "ui_saveToApply": {
+    "message": "Modificare în așteptare. Salvează pentru a aplica.",
+    "description": "Warning that a change needs saving to take effect."
+  },
+  "ui_fillUrlGrantSave": {
+    "message": "Introdu URL-ul, acordă accesul și salvează pentru a genera linkul cheii API.",
+    "description": "Text containing a URL or link (options/popup)."
+  },
+  "ui_connecting": {
+    "message": "Se testează…",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_connectionOk": {
+    "message": "Conexiune OK ($COUNT$ cronometru(e) activ(e)).",
+    "description": "Auto-connect flow text (options/popup).",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_connectionFailed": {
+    "message": "Eșuat",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_connectionFallback": {
+    "message": ". Verifică URL-ul, cheia și accesul de mai jos.",
+    "description": "Auto-connect flow text (options/popup)."
+  },
+  "ui_settingsSaved": {
+    "message": "Setări salvate.",
+    "description": "Toast confirming the settings were saved."
+  },
+  "ui_accessGranted": {
+    "message": "Acces acordat.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_accessRemoved": {
+    "message": "Acces eliminat pentru $ORIGIN$.",
+    "description": "Access status; {{origin}} is the Kimai origin.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      }
+    }
+  },
+  "ui_removeAccessFailed": {
+    "message": "Nu s-a putut elimina accesul (rezultat: $RESULT$). Elimină-l în chrome://extensions, la detaliile extensiei.",
+    "description": "Error removing access; {{result}} holds the browser response.",
+    "placeholders": {
+      "result": {
+        "content": "$1",
+        "example": "false"
+      }
+    }
+  },
+  "ui_updatingCache": {
+    "message": "Se reîmprospătează cache-ul…",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_tokenRequired": {
+    "message": "Introdu cheia API pentru reîmprospătare.",
+    "description": "API key management text (options/popup)."
+  },
+  "ui_cacheUpdated": {
+    "message": "Cache actualizat.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheUpdateFailed": {
+    "message": "Nu s-a putut reîmprospăta cache-ul. Verifică URL-ul și autentificarea.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_cacheCleared": {
+    "message": "Cache golit ($COUNT$ element(e)).",
+    "description": "Status message; {{count}} is the cached item count.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ui_cacheAlreadyEmpty": {
+    "message": "Cache-ul era deja gol.",
+    "description": "Cache management text (options/popup)."
+  },
+  "ui_nothingToDisconnect": {
+    "message": "Nimic de deconectat.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_confirmDisconnect": {
+    "message": "Te deconectezi?\n\nAceasta șterge cheia API salvată pe acest dispozitiv.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_disconnected": {
+    "message": "Deconectat.",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_popupOpenKimai": {
+    "message": "Deschide Kimai",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSettings": {
+    "message": "Setări",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupTracker": {
+    "message": "Urmărește cronometrul",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSetupNoBase": {
+    "message": "Setează URL-ul Kimai în setări pentru a folosi popup-ul.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupSetupNoToken": {
+    "message": "Introdu cheia API în setări pentru a folosi popup-ul.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupAuthorize": {
+    "message": "Acordă accesul",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupErrorSettings": {
+    "message": "Deschide setările",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupRetry": {
+    "message": "Reîncearcă",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_activeSection": {
+    "message": "Active acum",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_newTimer": {
+    "message": "Cronometru nou",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshCatalog": {
+    "message": "Reîmprospătează listele",
+    "description": "Label of a refresh control."
+  },
+  "ui_continueToday": {
+    "message": "Continuă de azi",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshToday": {
+    "message": "Reîmprospătează pontajele",
+    "description": "Label of a refresh control."
+  },
+  "ui_recent": {
+    "message": "Recente",
+    "description": "Interface string (options/popup)."
+  },
+  "ui_refreshRecent": {
+    "message": "Reîmprospătează intrările recente",
+    "description": "Label of a refresh control."
+  },
+  "ui_popupConnectionAuth": {
+    "message": "Deschide setările și alege „Testează conexiunea”.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupConnectionStart": {
+    "message": "Nu s-a putut conecta la $ORIGIN$. $WHY$Verifică URL-ul, autentificarea/cheia și accesul, apoi deschide setările și alege „Testează conexiunea”.",
+    "description": "Popup text (options/popup).",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "https://kimai.example"
+      },
+      "why": {
+        "content": "$2",
+        "example": "HTTP 401. "
+      }
+    }
+  },
+  "ui_popupOpenTrackerFailed": {
+    "message": "Nu s-a putut deschide urmărirea cronometrului.",
+    "description": "Popup text (options/popup)."
+  },
+  "ui_popupLoadFailed": {
+    "message": "Nu s-a putut încărca popup-ul: $ERROR$",
+    "description": "Popup text (options/popup).",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Failed to fetch"
+      }
+    }
+  }
+}
