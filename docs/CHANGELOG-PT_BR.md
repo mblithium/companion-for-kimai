@@ -4,6 +4,14 @@ Versão em português. [English version](../CHANGELOG.md).
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [0.26.1] — 2026-11-26
+### Added
+- Tradução da interface para japonês, com detecção automática e opção de
+  idioma nas configurações.
+### Changed
+- Os idiomas do seletor agora são exibidos por seus nomes nativos.
+- A documentação da arquitetura agora está em inglês.
+
 ## [0.26.0] — 2026-11-25
 ### Changed
 - Traduções da interface agora ficam em arquivos de idioma do navegador e são

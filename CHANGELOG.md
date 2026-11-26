@@ -4,6 +4,14 @@ English version. [Leia em português](docs/CHANGELOG-PT_BR.md).
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.26.1] — 2026-11-26
+### Added
+- Japanese interface localization with automatic detection and a language
+  option in settings.
+### Changed
+- Language choices are displayed using their native names.
+- Architecture documentation is now in English.
+
 ## [0.26.0] — 2026-11-25
 ### Changed
 - Interface translations now live in browser locale files and are loaded
