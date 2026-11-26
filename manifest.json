@@ -72,7 +72,8 @@
         "_locales/en/messages.json",
         "_locales/pt_BR/messages.json",
         "_locales/fr/messages.json",
-        "_locales/ro/messages.json"
+        "_locales/ro/messages.json",
+        "_locales/ja/messages.json"
       ],
       "matches": [
         "*://*/*"

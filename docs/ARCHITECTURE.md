@@ -1,117 +1,125 @@
-# Arquitetura
+# Architecture
 
-## Princípios
+## Principles
 
-- **Sem build**: JS vanilla + CSS puro, carregável direto como extensão
-  descompactada. Por isso não usamos ES modules nos content scripts (suporte
-  inconsistente entre Chrome e Firefox): os arquivos de `src/content` são
-  **scripts clássicos carregados em ordem** (ver `manifest.json`) no mesmo
-  isolated world.
-- **Um namespace, IIFEs**: cada módulo é uma IIFE que publica sua API em `KE`
-  (definido em `namespace.js`). Nada de globais implícitos — o que é
-  compartilhado passa por `KE`.
-- **Camadas**: dados (`kimai.js` + `api.js`) não conhecem DOM; UI
-  (`quicktimer.js`, `combo.js`) orquestra.
+- **No build step**: vanilla JavaScript and plain CSS can be loaded directly as an
+  unpacked extension. Content scripts do not use ES modules because support is
+  inconsistent between Chrome and Firefox; files in `src/content` are classic
+  scripts loaded in order (see `manifest.json`) in the same isolated world.
+- **One namespace, IIFEs**: each module is an IIFE that publishes its API through
+  `KE` (defined in `namespace.js`). Shared state and functions go through `KE`;
+  no implicit globals.
+- **Layers**: data modules (`kimai.js` and `api.js`) do not depend on the DOM;
+  UI modules (`quicktimer.js` and `combo.js`) orchestrate the interface.
 
-## Módulos (`src/content/`, ordem de carga)
+## Content modules (`src/content/`, load order)
 
-| Arquivo | Responsabilidade | Publica |
+| File | Responsibility | Publishes |
 |---|---|---|
-| `namespace.js` | Raiz do namespace | `KE` |
-| `i18n.js` | UI language: detection + `_locales/*/messages.json` loader with English fallback | `KE.T`, `KE.uiText` |
-| `utils.js` | Funções puras (datas, DOM, eventos Kimai) | `KE.el`, `KE.norm`, `KE.nowLocal`, `KE.elapsedSince`, `KE.asArray`, `KE.isTimesheetListPage`, `KE.notifyKimaiUpdate`, `KE.sleep` |
-| `api.js` | `fetch` mesma-origem + extração de erro do servidor | `KE.api`, `KE.apiGet/Post/Patch` |
-| `storage.js` | `browser`/`chrome`.storage com fallback | `KE.storageGet/Set` |
-| `combo.js` | Combobox pesquisável reutilizável | `KE.createCombo` |
-| `kimai.js` | Estado local + leitura da API + rótulos | `KE.state`, `KE.projectLabel`, `KE.load*`, `KE.apply*`, `KE.fetchActiveTimesheets`, `KE.ensureTags`, `KE.describeProjectRef/ActivityRef` |
-| `cache.js` | Cache `storage.local` (TTL 24h catálogo / 1h diários) | `KE.CACHE_TTL`, `KE.get*Cached`, `KE.cacheGet/Set/Fresh` |
-| `quicktimer.js` | Barra de timer: UI, start/stop, cascata, montagem, ciclo de vida | (efeito: injeta a seção) |
+| `namespace.js` | Namespace root | `KE` |
+| `i18n.js` | UI language detection and `_locales/*/messages.json` loading, with English fallback | `KE.T`, `KE.uiText` |
+| `utils.js` | Pure helpers for dates, DOM, and Kimai events | `KE.el`, `KE.norm`, `KE.nowLocal`, `KE.elapsedSince`, `KE.asArray`, `KE.isTimesheetListPage`, `KE.notifyKimaiUpdate`, `KE.sleep` |
+| `api.js` | Same-origin `fetch` and server-error extraction | `KE.api`, `KE.apiGet/Post/Patch` |
+| `storage.js` | `browser`/`chrome.storage` compatibility wrapper | `KE.storageGet/Set` |
+| `combo.js` | Reusable searchable combobox | `KE.createCombo` |
+| `kimai.js` | Local state, API access, and labels | `KE.state`, `KE.projectLabel`, `KE.load*`, `KE.apply*`, `KE.fetchActiveTimesheets`, `KE.ensureTags`, `KE.describeProjectRef/ActivityRef` |
+| `cache.js` | `storage.local` cache (24-hour catalog / 1-hour timesheet TTL) | `KE.CACHE_TTL`, `KE.get*Cached`, `KE.cacheGet/Set/Fresh` |
+| `quicktimer.js` | Timer bar UI, start/stop, cascading fields, mounting, and lifecycle | Injects the timer section |
 
-Estilos: `quicktimer.css`, `combo.css` (sem escopo de página — usado no
-content e no popup, sempre com prefixo `ke-`), `src/popup/popup.css`.
+Styles: `quicktimer.css`, `combo.css` (unscoped and shared by content pages and
+the popup, with the `ke-` prefix), and `src/popup/popup.css`.
 
-## Popup e opções (`src/popup/`, `src/options/`, `src/common/`)
+## Popup and options (`src/popup/`, `src/options/`, `src/common/`)
 
-- Reutilizam os módulos de conteúdo (`namespace` → `kimai`, `combo`,
-  `theme`) + `common/permissions.js` (compat `browser`/`chrome`, URL base,
-  optional host permissions) e `common/format.js` (funções puras: duração,
-  hoje, dedupe).
-- `quicktimer.js` NÃO é carregado no popup (ele injeta UI na página).
-- Origem do Kimai (`keSettings.kimaiBaseUrl`, idioma `keLocale`, usuário
-  `keUsername`): detectada pelo content script; idioma/usuário sincronizados
-  via `GET /api/users/me` nas opções. Feedback por toast de 5s.
-- Sem acesso concedido, o popup mostra como autorizar (só aquele host).
-  Chamadas usam base absoluta + `Authorization: Bearer` + `credentials: omit`
-  (chave guardada em `storage.local`, fora do sync; sem modo sessão).
-- **Cache**: catálogos e diários via `cache.js` (`storage.local`, nunca o
-  sync por causa da cota). Popup e barra pintam do cache na hora; a barra
-  revalida em fundo e atualiza combos só se mudou; diários e recentes têm
-  refresh manual + auto a cada 1h no popup.
-- **Popup**: campos do Novo timer com labels (`KE.T`) e cascata
-  Cliente→Projeto→Atividade + Tags multi; após iniciar, `reloadKimaiTabs()`
-  recarrega as abas da base (`tabs.reload`, sem permissão nova); Recentes via
-  `format.recentOthers()` (fora de hoje, com data) e `cache.getRecentCached()`.
-- **Temas**: `common/themes/*.css` contém uma paleta por arquivo;
-  `common/theme.css` integra as variáveis com o Tabler/Kimai, e `common/theme.js`
-  guarda o catálogo e a aplicação. Popup, opções e página do Kimai usam o tema;
-  GNOME acompanha a preferência de modo claro/escuro do sistema.
-- **Atalhos**: `utils` normaliza/compara (`describeKeyEvent`,
-  `shortcutMatches`); `quicktimer` ouve `keydown` (ignora campos e repetição),
-  lê `keSettings.shortcuts` (P inicia o timer padrão via `startDefaultTimer`,
-  S para via `stopAllTimers`) e reage a mudanças via `onStorageChanged`.
+- Reuse content modules (`namespace` through `kimai`, `combo`, and `theme`) plus
+  `common/permissions.js` (browser compatibility, base URL, optional host
+  permissions) and `common/format.js` (pure duration, date, and deduplication
+  helpers).
+- `quicktimer.js` is **not** loaded in the popup; it injects UI into Kimai.
+- Kimai base URL (`keSettings.kimaiBaseUrl`), locale (`keLocale`), and username
+  (`keUsername`) are detected by the content script. The options page syncs
+  locale and username through `GET /api/users/me`. Feedback uses a 5-second
+  toast.
+- Without host access, the popup offers to grant access for that host only.
+  Requests use the absolute base URL, `Authorization: Bearer`, and
+  `credentials: omit`. The API key is stored in `storage.local`, outside sync
+  storage; there is no session-only mode.
+- **Cache**: catalogs and timesheets use `cache.js` (`storage.local`, not sync,
+  to avoid quota limits). The popup and timer bar render cached data
+  immediately; the bar revalidates in the background and updates combos only
+  when the data changes. The popup refreshes timesheets manually and hourly.
+- **Popup**: the New timer form uses `KE.T` labels and a
+  Customer → Project → Activity cascade with multi-select Tags. After a timer
+  starts, `reloadKimaiTabs()` reloads tabs for the configured base
+  (`tabs.reload`, no additional permission). Recent entries use
+  `format.recentOthers()` (excluding today and including dates) and
+  `cache.getRecentCached()`.
+- **Themes**: each `common/themes/*.css` file defines a palette.
+  `common/theme.css` maps variables to Tabler/Kimai, while `common/theme.js`
+  manages theme selection and application. The popup, options page, and Kimai
+  page share the theme; GNOME follows the system light/dark preference.
+- **Shortcuts**: `utils` normalizes and compares (`describeKeyEvent`,
+  `shortcutMatches`). `quicktimer` listens for `keydown` (ignoring editable
+  fields and repeats), reads `keSettings.shortcuts` (P starts the default timer
+  via `startDefaultTimer`; S calls `stopAllTimers`), and reacts to
+  `onStorageChanged`.
 
-## Fluxos principais
+## Main flows
 
-- **Montagem**: `init()` → `findAnchor()` (tabela `.datatable_timesheet`) →
-  `mount()` + `loadAll()` (clientes → projetos → atividades, restaurando
-  `storage`) + `loadActive()`. Se a tabela ainda não existe, aguarda via
-  polling; fallback injeta no `.page-body`.
-- **Sobrevivência a reloads**: o Kimai recarrega a listagem via AJAX ao
-  iniciar/parar (eventos `kimai.timesheetUpdate` etc.), removendo a seção.
-  `startPersistentObserver()` remonta (debounce 400ms) e recarrega os dados.
-- **Start**: `flush(true)` nos combos (confirma texto pendente sem cascata) →
-  `ensureTags()` (cria faltantes, envia como string `a,b`) →
-  `POST /api/timesheets` (só campos preenchidos) → salva seleção →
-  `notifyKimaiUpdate()` → `loadActive()`.
-- **Edit inline**: `openEdit()` troca a linha por mini-form (combos próprios +
-  `ensureTags`) → `PATCH /api/timesheets/{id}` → `loadActive()`; `Esc`/`Cancelar`
-  voltam via `renderActive()`.
-- **Agrupar**: `format.groupByTask()` (por projeto+atividade) → linhas de grupo
-  com expandir + continuar pelo mais recente; preferência `groupTasks` no sync.
-- **Agrupar no site** (`content/sitegroup.js`, puro e testável): botão discreto
-  acima da tabela; agrupa só iguais **adjacentes** estilo Clockify
-  (cliente+projeto+atividade+descrição), avulsos sem cabeçalho; linha de grupo
-  espelha as colunas (checkbox do grupo, período, início/fim, duração somada)
-  no padrão Kimai; reaplica após cada redesenho via observer com debounce +
-  assinatura (sem loop); restaura a ordem ao desligar; totais dos timers
-  rodando atualizados a cada 1 min.
+- **Mount**: `init()` → `findAnchor()` (the `.datatable_timesheet` table) →
+  `mount()` + `loadAll()` (customers → projects → activities, restoring
+  `storage`) + `loadActive()`. If the table is not ready, the script polls;
+  the fallback mounts in `.page-body`.
+- **Survive page updates**: Kimai redraws the timesheet via AJAX after start or
+  stop, removing the injected section. `startPersistentObserver()` remounts it
+  (400 ms debounce) and reloads data.
+- **Start**: `flush(true)` commits pending combo text without triggering a
+  cascade → `ensureTags()` creates missing tags and sends them as a comma-
+  separated string → `POST /api/timesheets` with only populated fields → save
+  selection → `notifyKimaiUpdate()` → `loadActive()`.
+- **Inline edit**: `openEdit()` replaces a row with a small form (its own combos
+  and `ensureTags`) → `PATCH /api/timesheets/{id}` → `loadActive()`.
+  `Escape`/Cancel return to `renderActive()`.
+- **Group in popup**: `format.groupByTask()` groups by project and activity;
+  groups can expand and continue the most recent entry. The `groupTasks`
+  preference is stored in sync storage.
+- **Group on the Kimai page** (`content/sitegroup.js`, pure and testable): a
+  discreet button above the table groups only **adjacent** identical entries,
+  like Clockify (customer, project, activity, description). Ungrouped entries
+  remain standalone. Group rows mirror the table columns (group checkbox,
+  period, start/end, summed duration) in Kimai's style. A debounced observer
+  reapplies grouping after redraws without looping; disabling restores order.
+  Running-timer totals update every minute.
 
-## Sem worker de background
+## No background worker
 
-Não há `background.service_worker` nem event page: todo o comportamento mora
-no popup, na página de opções, na janela do tracker e nos content scripts.
-As listas são recarregadas sob demanda (com cache local de 24h/1h); o ícone
-da extensão é estático.
+There is no `background.service_worker` or event page. Behavior runs in the
+popup, options page, tracker window, and content scripts. Lists load on demand
+with a local cache (24-hour catalog / 1-hour timesheet TTL); the extension icon
+is static.
 
-## Testes
+## Tests
 
-`tests/harness.js` executa os **arquivos reais** (ordem lida do manifest)
-num DOM stub + API stub, cobrindo: restore, busca com acento, cascata,
-teclado, POST, validação, erro 400 com mensagem do servidor, remontagem após
-wipe. Rode com `npm test`; `npm run check` valida sintaxe de todos os JS e
-roda `tests/check-pages.js` (toda `KE.*` usada por popup/opções precisa estar
-definida nos scripts que a página carrega).
+`tests/harness.js` executes the **real files** in manifest order using a stub
+DOM and API. It covers restore, accent-insensitive search, cascading fields,
+keyboard input, POST, validation, HTTP 400 server messages, and remounting after
+a wipe. Run `npm test`. `npm run check` validates JavaScript syntax and runs
+`tests/check-pages.js`, which checks that every `KE.*` reference used by popup
+and options pages is defined by their loaded scripts.
 
-## Build de produção (`scripts/build-zip.js`, `dist/`)
+## Production build (`scripts/build-zip.js`, `dist/`)
 
-- Fonte da verdade: `manifest/chrome.json` + `manifest/firefox.json` (nunca o
-  `manifest.json` da raiz, que é só a variante ativa no dev).
-- Cada zip contém `manifest.json` (da variante) + `icons/`, `src/`, `LICENSE`.
-- Valida antes: versões sincronizadas (manifests + `package.json`), manifest
-  parseável e todos os arquivos referenciados (js/css/html/icons)
-  presentes; recusa vazar `tests/`, `docs/`, `scripts/`, `manifest/`.
-- Não edite versão/descrição/homepage nos manifests à mão: `package.json` é a
-  fonte da verdade; `npm run manifest:sync` propaga para as variantes e para o
-  `manifest.json` da raiz (com `--set-version X.Y.Z` para bump direto).
-- `npm run build` = `check` + `test` + zips; `build:chrome`/`build:firefox`
-  geram só a variante (sem gates).
+- Source of truth: `manifest/chrome.json` and `manifest/firefox.json` (not the
+  root `manifest.json`, which is only the active development variant).
+- Each ZIP contains the variant's `manifest.json`, `icons/`, `src/`, and
+  `LICENSE`.
+- Before packaging, the builder checks synchronized versions (manifests and
+  `package.json`), valid manifest syntax, and all referenced JS/CSS/HTML/icon
+  files. It refuses to include `tests/`, `docs/`, `scripts/`, or `manifest/`.
+- Do not edit manifest version, description, or homepage fields by hand.
+  `package.json` is the source of truth; `npm run manifest:sync` propagates
+  these fields to both variants and the root `manifest.json`. Use
+  `--set-version X.Y.Z` to bump the version directly.
+- `npm run build` runs checks, tests, and builds both ZIPs. `build:chrome` and
+  `build:firefox` build only the selected variant (without the full check/test
+  gates).

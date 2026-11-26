@@ -826,7 +826,8 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   check('configure-template key in all languages', msg('pt', 'ui_configureTemplate') === 'Configurar template' &&
     msg('en', 'ui_configureTemplate') === 'Configure template' &&
     msg('fr', 'ui_configureTemplate') === 'Configurer le modèle' &&
-    msg('ro', 'ui_configureTemplate') === 'Configurează șablonul');
+    msg('ro', 'ui_configureTemplate') === 'Configurează șablonul' &&
+    msg('ja', 'ui_configureTemplate') === 'テンプレートを設定');
   const savedGetAttr = document.documentElement.getAttribute;
   const savedNavLang = navigator.language;
   document.documentElement.getAttribute = () => 'es';
@@ -838,6 +839,9 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   document.documentElement.getAttribute = () => 'ro-RO';
   check('detectLang detects Romanian', KE.detectLang() === 'ro');
   check('setLocale selects Romanian', (await KE.setLocale('ro')) === 'ro' && KE.uiText('start') === 'Pornește');
+  document.documentElement.getAttribute = () => 'ja-JP';
+  check('detectLang detects Japanese', KE.detectLang() === 'ja');
+  check('setLocale selects Japanese', (await KE.setLocale('ja-JP')) === 'ja' && KE.uiText('start') === '開始');
   document.documentElement.getAttribute = () => '';
   navigator.language = 'es';
   check('detectLang without lang falls back to en', KE.detectLang() === 'en');
@@ -854,7 +858,7 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
   await KE.setLocale('pt');
   check('locale restored to Portuguese', KE.uiText('start') === 'Iniciar');
   const enKeys = Object.keys(tableFor('en'));
-  check('all languages share the English key set', ['pt_BR', 'fr', 'ro'].every((dir) =>
+  check('all languages share the English key set', ['pt_BR', 'fr', 'ro', 'ja'].every((dir) =>
     enKeys.every((k) => tableFor(dir)[k] && tableFor(dir)[k].message != null)), enKeys.length);
   check('draft options section has anchor',
     fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8').includes('id="ke-opt-draft-card"'));
@@ -1677,14 +1681,17 @@ function pageToast() { return findAll(document.body, 'ke-toast')[0]; }
     comboSrc.includes("KE.uiText('ui.expandOptions')"));
   const i18nSrc = fs.readFileSync(path.join(ROOT, 'src/content/i18n.js'), 'utf8');
   check('new i18n keys in all languages', ['ui_removeItem', 'ui_expandOptions', 'ui_newTagOption', 'ui_saveToApply', 'ui_useSuggestion', 'ui_startDefaultTask', 'ui_stopTask', 'ui_popupOpenHint', 'ui_moreShortcuts', 'ui_statsToday', 'ui_statsWeek'].every((k) =>
-    ['en', 'pt_BR', 'fr', 'ro'].every((dir) => tableFor(dir)[k] && tableFor(dir)[k].message)));
+    ['en', 'pt_BR', 'fr', 'ro', 'ja'].every((dir) => tableFor(dir)[k] && tableFor(dir)[k].message)));
   check('plugin section keys in all languages', ['ui_kimaiPage', 'ui_plugin', 'ui_pluginHint', 'ui_hideRecents', 'ui_hideContinueToday'].every((k) =>
-    ['en', 'pt_BR', 'fr', 'ro'].every((dir) => tableFor(dir)[k] && tableFor(dir)[k].message)));
+    ['en', 'pt_BR', 'fr', 'ro', 'ja'].every((dir) => tableFor(dir)[k] && tableFor(dir)[k].message)));
   const optHtml = fs.readFileSync(path.join(ROOT, 'src/options/options.html'), 'utf8');
   check('translatable options title and languages', optHtml.includes('<title data-ke-i18n="ui.optionsTitle">') &&
-    optHtml.includes('data-ke-i18n="ui.languagePortuguese"') && optHtml.includes('data-ke-i18n="ui.languageEnglish"') &&
-    optHtml.includes('data-ke-i18n="ui.languageFrench"') && optHtml.includes('data-ke-i18n="ui.languageRomanian"') &&
-    optHtml.includes('<option value="fr"') && optHtml.includes('<option value="ro"'));
+    optHtml.includes('<option value="pt-BR" lang="pt-BR">Português (Brasil)</option>') &&
+    optHtml.includes('<option value="en" lang="en">English</option>') &&
+    optHtml.includes('<option value="fr" lang="fr">Français</option>') &&
+    optHtml.includes('<option value="ro" lang="ro">Română</option>') &&
+    optHtml.includes('<option value="ja" lang="ja">日本語</option>') &&
+    !/option[^>]*data-ke-i18n="ui\.language(?:Portuguese|English|French|Romanian)"/.test(optHtml));
   check('popup icon buttons have translatable aria-label',
     ['ke-pop-open', 'ke-pop-settings', 'ke-pop-refresh-catalog', 'ke-pop-refresh-today', 'ke-pop-refresh-recent']
       .every((id) => new RegExp('id="' + id + '"[^>]*data-ke-i18n-aria-label').test(popHtmlForIcons)));

@@ -33,6 +33,7 @@
     if (h.startsWith('pt')) return 'pt';
     if (h.startsWith('fr')) return 'fr';
     if (h.startsWith('ro')) return 'ro';
+    if (h.startsWith('ja')) return 'ja';
     return 'en';
   };
 
@@ -89,7 +90,8 @@
 
   KE.setLocale = async function (locale) {
     const h = String(locale || '').toLowerCase();
-    const language = h.startsWith('pt') ? 'pt' : h.startsWith('fr') ? 'fr' : h.startsWith('ro') ? 'ro' : 'en';
+    const language = h.startsWith('pt') ? 'pt' : h.startsWith('fr') ? 'fr' :
+      h.startsWith('ro') ? 'ro' : h.startsWith('ja') ? 'ja' : 'en';
     KE.uiLocale = language === 'pt' ? 'pt-BR' : language;
     KE.T = await KE.loadStrings(language);
     try {
